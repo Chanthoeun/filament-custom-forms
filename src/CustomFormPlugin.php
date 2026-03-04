@@ -115,7 +115,7 @@ class CustomFormPlugin implements Plugin
 
     public function getNavigationGroup(): string
     {
-        return $this->navigationGroup ?? config('filament-custom-forms.navigation.group', __('custom_form.builder_group'));
+        return $this->navigationGroup ?? config('filament-custom-forms.navigation.group', __('filament-custom-forms::custom_form.builder_group'));
     }
 
     public function navigationOpsGroup(string $group): static
@@ -126,7 +126,7 @@ class CustomFormPlugin implements Plugin
 
     public function getNavigationOpsGroup(): string
     {
-        return $this->navigationOpsGroup ?? config('filament-custom-forms.navigation.ops_group', __('custom_form.operations_group'));
+        return $this->navigationOpsGroup ?? config('filament-custom-forms.navigation.ops_group', __('filament-custom-forms::custom_form.operations_group'));
     }
 
     public function navigationFormIcon(string $icon): static

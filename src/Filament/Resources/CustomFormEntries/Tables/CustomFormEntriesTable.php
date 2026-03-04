@@ -2,17 +2,17 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Tables;
 
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\Action; // Use generic Action
+use Filament\Actions\Action; // Use generic Action
 use Illuminate\Database\Eloquent\Builder;
 
 class CustomFormEntriesTable
@@ -118,7 +118,7 @@ class CustomFormEntriesTable
 
         if (count($columns) > 0) {
             $columns[] = TextColumn::make('created_at')
-                ->label(__('general.created_at'))
+                ->label(__('filament-custom-forms::general.created_at'))
                 ->dateTime()
                 ->sortable();
         }
@@ -187,7 +187,7 @@ class CustomFormEntriesTable
         }
 
         $filters[] = SelectFilter::make('custom_form_id')
-            ->label(__('custom_form.single'))
+            ->label(__('filament-custom-forms::custom_form.single'))
             ->options(\Chanthoeun\FilamentCustomForms\Models\CustomForm::pluck('name', 'id'))
             ->hidden();
 

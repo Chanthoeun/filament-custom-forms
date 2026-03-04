@@ -33,7 +33,7 @@ class ListCustomFormEntries extends ListRecords
         if ($this->activeFormId) {
             $customForm = \App\Models\CustomForm::find($this->activeFormId);
             if ($customForm) {
-                $name = __("custom_form.names.{$customForm->slug}");
+                $name = __("filament-custom-forms::custom_form.names.{$customForm->slug}");
                 if ($name === "custom_form.names.{$customForm->slug}") {
                     $name = $customForm->name;
                 }
@@ -41,7 +41,7 @@ class ListCustomFormEntries extends ListRecords
             }
         }
 
-        return __('custom_form_entry.plural');
+        return __('filament-custom-forms::custom_form_entry.plural');
     }
 
     public function getBreadcrumbs(): array
@@ -52,31 +52,31 @@ class ListCustomFormEntries extends ListRecords
     protected function getHeaderActions(): array
     {
         $customFormId = request()->input('tableFilters.custom_form_id.value');
-        $createLabel = __('custom_form_entry.action.create', ['name' => __('custom_form_entry.single')]);
+        $createLabel = __('filament-custom-forms::custom_form_entry.action.create', ['name' => __('filament-custom-forms::custom_form_entry.single')]);
 
         if ($customFormId) {
             $customForm = \App\Models\CustomForm::find($customFormId);
             if ($customForm) {
-                $name = __("custom_form.names.{$customForm->slug}");
+                $name = __("filament-custom-forms::custom_form.names.{$customForm->slug}");
                 if ($name === "custom_form.names.{$customForm->slug}") {
                     $name = $customForm->name;
                 }
-                $createLabel = __('custom_form_entry.action.create', ['name' => $name]);
+                $createLabel = __('filament-custom-forms::custom_form_entry.action.create', ['name' => $name]);
             }
         }
 
         return [
 
             Actions\Action::make('export_data')
-                ->label(__('custom_form_entry.action.export_data'))
+                ->label(__('filament-custom-forms::custom_form_entry.action.export_data'))
                 ->icon('heroicon-o-arrow-up-tray')
                 ->form([
                     \Filament\Forms\Components\Radio::make('format')
-                        ->label(__('custom_form_entry.field.export_format'))
+                        ->label(__('filament-custom-forms::custom_form_entry.field.export_format'))
                         ->options([
-                            'excel' => __('custom_form_entry.option.excel'),
-                            'json' => __('custom_form_entry.option.json'),
-                            'sql' => __('custom_form_entry.option.sql'),
+                            'excel' => __('filament-custom-forms::custom_form_entry.option.excel'),
+                            'json' => __('filament-custom-forms::custom_form_entry.option.json'),
+                            'sql' => __('filament-custom-forms::custom_form_entry.option.sql'),
                         ])
                         ->default('excel')
                         ->inline()

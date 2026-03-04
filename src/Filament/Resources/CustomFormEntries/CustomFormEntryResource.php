@@ -95,7 +95,7 @@ class CustomFormEntryResource extends Resource
                 static::$formCache[$form->id] = $form;
 
                 $items[] = NavigationItem::make($form->name)
-                    ->group(CustomFormPlugin::get()->getNavigationOpsGroup())
+                    ->group(CustomFormPlugin::get()->getNavigationEntryGroup())
                     ->icon(CustomFormPlugin::get()->getNavigationEntryIcon())
                     ->isActiveWhen(fn() => $activeFormId == $form->id)
                     ->url(static::getUrl('index', [

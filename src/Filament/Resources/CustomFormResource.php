@@ -14,19 +14,10 @@ use BackedEnum;
 
 class CustomFormResource extends Resource
 {
-    public static function shouldRegisterNavigation(): bool
+    public static function getModel(): string
     {
-        return tenant()?->checkFeature('custom_form') ?? false;
+        return config('filament-custom-forms.models.form', CustomForm::class);
     }
-
-    public static function canAccess(): bool
-    {
-        return tenant()?->checkFeature('custom_form') ?? false;
-    }
-
-    protected static ?string $model = CustomForm::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function getModelLabel(): string
     {
@@ -38,9 +29,14 @@ class CustomFormResource extends Resource
         return __('custom_form.plural');
     }
 
+    public static function getNavigationIcon(): string|BackedEnum|null
+    {
+        return config('filament-custom-forms.navigation.icon', Heroicon::OutlinedRectangleStack);
+    }
+
     public static function getNavigationGroup(): ?string
     {
-        return __('custom_form.builder_group');
+        return config('filament-custom-forms.navigation.group', __('custom_form.builder_group'));
     }
 
     public static function form(Schema $schema): Schema

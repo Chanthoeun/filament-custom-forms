@@ -16,16 +16,8 @@ return new class extends Migration {
                 $table->string('name');
                 $table->string('slug')->unique();
                 $table->json('schema')->nullable(); // The component definition
-                $table->json('accounting_config')->nullable();
                 $table->boolean('is_active')->default(true);
                 $table->json('allowed_roles')->nullable();
-
-                // Workflow columns
-                $table->boolean('enable_workflow')->default(false);
-                $table->json('reviewer_roles')->nullable();
-                $table->json('approver_roles')->nullable();
-                $table->json('reviewer_users')->nullable(); // Array of User IDs
-                $table->json('approver_users')->nullable(); // Array of User IDs
 
                 $table->timestamps();
                 $table->softDeletes();

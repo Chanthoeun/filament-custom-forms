@@ -17,11 +17,21 @@
     "homepage": "https://github.com/dcx/filament-custom-forms",
     "require": {
         "php": "^8.2",
-        "filament/filament": "^3.0|^4.0|^5.0"
+        "filament/filament": "^4.0|^5.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0",
+        "phpunit/phpunit": "^11.0"
     },
     "autoload": {
         "psr-4": {
             "Dcx\\FilamentCustomForms\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dcx\\FilamentCustomForms\\Tests\\": "tests/",
+            "Dcx\\FilamentCustomForms\\Database\\Factories\\": "database/factories/"
         }
     },
     "extra": {
@@ -29,6 +39,11 @@
             "providers": [
                 "Dcx\\FilamentCustomForms\\CustomFormServiceProvider"
             ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     }
 }

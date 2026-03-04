@@ -2,7 +2,6 @@
 
 namespace Dcx\FilamentCustomForms\Filament\Resources\Tables;
 
-use App\Filament\Actions\PrintAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -50,7 +49,7 @@ class CustomFormEntriesTable
         $columns = [];
 
         // Fetch fields metadata from parent CustomFormField table first
-        $fieldsMetadata = \App\Models\CustomFormField::query()
+        $fieldsMetadata = \Dcx\FilamentCustomForms\Models\CustomFormField::query()
             ->when($formId, fn($query) => $query->where('custom_form_id', $formId))
             ->orderBy('sort')
             ->get()
@@ -59,7 +58,7 @@ class CustomFormEntriesTable
         $definedKeys = $fieldsMetadata->keys();
 
         // Fetch keys from existing entries to catch any legacy/extra data (Limited to 20 for performance)
-        $dataKeys = \App\Models\CustomFormEntry::query()
+        $dataKeys = \Dcx\FilamentCustomForms\Models\CustomFormEntry::query()
             ->when($formId, fn($query) => $query->where('custom_form_id', $formId))
             ->latest()
             ->limit(20)
@@ -110,41 +109,12 @@ class CustomFormEntriesTable
                 $column->time();
             }
 
-            if (($fieldTypes[$key] ?? null) === 'season_select') {
-                $column->formatStateUsing(fn($state, $record) => $record->season?->name ?? $state);
-            }
-            if (($fieldTypes[$key] ?? null) === 'farmer_select') {
-                $column->formatStateUsing(function ($state, $record) {
-                    $farmer = $record->farmer;
-                    if (!$farmer)
-                        return $state;
-
-                    $label = $farmer->code . ' - ' . $farmer->name;
-                    if ($farmer->spouse) {
-                        $label .= ' - ' . $farmer->spouse;
-                    }
-                    return $label;
-                });
-            }
-            if (($fieldTypes[$key] ?? null) === 'land_select') {
-                $column->formatStateUsing(function ($state, $record) {
-                    $land = $record->land;
-                    if (!$land)
-                        return $state;
-                    return $land->parcel_code . ' - ' . ($land->block->name ?? '') . ' - ' . $land->area_size;
-                });
-            }
-            if (($fieldTypes[$key] ?? null) === 'block_select') {
-                $column->formatStateUsing(fn($state, $record) => $record->block?->name ?? $state);
+            if (($fieldTypes[$key] ?? null) === 'time_picker') {
+                $column->time();
             }
 
             $columns[] = $column;
         }
-
-        $columns[] = TextColumn::make('status')
-            ->label(__('custom_form_entry.status'))
-            ->badge()
-            ->sortable();
 
         if (count($columns) > 0) {
             $columns[] = TextColumn::make('created_at')
@@ -161,7 +131,7 @@ class CustomFormEntriesTable
         $filters = [];
 
         if ($formId) {
-            $formSchema = \App\Models\CustomForm::find($formId);
+            $formSchema = \Dcx\FilamentCustomForms\Models\CustomForm::find($formId);
             if ($formSchema) {
                 $schemaFields = $formSchema->fields()->orderBy('sort')->get();
 
@@ -216,13 +186,9 @@ class CustomFormEntriesTable
             }
         }
 
-        $filters[] = SelectFilter::make('status')
-            ->label(__('custom_form_entry.status'))
-            ->options(\App\Enums\CustomFormEntryStatus::class);
-
         $filters[] = SelectFilter::make('custom_form_id')
-            ->label('Form')
-            ->options(\App\Models\CustomForm::pluck('name', 'id'))
+            ->label(__('custom_form.single'))
+            ->options(\Dcx\FilamentCustomForms\Models\CustomForm::pluck('name', 'id'))
             ->hidden();
 
         return $filters;
@@ -231,103 +197,14 @@ class CustomFormEntriesTable
     protected static function getRecordActions(): array
     {
         return [
-            Action::make('review')
-                ->label(__('custom_form_entry.action.review'))
-                ->icon('heroicon-o-check-circle')
-                ->color('warning')
-                ->visible(function ($record) {
-                    $form = $record->customForm;
-                    if (!$form || !$form->enable_workflow)
-                        return false;
-                    if ($record->status !== \App\Enums\CustomFormEntryStatus::Submitted)
-                        return false;
-
-                    $user = auth()->user();
-                    if (!$user)
-                        return false;
-
-                    if ($form->reviewer_users && in_array($user->id, $form->reviewer_users))
-                        return true;
-                    if ($form->reviewer_roles && $user->hasAnyRole($form->reviewer_roles))
-                        return true;
-
-                    return false;
-                })
-                ->action(function ($record) {
-                    $record->update(['status' => \App\Enums\CustomFormEntryStatus::Reviewed]);
-                    \Filament\Notifications\Notification::make()
-                        ->title(__('custom_form_entry.action.reviewed'))
-                        ->success()
-                        ->send();
-                }),
-
-            Action::make('approve')
-                ->label(__('custom_form_entry.action.approve'))
-                ->icon('heroicon-o-check-badge')
-                ->color('success')
-                ->visible(function ($record) {
-                    $form = $record->customForm;
-                    if (!$form || !$form->enable_workflow)
-                        return false;
-                    if ($record->status !== \App\Enums\CustomFormEntryStatus::Reviewed)
-                        return false;
-
-                    $user = auth()->user();
-                    if (!$user)
-                        return false;
-
-                    if ($form->approver_users && in_array($user->id, $form->approver_users))
-                        return true;
-                    if ($form->approver_roles && $user->hasAnyRole($form->approver_roles))
-                        return true;
-
-                    return false;
-                })
-                ->action(function ($record) {
-                    $record->update(['status' => \App\Enums\CustomFormEntryStatus::Approved]);
-                    \Filament\Notifications\Notification::make()
-                        ->title(__('custom_form_entry.action.approved'))
-                        ->success()
-                        ->send();
-                }),
-
             EditAction::make(),
             DeleteAction::make(),
-            PrintAction::make(),
         ];
     }
 
     protected static function applyQueryConstraints(Builder $query, ?string $formId): Builder
     {
-        $user = auth()->user();
-        if (!$user)
-            return $query;
-
-        $query->with(['creator', 'customForm', 'season', 'farmer', 'land.block', 'block'])
+        return $query->with(['creator', 'customForm'])
             ->when($formId, fn($q, $id) => $q->where('custom_form_id', $id));
-
-        if ($user->hasRole('super_admin') || $user->hasRole('Super Admin')) {
-            return $query;
-        }
-
-        $query->where(function ($q) use ($user) {
-            $q->where('created_by', $user->id);
-
-            $q->orWhereHas('customForm', function ($formQ) use ($user) {
-                $formQ->where(function ($accessQ) use ($user) {
-                    $accessQ->whereJsonContains('reviewer_users', (string) $user->id)
-                        ->orWhereJsonContains('approver_users', (string) $user->id)
-                        ->orWhere(function ($roleQ) use ($user) {
-                            foreach ($user->getRoleNames() as $roleName) {
-                                $roleQ->orWhereJsonContains('reviewer_roles', $roleName)
-                                    ->orWhereJsonContains('approver_roles', $roleName)
-                                    ->orWhereJsonContains('allowed_roles', $roleName);
-                            }
-                        });
-                });
-            });
-        });
-
-        return $query;
     }
 }

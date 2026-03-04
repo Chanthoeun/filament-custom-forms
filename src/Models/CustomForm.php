@@ -17,26 +17,14 @@ class CustomForm extends Model
         'name',
         'slug',
         'schema',
-        'accounting_config',
         'is_active',
         'allowed_roles',
-        'enable_workflow',
-        'reviewer_roles',
-        'approver_roles',
-        'reviewer_users',
-        'approver_users',
     ];
 
     protected $casts = [
         'schema' => 'array',
-        'accounting_config' => 'array',
         'is_active' => 'boolean',
         'allowed_roles' => 'array',
-        'enable_workflow' => 'boolean',
-        'reviewer_roles' => 'array',
-        'approver_roles' => 'array',
-        'reviewer_users' => 'array',
-        'approver_users' => 'array',
     ];
 
 

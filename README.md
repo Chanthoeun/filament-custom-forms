@@ -1,46 +1,44 @@
 # Filament Custom Forms
 
-A powerful FilamentPHP plugin to manage and submit dynamic custom forms with approval workflows.
+A powerful and simplified FilamentPHP plugin to manage and submit dynamic custom forms. Refactored for speed and ease of use in standalone environments.
 
 ## Features
 
 - Dynamic form builder with custom fields.
-- Submission management with approval workflow (Reviewer/Approver).
-- Multi-tenancy support (works with standard Laravel/Filament setups).
-- Clean and modern UI for both form building and data entry.
+- Submission management with a clean interface.
+- Support for Filament v4 and v5.
+- Easy integration as a standalone package.
 
 ## Installation
 
 ### 1. Requirements
 
 - PHP 8.2+
-- Filament 3.x, 4.x, or 5.x
+- Filament v4.0 or v5.0
 
-### 2. Standard Installation (via Packagist)
+### 2. Standard Installation (via GitHub)
 
-Once the package is published on Packagist, you can install it via composer:
-
-```bash
-composer require dcx/filament-custom-forms
-```
-
-### 3. Local Installation (for development)
-
-If you have the package locally, add the local repository to your project's `composer.json`:
+Add the repository to your project's `composer.json`:
 
 ```json
 "repositories": [
     {
-        "type": "path",
-        "url": "../packages/filament-custom-forms"
+        "type": "vcs",
+        "url": "https://github.com/Chanthoeun/filament-custom-forms.git"
     }
 ],
 "require": {
-    "dcx/filament-custom-forms": "*"
+    "dcx/filament-custom-forms": "^1.0"
 }
 ```
 
-### 4. Register the Plugin
+Then run:
+
+```bash
+composer update
+```
+
+### 3. Register the Plugin
 
 Add the plugin to your Filament Panel provider:
 
@@ -60,12 +58,41 @@ public function panel(Panel $panel): Panel
 php artisan migrate
 ```
 
+### 6. Configuration
+
+You can customize models, uploads, and navigation by publishing the config file:
+
+```bash
+php artisan vendor:publish --tag=filament-custom-forms-config
+```
+
+The config allows you to override:
+- `models.form`: Custom form model.
+- `models.entry`: Custom form entry model.
+- `models.user`: The user model used for `created_by`.
+- `uploads`: Storage disk and directory.
+- `navigation`: Icons and groups.
+
+### 7. Publishing Resources
+
+You can publish the translations, views, and migrations:
+
+```bash
+# Publish Translations
+php artisan vendor:publish --tag=filament-custom-forms-translations
+
+# Publish Views
+php artisan vendor:publish --tag=filament-custom-forms-views
+
+# Publish Migrations
+php artisan vendor:publish --tag=filament-custom-forms-migrations
+```
+
 ## Usage
 
-1.  Navigate to the **Custom Forms** resource in your Filament dashboard.
-2.  Create a new form and define your fields (Text, Select, etc.).
-3.  Users can then submit entries via the **Custom Form Entries** resource.
-4.  If enabled, submissions will follow your configured approval workflow.
+1.  **Form Creation**: Navigate to the **Custom Forms** resource to create dynamic forms using the builder.
+2.  **Data Collection**: Users can submit entries through the generated forms.
+3.  **Entry Management**: View and export entries in the **Custom Form Entries** resource.
 
 ## License
 

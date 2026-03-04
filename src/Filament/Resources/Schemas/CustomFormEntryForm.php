@@ -30,7 +30,7 @@ class CustomFormEntryForm
         return $schema
             ->components([
                 Select::make('custom_form_id')
-                    ->label('Form')
+                    ->label(__('custom_form.single'))
                     ->options(CustomForm::where('is_active', true)->whereNotNull('name')->pluck('name', 'id'))
                     ->required()
                     ->default($preselectedFormId)
@@ -227,52 +227,13 @@ class CustomFormEntryForm
                     case 'image':
                         $component = FileUpload::make("data.{$name}")
                             ->image() // Enforce image types
-                            ->disk('public')
-                            ->directory('custom-form-uploads')
-                            ->visibility('public');
+                            ->disk(config('filament-custom-forms.uploads.disk', 'public'))
+                            ->directory(config('filament-custom-forms.uploads.directory', 'custom-form-uploads'))
+                            ->visibility(config('filament-custom-forms.uploads.visibility', 'public'));
                         break;
                     case 'select':
                         $selectOptions = $options['choices'] ?? [];
                         $component = Select::make("data.{$name}")->options($selectOptions);
-                        break;
-                    case 'season_select':
-                        $component = Select::make("data.{$name}")
-                            ->label($label)
-                            ->options(\App\Models\Season::whereNotNull('name')->pluck('name', 'id'))
-                            ->searchable();
-                        break;
-                    case 'farmer_select':
-                        $component = Select::make("data.{$name}")
-                            ->label($label)
-                            ->searchable()
-                            ->getSearchResultsUsing(fn(string $search) => \App\Models\Farmer::where('name', 'like', "%{$search}%")
-                                ->orWhere('code', 'like', "%{$search}%")
-                                ->limit(50)
-                                ->get()
-                                ->mapWithKeys(function ($item) {
-                                    $label = $item->code . ' - ' . $item->name;
-                                    if ($item->spouse) {
-                                        $label .= ' - ' . $item->spouse;
-                                    }
-                                    return [$item->id => $label];
-                                }))
-                            ->getOptionLabelUsing(fn($value) => \App\Models\Farmer::find($value)?->name);
-                        break;
-                    case 'land_select':
-                        $component = Select::make("data.{$name}")
-                            ->label($label)
-                            ->searchable()
-                            ->getSearchResultsUsing(fn(string $search) => \App\Models\Land::where('parcel_code', 'like', "%{$search}%")
-                                ->limit(50)
-                                ->get()
-                                ->mapWithKeys(fn($item) => [$item->id => $item->parcel_code . ' - ' . ($item->block->name ?? '') . ' - ' . $item->area_size]))
-                            ->getOptionLabelUsing(fn($value) => \App\Models\Land::find($value)?->parcel_code);
-                        break;
-                    case 'block_select':
-                        $component = Select::make("data.{$name}")
-                            ->label($label)
-                            ->options(\App\Models\Block::whereNotNull('name')->pluck('name', 'id'))
-                            ->searchable();
                         break;
                 }
 

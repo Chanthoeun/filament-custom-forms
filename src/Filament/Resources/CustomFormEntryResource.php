@@ -16,73 +16,22 @@ use Dcx\FilamentCustomForms\Models\CustomForm;
 
 class CustomFormEntryResource extends Resource
 {
-    protected static ?string $model = CustomFormEntry::class;
+    public static function getModel(): string
+    {
+        return config('filament-custom-forms.models.entry', CustomFormEntry::class);
+    }
 
     protected static ?string $slug = 'custom-form-entries';
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        if (!(tenant()?->checkFeature('custom_form') ?? false)) {
-            return false;
-        }
-        return parent::shouldRegisterNavigation();
-    }
-
-    public static function canAccess(): bool
-    {
-        return tenant()?->checkFeature('custom_form') ?? false;
-    }
-
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
-        $query = parent::getEloquentQuery();
-
-        if (auth()->guest()) {
-            return $query;
-        }
-
-        // Filter based on allowed_roles of the related CustomForm
-        $user = auth()->user();
-
-        // Standardize on snake_case super_admin, but keep Title Case check for safety during transition
-        if ($user->hasRole('super_admin') || $user->hasRole('Super Admin')) {
-            return $query;
-        }
-
-        // Fetch IDs of forms the user is allowed to see
-        $allowedFormIds = CustomForm::where('is_active', true)->get()->filter(function ($form) use ($user) {
-            // 1. Allowed Roles
-            if (!empty($form->allowed_roles) && $user->hasAnyRole($form->allowed_roles)) {
-                return true;
-            }
-            // 2. Reviewer
-            if (!empty($form->reviewer_roles) && $user->hasAnyRole($form->reviewer_roles)) {
-                return true;
-            }
-            if (!empty($form->reviewer_users) && in_array($user->id, $form->reviewer_users)) {
-                return true;
-            }
-
-            // 3. Approver
-            if (!empty($form->approver_roles) && $user->hasAnyRole($form->approver_roles)) {
-                return true;
-            }
-            if (!empty($form->approver_users) && in_array($user->id, $form->approver_users)) {
-                return true;
-            }
-
-            // 4. Fallback (if no roles/users specified, everyone can see it)
-            if (empty($form->allowed_roles) && empty($form->reviewer_roles) && empty($form->approver_roles)) {
-                return true;
-            }
-
-            return false;
-        })->pluck('id');
-
-        return $query->whereIn('custom_form_id', $allowedFormIds);
+        return parent::getEloquentQuery();
     }
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+    public static function getNavigationIcon(): string|BackedEnum|null
+    {
+        return config('filament-custom-forms.navigation.entry_icon', Heroicon::OutlinedDocumentText);
+    }
 
     public static function getModelLabel(): string
     {
@@ -91,7 +40,7 @@ class CustomFormEntryResource extends Resource
             // Using find() here is technically 1 query, but if called multiple times it's better to cache
             $form = static::getFormFromCache($id);
             if ($form)
-                return $form->name . ' Entry';
+                return __('custom_form_entry.entry', ['form' => $form->name]);
         }
         return __('custom_form_entry.single');
     }
@@ -102,7 +51,7 @@ class CustomFormEntryResource extends Resource
         if ($id) {
             $form = static::getFormFromCache($id);
             if ($form)
-                return $form->name . ' Entries';
+                return __('custom_form_entry.entries', ['form' => $form->name]);
         }
         return __('custom_form_entry.plural');
     }
@@ -120,11 +69,6 @@ class CustomFormEntryResource extends Resource
     public static function getNavigationItems(): array
     {
         $items = [];
-        $user = \Illuminate\Support\Facades\Auth::user();
-
-        if (!$user || !(tenant()?->checkFeature('custom_form') ?? false)) {
-            return [];
-        }
 
         try {
             if (!\Illuminate\Support\Facades\Schema::hasTable('custom_forms')) {
@@ -139,46 +83,17 @@ class CustomFormEntryResource extends Resource
                 // Populate cache for label methods to use if they haven't run yet
                 static::$formCache[$form->id] = $form;
 
-                $shouldShow = false;
-
-                // 1. Super Admin always sees all forms
-                if ($user->hasRole('super_admin') || $user->hasRole('Super Admin')) {
-                    $shouldShow = true;
-                }
-                // 2. Check Allowed Roles/Users
-                elseif (
-                    (!empty($form->allowed_roles) && $user->hasAnyRole($form->allowed_roles)) ||
-                    (in_array($user->id, $form->allowed_users ?? []))
-                ) {
-                    $shouldShow = true;
-                }
-                // 3. Check Reviewer/Approver
-                elseif (
-                    (!empty($form->reviewer_roles) && $user->hasAnyRole($form->reviewer_roles)) ||
-                    (!empty($form->approver_roles) && $user->hasAnyRole($form->approver_roles)) ||
-                    (in_array($user->id, $form->reviewer_users ?? [])) ||
-                    (in_array($user->id, $form->approver_users ?? []))
-                ) {
-                    $shouldShow = true;
-                }
-                // 4. Fallback (everyone can see if no restrictions defined)
-                elseif (empty($form->allowed_roles) && empty($form->reviewer_roles) && empty($form->approver_roles)) {
-                    $shouldShow = true;
-                }
-
-                if ($shouldShow) {
-                    $items[] = NavigationItem::make($form->name)
-                        ->group(__('custom_form.operations_group'))
-                        ->icon('heroicon-o-document-text')
-                        ->isActiveWhen(fn() => $activeFormId == $form->id)
-                        ->url(static::getUrl('index', [
-                            'tableFilters' => [
-                                'custom_form_id' => [
-                                    'value' => $form->id,
-                                ],
+                $items[] = NavigationItem::make($form->name)
+                    ->group(config('filament-custom-forms.navigation.ops_group', __('custom_form.operations_group')))
+                    ->icon(config('filament-custom-forms.navigation.entry_icon', 'heroicon-o-document-text'))
+                    ->isActiveWhen(fn() => $activeFormId == $form->id)
+                    ->url(static::getUrl('index', [
+                        'tableFilters' => [
+                            'custom_form_id' => [
+                                'value' => $form->id,
                             ],
-                        ], panel: 'app'));
-                }
+                        ],
+                    ]));
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('CustomFormEntryResource Navigation Error: ' . $e->getMessage());

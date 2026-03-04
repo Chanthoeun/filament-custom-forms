@@ -39,37 +39,33 @@ class FieldsRelationManager extends RelationManager
                                 ignoreRecord: true,
                                 modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, $livewire) => $rule->where('custom_form_id', $livewire->getOwnerRecord()->id)
                             )
-                            ->helperText('Use snake_case keys. For layouts, this is internal ID.'),
+                            ->helperText(__('form_builder.fields.name_help')),
                         \Filament\Forms\Components\TextInput::make('label')
                             ->label(__('custom_form_field.label')),
                         \Filament\Forms\Components\Select::make('type')
                             ->label(__('custom_form_field.type'))
                             ->required()
                             ->options([
-                                'Layouts' => [
-                                    'section' => 'Section',
-                                    'grid' => 'Grid',
-                                    'fieldset' => 'Fieldset',
-                                    'repeater' => 'Repeater',
-                                    'wizard' => 'Wizard',
+                                __('form_builder.blocks.section') => [
+                                    'section' => __('form_builder.blocks.section'),
+                                    'grid' => __('form_builder.blocks.grid'),
+                                    'fieldset' => __('form_builder.blocks.fieldset'),
+                                    'repeater' => __('form_builder.blocks.repeater'),
+                                    'wizard' => __('form_builder.blocks.wizard'),
                                 ],
-                                'Fields' => [
-                                    'text_input' => 'Text Input',
-                                    'textarea' => 'Text Area',
-                                    'email' => 'Email',
-                                    'number_input' => 'Number',
-                                    'money' => 'Money',
-                                    'date_picker' => 'Date',
-                                    'time_picker' => 'Time Picker',
-                                    'boolean' => 'Boolean (Toggle)',
-                                    'select' => 'Select',
-                                    'image' => 'Image',
-                                    'password' => 'Password',
-                                    'phone' => 'Phone',
-                                    'season_select' => 'Season Select',
-                                    'farmer_select' => 'Farmer Select',
-                                    'land_select' => 'Land Select',
-                                    'block_select' => 'Block Select',
+                                __('form_builder.fields.repeater_fields') => [
+                                    'text_input' => __('form_builder.blocks.text_input'),
+                                    'textarea' => __('form_builder.blocks.textarea'),
+                                    'email' => __('form_builder.blocks.email'),
+                                    'number_input' => __('form_builder.blocks.number_input'),
+                                    'money' => __('form_builder.blocks.money'),
+                                    'date_picker' => __('form_builder.blocks.date_picker'),
+                                    'time_picker' => __('form_builder.blocks.time_picker'),
+                                    'boolean' => __('form_builder.blocks.boolean'),
+                                    'select' => __('form_builder.blocks.select'),
+                                    'image' => __('form_builder.blocks.image'),
+                                    'password' => __('form_builder.blocks.password'),
+                                    'phone' => __('form_builder.blocks.phone'),
                                 ],
                             ])
                             ->default('text_input')
@@ -87,10 +83,10 @@ class FieldsRelationManager extends RelationManager
                                     ->label(__('admin_panel.columns'))
                                     ->visible(fn($get) => in_array($get('type'), ['grid', 'section', 'fieldset', 'repeater', 'wizard']))
                                     ->options([
-                                        '1' => '1 Column',
-                                        '2' => '2 Columns',
-                                        '3' => '3 Columns',
-                                        '4' => '4 Columns',
+                                        '1' => trans_choice('form_builder.fields.columns_help', 1),
+                                        '2' => trans_choice('form_builder.fields.columns_help', 2),
+                                        '3' => trans_choice('form_builder.fields.columns_help', 3),
+                                        '4' => trans_choice('form_builder.fields.columns_help', 4),
                                     ])
                                     ->default('2'),
 

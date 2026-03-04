@@ -14,14 +14,14 @@ return new class extends Migration {
             Schema::create('custom_form_entries', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('custom_form_id')->constrained('custom_forms')->cascadeOnDelete();
-                $table->foreignId('season_id')->nullable()->constrained('seasons')->nullOnDelete();
-                $table->foreignId('farmer_id')->nullable()->constrained('farmers')->nullOnDelete();
-                $table->foreignId('land_id')->nullable()->constrained('lands')->nullOnDelete();
-                $table->foreignId('block_id')->nullable()->constrained('blocks')->nullOnDelete();
                 $table->json('data')->nullable(); // Key-value pairs matching the schema
-                $table->string('status')->default('submitted');
-                $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-                $table->foreignId('transaction_id')->nullable()->constrained('transactions')->nullOnDelete();
+                
+                if (Schema::hasTable('users')) {
+                    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+                } else {
+                    $table->unsignedBigInteger('created_by')->nullable();
+                }
+
                 $table->timestamps();
             });
         }

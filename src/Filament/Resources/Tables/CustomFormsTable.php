@@ -31,10 +31,6 @@ class CustomFormsTable
                     ->label(__('custom_form.is_active'))
                     ->boolean()
                     ->alignCenter(),
-                IconColumn::make('accounting_config.enabled')
-                    ->label(__('custom_form.accounting_system'))
-                    ->boolean()
-                    ->alignCenter(),
                 TextColumn::make('created_at')
                     ->label(__('general.created_at'))
                     ->dateTime()
@@ -52,8 +48,7 @@ class CustomFormsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->visible(fn() => auth()->user()->hasRole('super_admin')),
+                TrashedFilter::make(),
             ])
             ->actions([ // Standard way is actions()
                 EditAction::make(),

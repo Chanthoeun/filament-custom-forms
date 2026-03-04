@@ -34,7 +34,7 @@ class ListCustomFormEntries extends ListRecords
             $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->activeFormId);
             if ($customForm) {
                 $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}");
-                if ($name === "fcf.form.names.{$customForm->slug}") {
+                if ($name === "filament-custom-forms::fcf.form.names.{$customForm->slug}") {
                     $name = $customForm->name;
                 }
                 return $name;
@@ -58,7 +58,7 @@ class ListCustomFormEntries extends ListRecords
             $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($customFormId);
             if ($customForm) {
                 $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}");
-                if ($name === "fcf.form.names.{$customForm->slug}") {
+                if ($name === "filament-custom-forms::fcf.form.names.{$customForm->slug}") {
                     $name = $customForm->name;
                 }
                 $createLabel = __('filament-custom-forms::fcf.entry.action.create', ['name' => $name]);

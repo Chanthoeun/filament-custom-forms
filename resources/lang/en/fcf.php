@@ -21,6 +21,7 @@
          'slug' => 'Slug',
          'is_active' => 'Is Active',
          'details' => 'Form Details',
+         'names' => [],
      ],
      'entry' => [
          'single' => 'Form Entry',

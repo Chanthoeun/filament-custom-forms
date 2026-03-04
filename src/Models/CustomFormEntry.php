@@ -26,10 +26,8 @@ class CustomFormEntry extends Model
 
     protected $casts = [
         'data' => 'array',
-        'status' => \App\Enums\CustomFormEntryStatus::class,
+        'status' => \LaraSpace\FilamentCustomForms\Enums\CustomFormEntryStatus::class,
     ];
-
-
 
     public function customForm(): BelongsTo
     {
@@ -38,31 +36,31 @@ class CustomFormEntry extends Model
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(config('auth.providers.users.model') ?? 'App\Models\User', 'created_by');
     }
 
     public function transaction(): BelongsTo
     {
-        return $this->belongsTo(Transaction::class);
+        return $this->belongsTo('App\Models\Transaction');
     }
 
     public function season(): BelongsTo
     {
-        return $this->belongsTo(Season::class);
+        return $this->belongsTo('App\Models\Season');
     }
 
     public function farmer(): BelongsTo
     {
-        return $this->belongsTo(Farmer::class);
+        return $this->belongsTo('App\Models\Farmer');
     }
 
     public function land(): BelongsTo
     {
-        return $this->belongsTo(Land::class);
+        return $this->belongsTo('App\Models\Land');
     }
 
     public function block(): BelongsTo
     {
-        return $this->belongsTo(Block::class);
+        return $this->belongsTo('App\Models\Block');
     }
 }

@@ -128,6 +128,22 @@ class CustomFormPlugin implements Plugin
     {
         return $this->navigationEntryGroup ?? config('filament-custom-forms.navigation.entry_group', __('filament-custom-forms::fcf.form.entry_group'));
     }
+ 
+    /**
+     * @deprecated Use navigationEntryGroup() instead.
+     */
+    public function navigationOpsGroup(string $group): static
+    {
+        return $this->navigationEntryGroup($group);
+    }
+ 
+    /**
+     * @deprecated Use getNavigationEntryGroup() instead.
+     */
+    public function getNavigationOpsGroup(): string
+    {
+        return $this->getNavigationEntryGroup();
+    }
 
     public function navigationFormIcon(string $icon): static
     {

@@ -24,7 +24,6 @@ class EditCustomFormEntry extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
-            \App\Filament\Actions\PrintAction::make(),
         ];
     }
     public function getBreadcrumbs(): array

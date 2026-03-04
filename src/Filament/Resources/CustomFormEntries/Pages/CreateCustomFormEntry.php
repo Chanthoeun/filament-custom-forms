@@ -13,7 +13,7 @@ class CreateCustomFormEntry extends CreateRecord
         $customFormId = request()->input('tableFilters.custom_form_id.value');
 
         if ($customFormId) {
-            $customForm = \App\Models\CustomForm::find($customFormId);
+            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($customFormId);
             if ($customForm) {
                 return 'Create ' . $customForm->name;
             }
@@ -29,7 +29,7 @@ class CreateCustomFormEntry extends CreateRecord
         $urlParams = [];
 
         if ($customFormId) {
-            $customForm = \App\Models\CustomForm::find($customFormId);
+            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($customFormId);
             if ($customForm) {
                 $label = $customForm->name . ' Entries';
                 $urlParams = ['tableFilters' => ['custom_form_id' => ['value' => $customFormId]]];

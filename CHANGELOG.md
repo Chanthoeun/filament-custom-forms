@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
  
+ ## [v1.0.7] - 2026-03-04
+ ### Fixed
+ - Fixed `Class "App\Models\CustomForm" not found` by removing hardcoded project-level namespaces.
+ - Implemented `CustomFormEntryExport` and `CustomFormEntrySqlExport` within the plugin to make exports standalone.
+ - Removed hardcoded `PrintAction` from `EditCustomFormEntry` header actions.
+ 
  ## [v1.0.6] - 2026-03-04
  ### Fixed
  - Added `navigationOpsGroup()` and `getNavigationOpsGroup()` back to `CustomFormPlugin` for backward compatibility.

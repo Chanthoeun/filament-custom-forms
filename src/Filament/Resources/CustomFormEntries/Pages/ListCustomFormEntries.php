@@ -31,7 +31,7 @@ class ListCustomFormEntries extends ListRecords
     {
         // Use the manually tracked state which is robust across updates
         if ($this->activeFormId) {
-            $customForm = \App\Models\CustomForm::find($this->activeFormId);
+            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->activeFormId);
             if ($customForm) {
                 $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}");
                 if ($name === "fcf.form.names.{$customForm->slug}") {
@@ -55,7 +55,7 @@ class ListCustomFormEntries extends ListRecords
         $createLabel = __('filament-custom-forms::fcf.entry.action.create', ['name' => __('filament-custom-forms::fcf.entry.single')]);
 
         if ($customFormId) {
-            $customForm = \App\Models\CustomForm::find($customFormId);
+            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($customFormId);
             if ($customForm) {
                 $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}");
                 if ($name === "fcf.form.names.{$customForm->slug}") {
@@ -94,7 +94,7 @@ class ListCustomFormEntries extends ListRecords
 
                     $formName = 'custom-entries';
                     if ($this->activeFormId) {
-                        $customForm = \App\Models\CustomForm::find($this->activeFormId);
+                        $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->activeFormId);
                         if ($customForm) {
                             $name = trim($customForm->name);
                             if ($format === 'sql') {
@@ -111,12 +111,12 @@ class ListCustomFormEntries extends ListRecords
 
                     if ($format === 'excel') {
                         return \Maatwebsite\Excel\Facades\Excel::download(
-                            new \App\Exports\CustomFormEntryExport($records, $this->activeFormId),
+                            new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport($records, $this->activeFormId),
                             $formName . '-' . now()->format('Y-m-d-His') . '.xlsx'
                         );
                     } elseif ($format === 'json') {
                         // Reuse the Export class to get consistent formatting
-                        $exporter = new \App\Exports\CustomFormEntryExport($records, $this->activeFormId);
+                        $exporter = new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport($records, $this->activeFormId);
                         $headings = $exporter->headings();
 
                         $data = $records->map(function ($record) use ($exporter, $headings) {
@@ -128,7 +128,7 @@ class ListCustomFormEntries extends ListRecords
                             echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                         }, $formName . '-' . now()->format('Y-m-d-His') . '.json');
                     } elseif ($format === 'sql') {
-                        $exporter = new \App\Exports\CustomFormEntrySqlExport($records, $this->activeFormId, $formName);
+                        $exporter = new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntrySqlExport($records, $this->activeFormId, $formName);
                         $sql = $exporter->generate();
 
                         return response()->streamDownload(function () use ($sql) {

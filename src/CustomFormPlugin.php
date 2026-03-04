@@ -16,7 +16,7 @@ class CustomFormPlugin implements Plugin
     protected ?string $uploadDirectory = null;
     protected ?string $uploadVisibility = null;
     protected ?string $navigationGroup = null;
-    protected ?string $navigationOpsGroup = null;
+    protected ?string $navigationEntryGroup = null;
     protected ?string $navigationFormIcon = null;
     protected ?string $navigationEntryIcon = null;
 
@@ -115,18 +115,18 @@ class CustomFormPlugin implements Plugin
 
     public function getNavigationGroup(): string
     {
-        return $this->navigationGroup ?? config('filament-custom-forms.navigation.group', __('filament-custom-forms::custom_form.builder_group'));
+        return $this->navigationGroup ?? config('filament-custom-forms.navigation.group', __('filament-custom-forms::fcf.form.builder_group'));
     }
 
-    public function navigationOpsGroup(string $group): static
+    public function navigationEntryGroup(string $group): static
     {
-        $this->navigationOpsGroup = $group;
+        $this->navigationEntryGroup = $group;
         return $this;
     }
 
-    public function getNavigationOpsGroup(): string
+    public function getNavigationEntryGroup(): string
     {
-        return $this->navigationOpsGroup ?? config('filament-custom-forms.navigation.ops_group', __('filament-custom-forms::custom_form.operations_group'));
+        return $this->navigationEntryGroup ?? config('filament-custom-forms.navigation.entry_group', __('filament-custom-forms::fcf.form.entry_group'));
     }
 
     public function navigationFormIcon(string $icon): static

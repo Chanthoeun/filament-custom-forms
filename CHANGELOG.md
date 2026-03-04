@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+ 
+ ## [v1.0.4] - 2026-03-04
+ ### Changed
+ - Consolidated all translation files into a single `fcf.php` per locale.
+ - Shortened translation keys from `filament-custom-forms::filament_custom_form.*` to `filament-custom-forms::fcf.*`.
+ - Renamed "Form Operation" to "Form Entry" throughout the plugin for better clarity.
+ - Updated `README.md` with a simplified 5-step installation guide.
+ 
+ ### Added
+ - Added missing `wizard` block translation key.
+ - Made navigation group name customizable in the plugin configuration.
 
 ## [v1.0.3] - 2026-03-04
 ### Fixed

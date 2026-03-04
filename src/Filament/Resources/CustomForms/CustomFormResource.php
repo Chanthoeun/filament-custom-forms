@@ -22,12 +22,12 @@ class CustomFormResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('filament-custom-forms::custom_form.single');
+        return __('filament-custom-forms::fcf.form.single');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('filament-custom-forms::custom_form.plural');
+        return __('filament-custom-forms::fcf.form.plural');
     }
 
     public static function getNavigationIcon(): string|BackedEnum|null

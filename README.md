@@ -16,31 +16,25 @@ A powerful and simplified FilamentPHP plugin to manage and submit dynamic custom
 - PHP 8.2+
 - Filament v4.0 or v5.0
 
-### 2. Standard Installation (Packagist)
-
-You can install the package via composer:
+### 2. Install via Composer
 
 ```bash
 composer require chanthoeun/filament-custom-forms
 ```
+### 3. Publish Assets
 
-### 3. Private Repository Installation (VCS)
-
-If this package is not on Packagist, add the repository to your project's `composer.json`:
-
-```json
-"repositories": [
-    {
-        "type": "vcs",
-        "url": "https://github.com/chanthoeun/filament-custom-forms"
-    }
-],
-"require": {
-    "chanthoeun/filament-custom-forms": "^1.0"
-}
+```bash
+php artisan vendor:publish --tag="filament-custom-forms-config"
+php artisan vendor:publish --tag="filament-custom-forms-migrations"
 ```
 
-### 4. Register the Plugin
+### 4. Run Migrations
+
+```bash
+php artisan migrate
+```
+
+### 5. Register the Plugin
 
 Add the plugin to your Filament Panel provider:
 
@@ -52,17 +46,11 @@ public function panel(Panel $panel): Panel
     return $panel
         ->plugin(
             CustomFormPlugin::make()
-                ->navigationGroup('System Settings')
+                ->navigationGroup('Form Builder')
                 ->navigationFormIcon('heroicon-o-document-duplicate')
                 ->navigationEntryIcon('heroicon-o-clipboard-document-list')
         );
 }
-```
-
-### 5. Run Migrations
-
-```bash
-php artisan migrate
 ```
 
 ## Updates

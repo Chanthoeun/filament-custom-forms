@@ -22,27 +22,27 @@ class CustomFormsTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('filament-custom-forms::custom_form.name'))
+                    ->label(__('filament-custom-forms::fcf.form.name'))
                     ->searchable(),
                 TextColumn::make('slug')
-                    ->label(__('filament-custom-forms::custom_form.slug'))
+                    ->label(__('filament-custom-forms::fcf.form.slug'))
                     ->searchable(),
                 IconColumn::make('is_active')
-                    ->label(__('filament-custom-forms::custom_form.is_active'))
+                    ->label(__('filament-custom-forms::fcf.form.is_active'))
                     ->boolean()
                     ->alignCenter(),
                 TextColumn::make('created_at')
-                    ->label(__('filament-custom-forms::general.created_at'))
+                    ->label(__('filament-custom-forms::fcf.general.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label(__('filament-custom-forms::general.updated_at'))
+                    ->label(__('filament-custom-forms::fcf.general.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')
-                    ->label(__('filament-custom-forms::general.deleted_at'))
+                    ->label(__('filament-custom-forms::fcf.general.deleted_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

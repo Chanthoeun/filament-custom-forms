@@ -31,7 +31,7 @@ class CustomFormEntryForm
         return $schema
             ->components([
                 Select::make('custom_form_id')
-                    ->label(__('filament-custom-forms::custom_form.single'))
+                    ->label(__('filament-custom-forms::fcf.form.single'))
                     ->options(CustomForm::where('is_active', true)->whereNotNull('name')->pluck('name', 'id'))
                     ->required()
                     ->default($preselectedFormId)

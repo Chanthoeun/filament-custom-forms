@@ -41,9 +41,9 @@ class CustomFormEntryResource extends Resource
             // Using find() here is technically 1 query, but if called multiple times it's better to cache
             $form = static::getFormFromCache($id);
             if ($form)
-                return __('filament-custom-forms::custom_form_entry.entry', ['form' => $form->name]);
+                return __('filament-custom-forms::fcf.entry.entry', ['form' => $form->name]);
         }
-        return __('filament-custom-forms::custom_form_entry.single');
+        return __('filament-custom-forms::fcf.entry.single');
     }
 
     public static function getPluralModelLabel(): string
@@ -52,9 +52,9 @@ class CustomFormEntryResource extends Resource
         if ($id) {
             $form = static::getFormFromCache($id);
             if ($form)
-                return __('filament-custom-forms::custom_form_entry.entries', ['form' => $form->name]);
+                return __('filament-custom-forms::fcf.entry.entries', ['form' => $form->name]);
         }
-        return __('filament-custom-forms::custom_form_entry.plural');
+        return __('filament-custom-forms::fcf.entry.plural');
     }
 
     protected static array $formCache = [];
@@ -74,8 +74,8 @@ class CustomFormEntryResource extends Resource
         try {
             if (!config('filament-custom-forms.navigation.dynamic_navigation', true)) {
                 return [
-                    NavigationItem::make(__('filament-custom-forms::custom_form_entry.plural'))
-                        ->group(CustomFormPlugin::get()->getNavigationOpsGroup())
+                    NavigationItem::make(__('filament-custom-forms::fcf.entry.plural'))
+                        ->group(CustomFormPlugin::get()->getNavigationEntryGroup())
                         ->icon(CustomFormPlugin::get()->getNavigationEntryIcon())
                         ->isActiveWhen(fn() => request()->routeIs(static::getRouteBaseName() . '.*'))
                         ->url(static::getUrl('index')),

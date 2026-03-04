@@ -40,7 +40,7 @@ return [
     */
     'navigation' => [
         'group' => 'Form Builder',
-        'ops_group' => 'Form Operations',
+        'entry_group' => 'Form Entry',
         'icon' => 'heroicon-o-rectangle-stack',
         'entry_icon' => 'heroicon-o-document-text',
         'dynamic_navigation' => true,

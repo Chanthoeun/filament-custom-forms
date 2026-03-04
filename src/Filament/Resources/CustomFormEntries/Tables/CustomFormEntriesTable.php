@@ -118,7 +118,7 @@ class CustomFormEntriesTable
 
         if (count($columns) > 0) {
             $columns[] = TextColumn::make('created_at')
-                ->label(__('filament-custom-forms::general.created_at'))
+                ->label(__('filament-custom-forms::fcf.general.created_at'))
                 ->dateTime()
                 ->sortable();
         }
@@ -187,7 +187,7 @@ class CustomFormEntriesTable
         }
 
         $filters[] = SelectFilter::make('custom_form_id')
-            ->label(__('filament-custom-forms::custom_form.single'))
+            ->label(__('filament-custom-forms::fcf.form.single'))
             ->options(\Chanthoeun\FilamentCustomForms\Models\CustomForm::pluck('name', 'id'))
             ->hidden();
 

@@ -72,6 +72,16 @@ class CustomFormEntryResource extends Resource
         $items = [];
 
         try {
+            if (!config('filament-custom-forms.navigation.dynamic_navigation', true)) {
+                return [
+                    NavigationItem::make(__('custom_form_entry.plural'))
+                        ->group(CustomFormPlugin::get()->getNavigationOpsGroup())
+                        ->icon(CustomFormPlugin::get()->getNavigationEntryIcon())
+                        ->isActiveWhen(fn() => request()->routeIs(static::getRouteBaseName() . '.*'))
+                        ->url(static::getUrl('index')),
+                ];
+            }
+
             if (!\Illuminate\Support\Facades\Schema::hasTable('custom_forms')) {
                 return [];
             }

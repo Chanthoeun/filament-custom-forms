@@ -43,5 +43,6 @@ return [
         'ops_group' => 'Form Operations',
         'icon' => 'heroicon-o-rectangle-stack',
         'entry_icon' => 'heroicon-o-document-text',
+        'dynamic_navigation' => true,
     ],
 ];

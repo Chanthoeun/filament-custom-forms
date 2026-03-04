@@ -1,0 +1,39 @@
+# Plugin Analysis: chanthoeun/filament-custom-forms
+
+After a thorough review of the plugin's codebase and its integration with Laravel 12 / Filament v5, I have identified several issues that may cause bugs or installation failures.
+
+## 🔴 Critical Issues
+
+### 1. Hardcoded Application Enums
+The [FieldsRelationManager](file:///home/chris/codes/laravel/plugins/filament-custom-forms/src/Filament/Resources/CustomForms/RelationManagers/FieldsRelationManager.php#11-186) (at `src/Filament/Resources/CustomForms/RelationManagers/FieldsRelationManager.php:137-138`) references `\App\Enums\Currency`. This enum is NOT part of the plugin and does not exist in your new project.
+- **Problem**: This will cause a **Fatal Error** (Class not found) as soon as you try to add a "Money" field.
+
+### 2. Broken `vendor:publish`
+The [CustomFormServiceProvider](file:///home/chris/codes/laravel/plugins/filament-custom-forms/src/CustomFormServiceProvider.php#8-24) is configured with `hasMigrations()` and `hasViews()`, but:
+- **Missing Migration Stubs**: It expects `.stub` files, but the directory contains [.php](file:///home/chris/codes/laravel/plugins/filament-custom-forms/src/CustomFormPlugin.php) files. This prevents Laravel from publishing them correctly.
+- **Missing Views**: There is no `resources/views` directory, which causes an error during publishing.
+
+## 🟡 Significant Concerns
+
+### 1. Experimental `filament/schemas` dependency
+The plugin heavily relies on the `filament/schemas` package. While powerful, this is an experimental/newer part of the Filament ecosystem and may have breaking changes or less community support compared to standard Filament Forms.
+
+### 2. Scalability: Dynamic Navigation
+`CustomFormEntryResource` dynamically generates a navigation item for EVERY active form in the database.
+- **Problem**: If you create hundreds of forms, your Admin Sidebar will become extremely cluttered and slow to render.
+
+### 3. Outdated Action/Column Namespaces
+- **Actions**: Uses `Filament\Actions\*` (standard for headers) inside table actions, whereas `Filament\Tables\Actions\*` is the preferred standard for row actions in v5.
+- **Columns**: Uses `BooleanColumn`, which is generally replaced by `IconColumn::make()->boolean()` in modern Filament versions.
+
+## 🟢 Minor Issues & Improvements
+
+### 1. Incomplete Translations
+Several translation keys used in the code (e.g., `admin_panel.configuration`, `admin_panel.columns`) appear to be missing or mismatched with the provided `lang` files.
+
+### 2. Missing Default Logic
+Some components (like `FileUpload`) have fixed configurations that might struggle if the specific disks or directories aren't pre-configured in your application's `filesystems.php`.
+
+---
+
+**Recommendation**: Would you like me to start fixing these issues (specifically the `Currency` enum and the migration/view publishing logic)?

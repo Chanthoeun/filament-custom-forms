@@ -4,9 +4,14 @@ namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\Relation
 
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\BooleanColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 
 class FieldsRelationManager extends RelationManager
 {
@@ -131,13 +136,6 @@ class FieldsRelationManager extends RelationManager
                                     ->label(__('admin_panel.hide_in_view'))
                                     ->default(false),
 
-                                \Filament\Forms\Components\Radio::make('options.currency')
-                                    ->label('Currency')
-                                    ->visible(fn($get) => $get('type') === 'money')
-                                    ->options(\App\Enums\Currency::class)
-                                    ->default(\App\Enums\Currency::USD)
-                                    ->inline(),
-
                                 \Filament\Forms\Components\Toggle::make('options.is_table')
                                     ->label('Use Table Layout (Simple)')
                                     ->visible(fn($get) => $get('type') === 'repeater')
@@ -160,7 +158,7 @@ class FieldsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name')->label(__('custom_form_field.name'))->searchable(),
                 TextColumn::make('label')->label(__('custom_form_field.label'))->searchable(),
-                BooleanColumn::make('required')->label(__('custom_form_field.is_required')),
+                IconColumn::make('required')->label(__('custom_form_field.is_required'))->boolean(),
                 TextColumn::make('type')->label(__('custom_form_field.type'))->badge()->color(fn(string $state): string => match ($state) {
                     'section', 'grid', 'fieldset', 'wizard' => 'info',
                     default => 'gray',
@@ -170,15 +168,15 @@ class FieldsRelationManager extends RelationManager
             ->reorderable('sort')
             ->defaultSort('sort', 'asc')
             ->headerActions([
-                \Filament\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

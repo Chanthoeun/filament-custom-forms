@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\Schemas;
+namespace Dcx\FilamentCustomForms\Filament\Resources\CustomForms\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Grid;

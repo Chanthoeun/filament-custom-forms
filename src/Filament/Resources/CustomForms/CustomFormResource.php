@@ -1,10 +1,10 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources;
+namespace Dcx\FilamentCustomForms\Filament\Resources\CustomForms;
 
-use Dcx\FilamentCustomForms\Filament\Resources\Pages;
-use Dcx\FilamentCustomForms\Filament\Resources\Schemas\CustomFormForm;
-use Dcx\FilamentCustomForms\Filament\Resources\Tables\CustomFormsTable;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomForms\Pages;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomForms\Schemas\CustomFormForm;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomForms\Tables\CustomFormsTable;
 use Dcx\FilamentCustomForms\Models\CustomForm;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;

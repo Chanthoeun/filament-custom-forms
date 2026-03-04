@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\Schemas;
+namespace Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\Schemas;
 
 use Dcx\FilamentCustomForms\Models\CustomForm;
 use Filament\Forms\Components\DatePicker;

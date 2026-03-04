@@ -1,12 +1,11 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\Pages;
+namespace Dcx\FilamentCustomForms\Filament\Resources\CustomForms\Pages;
 
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
+use Filament\Resources\Pages\CreateRecord;
 
-class ListCustomForms extends ListRecords
+class CreateCustomForm extends CreateRecord
 {
     protected static string $resource = CustomFormResource::class;
 
@@ -24,12 +23,5 @@ class ListCustomForms extends ListRecords
         }
 
         parent::mount();
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\CreateAction::make(),
-        ];
     }
 }

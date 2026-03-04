@@ -1,8 +1,8 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\Pages;
+namespace Dcx\FilamentCustomForms\Filament\Resources\CustomForms\Pages;
 
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormResource;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 

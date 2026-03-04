@@ -4,8 +4,8 @@ namespace Dcx\FilamentCustomForms;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormResource;
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntryResource;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
 
 class CustomFormPlugin implements Plugin
 {

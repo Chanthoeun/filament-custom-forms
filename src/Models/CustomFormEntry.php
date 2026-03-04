@@ -5,6 +5,7 @@ namespace Dcx\FilamentCustomForms\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Dcx\FilamentCustomForms\CustomFormPlugin;
 
 class CustomFormEntry extends Model
 {
@@ -22,12 +23,12 @@ class CustomFormEntry extends Model
 
     public function customForm(): BelongsTo
     {
-        return $this->belongsTo(config('filament-custom-forms.models.form', CustomForm::class));
+        return $this->belongsTo(CustomFormPlugin::get()->getFormModel());
     }
 
     public function creator(): BelongsTo
     {
-        $userModel = config('filament-custom-forms.models.user') ?? config('auth.providers.users.model') ?? 'App\Models\User';
+        $userModel = CustomFormPlugin::get()->getUserModel();
 
         if (!class_exists($userModel)) {
             return $this->belongsTo(\Illuminate\Database\Eloquent\Model::class, 'created_by')->withDefault([

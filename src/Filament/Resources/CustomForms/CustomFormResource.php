@@ -11,12 +11,13 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use BackedEnum;
+use Dcx\FilamentCustomForms\CustomFormPlugin;
 
 class CustomFormResource extends Resource
 {
     public static function getModel(): string
     {
-        return config('filament-custom-forms.models.form', CustomForm::class);
+        return CustomFormPlugin::get()->getFormModel();
     }
 
     public static function getModelLabel(): string
@@ -31,12 +32,12 @@ class CustomFormResource extends Resource
 
     public static function getNavigationIcon(): string|BackedEnum|null
     {
-        return config('filament-custom-forms.navigation.icon', Heroicon::OutlinedRectangleStack);
+        return CustomFormPlugin::get()->getNavigationFormIcon();
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return config('filament-custom-forms.navigation.group', __('custom_form.builder_group'));
+        return CustomFormPlugin::get()->getNavigationGroup();
     }
 
     public static function form(Schema $schema): Schema

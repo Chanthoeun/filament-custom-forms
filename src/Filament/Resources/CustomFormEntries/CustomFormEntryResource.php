@@ -13,12 +13,13 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use BackedEnum;
 use Dcx\FilamentCustomForms\Models\CustomForm;
+use Dcx\FilamentCustomForms\CustomFormPlugin;
 
 class CustomFormEntryResource extends Resource
 {
     public static function getModel(): string
     {
-        return config('filament-custom-forms.models.entry', CustomFormEntry::class);
+        return CustomFormPlugin::get()->getEntryModel();
     }
 
     protected static ?string $slug = 'custom-form-entries';
@@ -30,7 +31,7 @@ class CustomFormEntryResource extends Resource
 
     public static function getNavigationIcon(): string|BackedEnum|null
     {
-        return config('filament-custom-forms.navigation.entry_icon', Heroicon::OutlinedDocumentText);
+        return CustomFormPlugin::get()->getNavigationEntryIcon();
     }
 
     public static function getModelLabel(): string
@@ -84,8 +85,8 @@ class CustomFormEntryResource extends Resource
                 static::$formCache[$form->id] = $form;
 
                 $items[] = NavigationItem::make($form->name)
-                    ->group(config('filament-custom-forms.navigation.ops_group', __('custom_form.operations_group')))
-                    ->icon(config('filament-custom-forms.navigation.entry_icon', 'heroicon-o-document-text'))
+                    ->group(CustomFormPlugin::get()->getNavigationOpsGroup())
+                    ->icon(CustomFormPlugin::get()->getNavigationEntryIcon())
                     ->isActiveWhen(fn() => $activeFormId == $form->id)
                     ->url(static::getUrl('index', [
                         'tableFilters' => [

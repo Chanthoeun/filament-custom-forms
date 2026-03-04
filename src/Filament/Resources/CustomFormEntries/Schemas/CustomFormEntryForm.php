@@ -19,6 +19,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Dcx\FilamentCustomForms\CustomFormPlugin;
 
 class CustomFormEntryForm
 {
@@ -227,9 +228,9 @@ class CustomFormEntryForm
                     case 'image':
                         $component = FileUpload::make("data.{$name}")
                             ->image() // Enforce image types
-                            ->disk(config('filament-custom-forms.uploads.disk', 'public'))
-                            ->directory(config('filament-custom-forms.uploads.directory', 'custom-form-uploads'))
-                            ->visibility(config('filament-custom-forms.uploads.visibility', 'public'));
+                            ->disk(CustomFormPlugin::get()->getUploadDisk())
+                            ->directory(CustomFormPlugin::get()->getUploadDirectory())
+                            ->visibility(CustomFormPlugin::get()->getUploadVisibility());
                         break;
                     case 'select':
                         $selectOptions = $options['choices'] ?? [];

@@ -40,9 +40,21 @@ use Dcx\FilamentCustomForms\CustomFormPlugin;
 public function panel(Panel $panel): Panel
 {
     return $panel
-        ->plugin(CustomFormPlugin::make());
+        ->plugin(
+            CustomFormPlugin::make()
+                ->navigationGroup('System Settings')
+                ->navigationFormIcon('heroicon-o-document-duplicate')
+                ->navigationEntryIcon('heroicon-o-clipboard-document-list')
+                // ->formModel(MyCustomForm::class)
+                // ->entryModel(MyCustomFormEntry::class)
+                // ->userModel(App\Models\User::class)
+                // ->uploadDisk('s3')
+                // ->uploadDirectory('forms')
+        );
 }
 ```
+
+By default, the plugin provides a fluent API to customize the models, uploads, and navigation icons directly from your panel provider.
 
 ### 4. Run Migrations
 
@@ -50,20 +62,13 @@ public function panel(Panel $panel): Panel
 php artisan migrate
 ```
 
-### 6. Configuration
+### 6. Configuration (Optional)
 
-You can customize models, uploads, and navigation by publishing the config file:
+Alternatively, you can publish the configuration file to customize the plugin globally instead of per-panel:
 
 ```bash
 php artisan vendor:publish --tag=filament-custom-forms-config
 ```
-
-The config allows you to override:
-- `models.form`: Custom form model.
-- `models.entry`: Custom form entry model.
-- `models.user`: The user model used for `created_by`.
-- `uploads`: Storage disk and directory.
-- `navigation`: Icons and groups.
 
 ### 7. Publishing Resources
 

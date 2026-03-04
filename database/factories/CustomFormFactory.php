@@ -1,8 +1,8 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Database\Factories;
+namespace Chanthoeun\FilamentCustomForms\Database\Factories;
 
-use Dcx\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 

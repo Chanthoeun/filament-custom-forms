@@ -1,11 +1,11 @@
 <?php
 
-namespace Dcx\FilamentCustomForms;
+namespace Chanthoeun\FilamentCustomForms;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use Dcx\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
 
 class CustomFormPlugin implements Plugin
 {
@@ -47,7 +47,7 @@ class CustomFormPlugin implements Plugin
 
     public function getFormModel(): string
     {
-        return $this->formModel ?? config('filament-custom-forms.models.form', \Dcx\FilamentCustomForms\Models\CustomForm::class);
+        return $this->formModel ?? config('filament-custom-forms.models.form', \Chanthoeun\FilamentCustomForms\Models\CustomForm::class);
     }
 
     public function entryModel(string $model): static
@@ -58,7 +58,7 @@ class CustomFormPlugin implements Plugin
 
     public function getEntryModel(): string
     {
-        return $this->entryModel ?? config('filament-custom-forms.models.entry', \Dcx\FilamentCustomForms\Models\CustomFormEntry::class);
+        return $this->entryModel ?? config('filament-custom-forms.models.entry', \Chanthoeun\FilamentCustomForms\Models\CustomFormEntry::class);
     }
 
     public function userModel(string $model): static

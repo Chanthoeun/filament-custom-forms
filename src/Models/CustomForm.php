@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Models;
+namespace Chanthoeun\FilamentCustomForms\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

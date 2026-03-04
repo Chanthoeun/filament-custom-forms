@@ -21,7 +21,7 @@ A powerful and simplified FilamentPHP plugin to manage and submit dynamic custom
 You can install the package via composer:
 
 ```bash
-composer require dcx/filament-custom-forms
+composer require chanthoeun/filament-custom-forms
 ```
 
 ### 3. Register the Plugin
@@ -29,7 +29,7 @@ composer require dcx/filament-custom-forms
 Add the plugin to your Filament Panel provider:
 
 ```php
-use Dcx\FilamentCustomForms\CustomFormPlugin;
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 
 public function panel(Panel $panel): Panel
 {

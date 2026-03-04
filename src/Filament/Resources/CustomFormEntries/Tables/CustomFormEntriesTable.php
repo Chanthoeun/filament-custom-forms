@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\Tables;
+namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -49,7 +49,7 @@ class CustomFormEntriesTable
         $columns = [];
 
         // Fetch fields metadata from parent CustomFormField table first
-        $fieldsMetadata = \Dcx\FilamentCustomForms\Models\CustomFormField::query()
+        $fieldsMetadata = \Chanthoeun\FilamentCustomForms\Models\CustomFormField::query()
             ->when($formId, fn($query) => $query->where('custom_form_id', $formId))
             ->orderBy('sort')
             ->get()
@@ -58,7 +58,7 @@ class CustomFormEntriesTable
         $definedKeys = $fieldsMetadata->keys();
 
         // Fetch keys from existing entries to catch any legacy/extra data (Limited to 20 for performance)
-        $dataKeys = \Dcx\FilamentCustomForms\Models\CustomFormEntry::query()
+        $dataKeys = \Chanthoeun\FilamentCustomForms\Models\CustomFormEntry::query()
             ->when($formId, fn($query) => $query->where('custom_form_id', $formId))
             ->latest()
             ->limit(20)
@@ -131,7 +131,7 @@ class CustomFormEntriesTable
         $filters = [];
 
         if ($formId) {
-            $formSchema = \Dcx\FilamentCustomForms\Models\CustomForm::find($formId);
+            $formSchema = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($formId);
             if ($formSchema) {
                 $schemaFields = $formSchema->fields()->orderBy('sort')->get();
 
@@ -188,7 +188,7 @@ class CustomFormEntriesTable
 
         $filters[] = SelectFilter::make('custom_form_id')
             ->label(__('custom_form.single'))
-            ->options(\Dcx\FilamentCustomForms\Models\CustomForm::pluck('name', 'id'))
+            ->options(\Chanthoeun\FilamentCustomForms\Models\CustomForm::pluck('name', 'id'))
             ->hidden();
 
         return $filters;

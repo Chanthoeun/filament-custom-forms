@@ -1,9 +1,9 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Tests;
+namespace Chanthoeun\FilamentCustomForms\Tests;
 
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntryResource;
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableDeviceIdentifierCookie;
 use Filament\Http\Middleware\InertiaRequests;

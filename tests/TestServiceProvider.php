@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Tests;
+namespace Chanthoeun\FilamentCustomForms\Tests;
 
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -12,7 +12,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Dcx\FilamentCustomForms\CustomFormPlugin;
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Illuminate\Support\ServiceProvider;
 use Filament\Facades\Filament;
 

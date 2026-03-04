@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcx\FilamentCustomForms;
+namespace Chanthoeun\FilamentCustomForms;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;

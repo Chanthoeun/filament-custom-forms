@@ -1,8 +1,8 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
+namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
 
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateCustomFormEntry extends CreateRecord

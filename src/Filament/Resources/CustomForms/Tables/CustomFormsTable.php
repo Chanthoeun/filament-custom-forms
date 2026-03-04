@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\CustomForms\Tables;
+namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;

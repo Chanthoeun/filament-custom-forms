@@ -1,6 +1,6 @@
 {
-    "name": "dcx/filament-custom-forms",
-    "description": "A FilamentPHP plugin to manage and submit custom forms with approval workflow.",
+    "name": "chanthoeun/filament-custom-forms",
+    "description": "A FilamentPHP plugin to manage and submit custom forms.",
     "keywords": [
         "laravel",
         "filament",
@@ -10,11 +10,11 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Dcx",
-            "email": "info@dcx.com"
+            "name": "Chanthoeun",
+            "email": "info@chanthoeun.com"
         }
     ],
-    "homepage": "https://github.com/dcx/filament-custom-forms",
+    "homepage": "https://github.com/chanthoeun/filament-custom-forms",
     "require": {
         "php": "^8.2",
         "filament/filament": "^4.0|^5.0"
@@ -25,19 +25,19 @@
     },
     "autoload": {
         "psr-4": {
-            "Dcx\\FilamentCustomForms\\": "src/"
+            "Chanthoeun\\FilamentCustomForms\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Dcx\\FilamentCustomForms\\Tests\\": "tests/",
-            "Dcx\\FilamentCustomForms\\Database\\Factories\\": "database/factories/"
+            "Chanthoeun\\FilamentCustomForms\\Tests\\": "tests/",
+            "Chanthoeun\\FilamentCustomForms\\Database\\Factories\\": "database/factories/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Dcx\\FilamentCustomForms\\CustomFormServiceProvider"
+                "Chanthoeun\\FilamentCustomForms\\CustomFormServiceProvider"
             ]
         }
     },

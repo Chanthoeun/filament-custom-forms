@@ -11,8 +11,8 @@ return [
     |
     */
     'models' => [
-        'form' => \Dcx\FilamentCustomForms\Models\CustomForm::class,
-        'entry' => \Dcx\FilamentCustomForms\Models\CustomFormEntry::class,
+        'form' => \Chanthoeun\FilamentCustomForms\Models\CustomForm::class,
+        'entry' => \Chanthoeun\FilamentCustomForms\Models\CustomFormEntry::class,
         'user' => config('auth.providers.users.model') ?? 'App\Models\User',
     ],
 

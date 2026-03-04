@@ -1,8 +1,8 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Database\Factories;
+namespace Chanthoeun\FilamentCustomForms\Database\Factories;
 
-use Dcx\FilamentCustomForms\Models\CustomFormEntry;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CustomFormEntryFactory extends Factory

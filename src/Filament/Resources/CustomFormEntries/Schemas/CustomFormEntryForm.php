@@ -1,8 +1,8 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\Schemas;
+namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Schemas;
 
-use Dcx\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -19,7 +19,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Dcx\FilamentCustomForms\CustomFormPlugin;
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 
 class CustomFormEntryForm
 {

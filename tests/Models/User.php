@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Tests\Models;
+namespace Chanthoeun\FilamentCustomForms\Tests\Models;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;

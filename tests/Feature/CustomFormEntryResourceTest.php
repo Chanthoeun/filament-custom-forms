@@ -1,12 +1,12 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Tests\Feature;
+namespace Chanthoeun\FilamentCustomForms\Tests\Feature;
 
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntryResource;
-use Dcx\FilamentCustomForms\Filament\Resources\Pages;
-use Dcx\FilamentCustomForms\Models\CustomForm;
-use Dcx\FilamentCustomForms\Models\CustomFormEntry;
-use Dcx\FilamentCustomForms\Tests\TestCase;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
+use Chanthoeun\FilamentCustomForms\Tests\TestCase;
 use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -19,7 +19,7 @@ class CustomFormEntryResourceTest extends TestCase
     {
         parent::setUp();
         
-        $user = \Dcx\FilamentCustomForms\Tests\Models\User::create([
+        $user = \Chanthoeun\FilamentCustomForms\Tests\Models\User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),

@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\CustomForms\RelationManagers;
+namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\RelationManagers;
 
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;

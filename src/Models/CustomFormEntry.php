@@ -1,11 +1,11 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Models;
+namespace Chanthoeun\FilamentCustomForms\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Dcx\FilamentCustomForms\CustomFormPlugin;
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 
 class CustomFormEntry extends Model
 {

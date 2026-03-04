@@ -1,19 +1,19 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries;
+namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries;
 
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\Schemas\CustomFormEntryForm;
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntries\Tables\CustomFormEntriesTable;
-use Dcx\FilamentCustomForms\Models\CustomFormEntry;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Schemas\CustomFormEntryForm;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Tables\CustomFormEntriesTable;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use BackedEnum;
-use Dcx\FilamentCustomForms\Models\CustomForm;
-use Dcx\FilamentCustomForms\CustomFormPlugin;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 
 class CustomFormEntryResource extends Resource
 {

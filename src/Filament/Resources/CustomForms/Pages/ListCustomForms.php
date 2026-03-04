@@ -1,8 +1,8 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Filament\Resources\CustomForms\Pages;
+namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\Pages;
 
-use Dcx\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 

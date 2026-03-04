@@ -1,8 +1,8 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Tests;
+namespace Chanthoeun\FilamentCustomForms\Tests;
 
-use Dcx\FilamentCustomForms\CustomFormServiceProvider;
+use Chanthoeun\FilamentCustomForms\CustomFormServiceProvider;
 use Filament\FilamentServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -24,14 +24,14 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Dcx\\FilamentCustomForms\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'Chanthoeun\\FilamentCustomForms\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
 
         $this->setUpDatabase();
 
         session()->put('errors', new \Illuminate\Support\ViewErrorBag);
 
-        $user = \Dcx\FilamentCustomForms\Tests\Models\User::create([
+        $user = \Chanthoeun\FilamentCustomForms\Tests\Models\User::create([
             'name' => 'Test User',
             'email' => 'test' . uniqid() . '@example.com',
             'password' => bcrypt('password'),
@@ -53,7 +53,7 @@ class TestCase extends Orchestra
         config()->set('database.default', 'testing');
         config()->set('app.key', 'base64:Hupx3yAySly9Xiq9fR8P5lK3fS72xXpW4yL1k9xYvG8=');
         
-        config()->set('auth.providers.users.model', \Dcx\FilamentCustomForms\Tests\Models\User::class);
+        config()->set('auth.providers.users.model', \Chanthoeun\FilamentCustomForms\Tests\Models\User::class);
         config()->set('session.driver', 'array');
 
         $app['router']->aliasMiddleware('auth', \Illuminate\Auth\Middleware\Authenticate::class);

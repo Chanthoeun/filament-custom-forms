@@ -1,11 +1,11 @@
 <?php
 
-namespace Dcx\FilamentCustomForms\Tests\Feature;
+namespace Chanthoeun\FilamentCustomForms\Tests\Feature;
 
-use Dcx\FilamentCustomForms\Filament\Resources\CustomFormResource;
-use Dcx\FilamentCustomForms\Filament\Resources\Pages;
-use Dcx\FilamentCustomForms\Models\CustomForm;
-use Dcx\FilamentCustomForms\Tests\TestCase;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\Pages;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Tests\TestCase;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,7 +19,7 @@ class CustomFormResourceTest extends TestCase
     {
         parent::setUp();
         
-        $user = \Dcx\FilamentCustomForms\Tests\Models\User::create([
+        $user = \Chanthoeun\FilamentCustomForms\Tests\Models\User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),

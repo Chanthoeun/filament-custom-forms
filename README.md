@@ -16,18 +16,12 @@ A powerful and simplified FilamentPHP plugin to manage and submit dynamic custom
 - PHP 8.2+
 - Filament v4.0 or v5.0
 
-### 2. Standard Installation (via GitHub)
+### 2. Standard Installation
 
-Since this package is hosted on GitHub, you need to add the repository to your `composer.json` first:
-
-```bash
-composer config repositories.filament-custom-forms vcs https://github.com/Chanthoeun/filament-custom-forms.git
-```
-
-Then, you can require the package directly:
+You can install the package via composer:
 
 ```bash
-composer require dcx/filament-custom-forms:dev-main
+composer require dcx/filament-custom-forms
 ```
 
 ### 3. Register the Plugin

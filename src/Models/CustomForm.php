@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Models;
+namespace Dcx\FilamentCustomForms\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

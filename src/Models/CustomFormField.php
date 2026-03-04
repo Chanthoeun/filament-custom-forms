@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Models;
+namespace Dcx\FilamentCustomForms\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

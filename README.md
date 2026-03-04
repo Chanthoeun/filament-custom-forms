@@ -21,7 +21,7 @@ A powerful FilamentPHP plugin to manage and submit dynamic custom forms with app
 Once the package is published on Packagist, you can install it via composer:
 
 ```bash
-composer require laraspace/filament-custom-forms
+composer require dcx/filament-custom-forms
 ```
 
 ### 3. Local Installation (for development)
@@ -36,7 +36,7 @@ If you have the package locally, add the local repository to your project's `com
     }
 ],
 "require": {
-    "laraspace/filament-custom-forms": "*"
+    "dcx/filament-custom-forms": "*"
 }
 ```
 
@@ -45,7 +45,7 @@ If you have the package locally, add the local repository to your project's `com
 Add the plugin to your Filament Panel provider:
 
 ```php
-use LaraSpace\FilamentCustomForms\CustomFormPlugin;
+use Dcx\FilamentCustomForms\CustomFormPlugin;
 
 public function panel(Panel $panel): Panel
 {

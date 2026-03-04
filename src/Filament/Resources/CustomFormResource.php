@@ -1,11 +1,11 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Filament\Resources;
+namespace Dcx\FilamentCustomForms\Filament\Resources;
 
-use LaraSpace\FilamentCustomForms\Filament\Resources\Pages;
-use LaraSpace\FilamentCustomForms\Filament\Resources\Schemas\CustomFormForm;
-use LaraSpace\FilamentCustomForms\Filament\Resources\Tables\CustomFormsTable;
-use LaraSpace\FilamentCustomForms\Models\CustomForm;
+use Dcx\FilamentCustomForms\Filament\Resources\Pages;
+use Dcx\FilamentCustomForms\Filament\Resources\Schemas\CustomFormForm;
+use Dcx\FilamentCustomForms\Filament\Resources\Tables\CustomFormsTable;
+use Dcx\FilamentCustomForms\Models\CustomForm;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;

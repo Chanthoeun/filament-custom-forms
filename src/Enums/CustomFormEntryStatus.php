@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Enums;
+namespace Dcx\FilamentCustomForms\Enums;
 
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;

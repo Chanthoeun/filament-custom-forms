@@ -1,8 +1,8 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Filament\Resources\Pages;
+namespace Dcx\FilamentCustomForms\Filament\Resources\Pages;
 
-use LaraSpace\FilamentCustomForms\Filament\Resources\CustomFormResource;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomFormResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 

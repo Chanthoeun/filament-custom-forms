@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Filament\Resources\RelationManagers;
+namespace Dcx\FilamentCustomForms\Filament\Resources\RelationManagers;
 
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;

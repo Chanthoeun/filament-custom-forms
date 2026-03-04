@@ -1,8 +1,8 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Filament\Resources\Pages;
+namespace Dcx\FilamentCustomForms\Filament\Resources\Pages;
 
-use LaraSpace\FilamentCustomForms\Filament\Resources\CustomFormEntryResource;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntryResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateCustomFormEntry extends CreateRecord

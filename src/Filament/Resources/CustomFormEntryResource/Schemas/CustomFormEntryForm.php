@@ -1,8 +1,8 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Filament\Resources\Schemas;
+namespace Dcx\FilamentCustomForms\Filament\Resources\Schemas;
 
-use LaraSpace\FilamentCustomForms\Models\CustomForm;
+use Dcx\FilamentCustomForms\Models\CustomForm;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;

@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Models;
+namespace Dcx\FilamentCustomForms\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +26,7 @@ class CustomFormEntry extends Model
 
     protected $casts = [
         'data' => 'array',
-        'status' => \LaraSpace\FilamentCustomForms\Enums\CustomFormEntryStatus::class,
+        'status' => \Dcx\FilamentCustomForms\Enums\CustomFormEntryStatus::class,
     ];
 
     public function customForm(): BelongsTo

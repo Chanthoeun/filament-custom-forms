@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Filament\Resources\Schemas;
+namespace Dcx\FilamentCustomForms\Filament\Resources\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Grid;

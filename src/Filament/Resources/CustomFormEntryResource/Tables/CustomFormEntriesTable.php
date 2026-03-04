@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Filament\Resources\Tables;
+namespace Dcx\FilamentCustomForms\Filament\Resources\Tables;
 
 use App\Filament\Actions\PrintAction;
 use Filament\Actions\BulkActionGroup;

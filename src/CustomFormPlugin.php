@@ -1,11 +1,11 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms;
+namespace Dcx\FilamentCustomForms;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use LaraSpace\FilamentCustomForms\Filament\Resources\CustomFormResource;
-use LaraSpace\FilamentCustomForms\Filament\Resources\CustomFormEntryResource;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomFormResource;
+use Dcx\FilamentCustomForms\Filament\Resources\CustomFormEntryResource;
 
 class CustomFormPlugin implements Plugin
 {

@@ -1,18 +1,18 @@
 <?php
 
-namespace LaraSpace\FilamentCustomForms\Filament\Resources;
+namespace Dcx\FilamentCustomForms\Filament\Resources;
 
-use LaraSpace\FilamentCustomForms\Filament\Resources\Pages;
-use LaraSpace\FilamentCustomForms\Filament\Resources\Schemas\CustomFormEntryForm;
-use LaraSpace\FilamentCustomForms\Filament\Resources\Tables\CustomFormEntriesTable;
-use LaraSpace\FilamentCustomForms\Models\CustomFormEntry;
+use Dcx\FilamentCustomForms\Filament\Resources\Pages;
+use Dcx\FilamentCustomForms\Filament\Resources\Schemas\CustomFormEntryForm;
+use Dcx\FilamentCustomForms\Filament\Resources\Tables\CustomFormEntriesTable;
+use Dcx\FilamentCustomForms\Models\CustomFormEntry;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use BackedEnum;
-use LaraSpace\FilamentCustomForms\Models\CustomForm;
+use Dcx\FilamentCustomForms\Models\CustomForm;
 
 class CustomFormEntryResource extends Resource
 {

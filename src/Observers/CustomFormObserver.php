@@ -18,4 +18,11 @@ class CustomFormObserver
             ]);
         }
     }
+
+    public function deleted(CustomForm $customForm)
+    {
+        if (class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)) {
+            \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::where('type', 'custom_form_' . $customForm->id)->delete();
+        }
+    }
 }

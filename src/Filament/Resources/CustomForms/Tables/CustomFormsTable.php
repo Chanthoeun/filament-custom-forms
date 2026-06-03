@@ -51,6 +51,29 @@ class CustomFormsTable
                 TrashedFilter::make(),
             ])
             ->actions([ // Standard way is actions()
+                \Filament\Actions\Action::make('edit_template')
+                    ->label('Edit Template')
+                    ->icon('heroicon-o-document-text')
+                    ->color('info')
+                    ->url(function ($record) {
+                        if (class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)) {
+                            $template = \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::where('type', 'custom_form_' . $record->id)->first();
+                            if ($template) {
+                                if (class_exists(\App\Filament\Resources\DocumentTemplateResource::class)) {
+                                    return \App\Filament\Resources\DocumentTemplateResource::getUrl('edit', ['record' => $template]);
+                                } elseif (class_exists(\Chanthoeun\FilamentDocumentBuilder\Resources\DocumentTemplateResource::class)) {
+                                    return \Chanthoeun\FilamentDocumentBuilder\Resources\DocumentTemplateResource::getUrl('edit', ['record' => $template]);
+                                }
+                            }
+                        }
+                        return null;
+                    })
+                    ->visible(function ($record) {
+                        if (!class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)) {
+                            return false;
+                        }
+                        return \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::where('type', 'custom_form_' . $record->id)->exists();
+                    }),
                 EditAction::make(),
                 DeleteAction::make(),
                 RestoreAction::make(),

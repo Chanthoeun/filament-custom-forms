@@ -25,8 +25,11 @@ class CustomFormEntryForm
 {
     public static function configure(Schema $schema): Schema
     {
-        // Attempt to get pre-selected ID from the parent resource URL query (tableFilters) if available
-        $preselectedFormId = request()->input('tableFilters.custom_form_id.value');
+        $livewire = $schema->getLivewire();
+        
+        $preselectedFormId = property_exists($livewire, 'form_id') && $livewire->form_id
+            ? $livewire->form_id
+            : (request()->query('form_id') ?? request()->input('tableFilters.custom_form_id.value'));
 
         return $schema
             ->components([

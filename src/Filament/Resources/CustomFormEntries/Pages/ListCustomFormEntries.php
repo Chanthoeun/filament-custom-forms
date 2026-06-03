@@ -139,7 +139,7 @@ class ListCustomFormEntries extends ListRecords
             Actions\CreateAction::make()
                 ->label($createLabel)
                 ->url(fn() => CustomFormEntryResource::getUrl('create', [
-                    'tableFilters' => request()->query('tableFilters', []),
+                    'form_id' => $this->activeFormId,
                 ])),
         ];
     }

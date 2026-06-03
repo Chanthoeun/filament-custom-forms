@@ -7,13 +7,22 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateCustomFormEntry extends CreateRecord
 {
+    #[\Livewire\Attributes\Url]
+    public ?string $form_id = null;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        if ($this->form_id) {
+            $data['custom_form_id'] = $this->form_id;
+        }
+        return $data;
+    }
+
     protected static string $resource = CustomFormEntryResource::class;
     public function getHeading(): string|\Illuminate\Contracts\Support\Htmlable
     {
-        $customFormId = request()->input('tableFilters.custom_form_id.value');
-
-        if ($customFormId) {
-            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($customFormId);
+        if ($this->form_id) {
+            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->form_id);
             if ($customForm) {
                 return 'Create ' . $customForm->name;
             }
@@ -24,15 +33,14 @@ class CreateCustomFormEntry extends CreateRecord
     public function getBreadcrumbs(): array
     {
         $breadcrumbs = [];
-        $customFormId = request()->input('tableFilters.custom_form_id.value');
         $label = 'Custom Form Entries';
         $urlParams = [];
 
-        if ($customFormId) {
-            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($customFormId);
+        if ($this->form_id) {
+            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->form_id);
             if ($customForm) {
                 $label = $customForm->name . ' Entries';
-                $urlParams = ['tableFilters' => ['custom_form_id' => ['value' => $customFormId]]];
+                $urlParams = ['tableFilters' => ['custom_form_id' => ['value' => $this->form_id]]];
             }
         }
 

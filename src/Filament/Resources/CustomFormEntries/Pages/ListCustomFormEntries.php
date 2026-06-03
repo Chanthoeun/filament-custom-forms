@@ -144,27 +144,19 @@ class ListCustomFormEntries extends ListRecords
                         }, $formName . '-' . now()->format('Y-m-d-His') . '.sql');
                     }
                 }),
-            Actions\Action::make('export_pdf')
+            \Chanthoeun\FilamentDocumentBuilder\Actions\DownloadAllPdfAction::make('export_pdf')
                 ->label('Download PDF')
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('success')
-                ->action(function () {
+                ->records(function () {
                     $query = $this->getFilteredTableQuery();
-
                     if ($this->activeFormId) {
                         $query->where('custom_form_id', $this->activeFormId);
                     }
-
-                    $records = $query->get();
-                    
-                    if ($records->isEmpty()) {
-                        \Filament\Notifications\Notification::make()
-                            ->title('No records to export')
-                            ->warning()
-                            ->send();
-                        return;
-                    }
-
+                    return $query->get();
+                })
+                ->templateType(fn () => $this->activeFormId ? 'custom_form_' . $this->activeFormId : null)
+                ->filename(function () {
                     $formName = 'custom-entries';
                     if ($this->activeFormId) {
                         $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->activeFormId);
@@ -174,47 +166,9 @@ class ListCustomFormEntries extends ListRecords
                             $formName = str_replace(' ', '-', $name);
                         }
                     }
-
-                    if (!class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)) {
-                        \Filament\Notifications\Notification::make()
-                            ->title('Document Builder Plugin Required')
-                            ->danger()
-                            ->send();
-                        return;
-                    }
-
-                    $templateType = $this->activeFormId ? 'custom_form_' . $this->activeFormId : null;
-                    $template = null;
-                    
-                    if ($templateType) {
-                        $template = \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::where('type', $templateType)->first();
-                    }
-                    
-                    if (!$template) {
-                        $template = \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::first();
-                    }
-
-                    if (!$template) {
-                        \Filament\Notifications\Notification::make()
-                            ->title('No Document Template Found')
-                            ->danger()
-                            ->send();
-                        return;
-                    }
-
-                    $renderer = app(\Chanthoeun\FilamentDocumentBuilder\Services\DocumentRenderer::class);
-                    
-                    if (method_exists($renderer, 'renderMultiple')) {
-                        $pdf = $renderer->renderMultiple($template, $records);
-                    } else {
-                        // Fallback for older versions
-                        $pdf = $renderer->render($template, $records->first());
-                    }
-
-                    return response()->streamDownload(function () use ($pdf) {
-                        echo $pdf->output();
-                    }, $formName . '-' . now()->format('Y-m-d-His') . '.pdf');
-                }),
+                    return $formName . '-' . now()->format('Y-m-d-His') . '.pdf';
+                })
+                ->visible(fn () => class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)),
             Actions\CreateAction::make()
                 ->label($createLabel)
                 ->url(fn() => CustomFormEntryResource::getUrl('create', [

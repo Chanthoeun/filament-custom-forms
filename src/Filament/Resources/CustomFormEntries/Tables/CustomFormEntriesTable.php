@@ -202,27 +202,9 @@ class CustomFormEntriesTable
         ];
 
         if (class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)) {
-            $actions[] = Action::make('download_pdf')
-                ->label('Download PDF')
-                ->icon('heroicon-o-document-arrow-down')
-                ->action(function ($record) {
-                    $templateType = 'custom_form_' . $record->custom_form_id;
-                    $template = \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::where('type', $templateType)->first();
-
-                    if (!$template) {
-                        return \Filament\Notifications\Notification::make()
-                            ->title('Template not found')
-                            ->danger()
-                            ->send();
-                    }
-
-                    $renderer = app(\Chanthoeun\FilamentDocumentBuilder\Services\DocumentRenderer::class);
-                    $pdf = $renderer->render($template, $record);
-
-                    return response()->streamDownload(function () use ($pdf) {
-                        echo $pdf->output();
-                    }, 'document-' . $record->id . '.pdf');
-                });
+            $actions[] = \Chanthoeun\FilamentDocumentBuilder\Tables\Actions\DownloadPdfAction::make('download_pdf')
+                ->templateType(fn ($record) => 'custom_form_' . $record->custom_form_id)
+                ->filename(fn ($record) => 'document-' . $record->id . '.pdf');
         }
 
         return $actions;

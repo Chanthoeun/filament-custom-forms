@@ -19,6 +19,7 @@ class CustomFormPlugin implements Plugin
     protected string|bool|null $navigationEntryGroup = null;
     protected ?string $navigationFormIcon = null;
     protected ?string $navigationEntryIcon = null;
+    protected ?int $navigationSort = null;
 
     public function getId(): string
     {
@@ -171,6 +172,17 @@ class CustomFormPlugin implements Plugin
     public function getNavigationEntryIcon(): string
     {
         return $this->navigationEntryIcon ?? config('filament-custom-forms.navigation.entry_icon', 'heroicon-o-document-text');
+    }
+
+    public function navigationSort(?int $sort): static
+    {
+        $this->navigationSort = $sort;
+        return $this;
+    }
+
+    public function getNavigationSort(): ?int
+    {
+        return $this->navigationSort ?? config('filament-custom-forms.navigation.sort');
     }
 
     public function register(Panel $panel): void

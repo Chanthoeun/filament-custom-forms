@@ -40,6 +40,11 @@ class CustomFormResource extends Resource
         return CustomFormPlugin::get()->getNavigationGroup();
     }
 
+    public static function getNavigationSort(): ?int
+    {
+        return CustomFormPlugin::get()->getNavigationSort();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return CustomFormForm::configure($schema);

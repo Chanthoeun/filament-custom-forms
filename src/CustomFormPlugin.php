@@ -15,8 +15,8 @@ class CustomFormPlugin implements Plugin
     protected ?string $uploadDisk = null;
     protected ?string $uploadDirectory = null;
     protected ?string $uploadVisibility = null;
-    protected ?string $navigationGroup = null;
-    protected ?string $navigationEntryGroup = null;
+    protected string|bool|null $navigationGroup = null;
+    protected string|bool|null $navigationEntryGroup = null;
     protected ?string $navigationFormIcon = null;
     protected ?string $navigationEntryIcon = null;
 
@@ -107,25 +107,31 @@ class CustomFormPlugin implements Plugin
     }
 
     // --- Navigation ---
-    public function navigationGroup(string $group): static
+    public function navigationGroup(string|bool|null $group): static
     {
         $this->navigationGroup = $group;
         return $this;
     }
 
-    public function getNavigationGroup(): string
+    public function getNavigationGroup(): ?string
     {
+        if ($this->navigationGroup === false) {
+            return null;
+        }
         return $this->navigationGroup ?? config('filament-custom-forms.navigation.group', __('filament-custom-forms::fcf.form.builder_group'));
     }
 
-    public function navigationEntryGroup(string $group): static
+    public function navigationEntryGroup(string|bool|null $group): static
     {
         $this->navigationEntryGroup = $group;
         return $this;
     }
 
-    public function getNavigationEntryGroup(): string
+    public function getNavigationEntryGroup(): ?string
     {
+        if ($this->navigationEntryGroup === false) {
+            return null;
+        }
         return $this->navigationEntryGroup ?? config('filament-custom-forms.navigation.entry_group', __('filament-custom-forms::fcf.form.entry_group'));
     }
  

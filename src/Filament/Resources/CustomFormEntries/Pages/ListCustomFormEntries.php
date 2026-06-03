@@ -76,8 +76,6 @@ class ListCustomFormEntries extends ListRecords
                         ->options([
                             'excel' => __('filament-custom-forms::fcf.entry.option.excel'),
                             'json' => __('filament-custom-forms::fcf.entry.option.json'),
-                            'sql' => __('filament-custom-forms::fcf.entry.option.sql'),
-                            'pdf' => 'PDF Document',
                         ])
                         ->default('excel')
                         ->inline()
@@ -119,47 +117,7 @@ class ListCustomFormEntries extends ListRecords
                         }
                     }
 
-                    if ($format === 'pdf') {
-                        if (!class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)) {
-                            \Filament\Notifications\Notification::make()
-                                ->title('Document Builder Plugin Required')
-                                ->danger()
-                                ->send();
-                            return;
-                        }
-
-                        $templateType = $this->activeFormId ? 'custom_form_' . $this->activeFormId : null;
-                        $template = null;
-                        
-                        if ($templateType) {
-                            $template = \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::where('type', $templateType)->first();
-                        }
-                        
-                        if (!$template) {
-                            $template = \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::first();
-                        }
-
-                        if (!$template) {
-                            \Filament\Notifications\Notification::make()
-                                ->title('No Document Template Found')
-                                ->danger()
-                                ->send();
-                            return;
-                        }
-
-                        $renderer = app(\Chanthoeun\FilamentDocumentBuilder\Services\DocumentRenderer::class);
-                        
-                        if (method_exists($renderer, 'renderMultiple')) {
-                            $pdf = $renderer->renderMultiple($template, $records);
-                        } else {
-                            // Fallback for older versions
-                            $pdf = $renderer->render($template, $records->first());
-                        }
-
-                        return response()->streamDownload(function () use ($pdf) {
-                            echo $pdf->output();
-                        }, $formName . '-' . now()->format('Y-m-d-His') . '.pdf');
-                    } elseif ($format === 'excel') {
+                    if ($format === 'excel') {
                         return \Maatwebsite\Excel\Facades\Excel::download(
                             new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport($records, $this->activeFormId),
                             $formName . '-' . now()->format('Y-m-d-His') . '.xlsx'
@@ -185,6 +143,77 @@ class ListCustomFormEntries extends ListRecords
                             echo $sql;
                         }, $formName . '-' . now()->format('Y-m-d-His') . '.sql');
                     }
+                }),
+            Actions\Action::make('export_pdf')
+                ->label('Export PDF')
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('gray')
+                ->action(function () {
+                    $query = $this->getFilteredTableQuery();
+
+                    if ($this->activeFormId) {
+                        $query->where('custom_form_id', $this->activeFormId);
+                    }
+
+                    $records = $query->get();
+                    
+                    if ($records->isEmpty()) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('No records to export')
+                            ->warning()
+                            ->send();
+                        return;
+                    }
+
+                    $formName = 'custom-entries';
+                    if ($this->activeFormId) {
+                        $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->activeFormId);
+                        if ($customForm) {
+                            $name = trim($customForm->name);
+                            $name = preg_replace('/[^A-Za-z0-9\-\_ ]/', '', $name);
+                            $formName = str_replace(' ', '-', $name);
+                        }
+                    }
+
+                    if (!class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Document Builder Plugin Required')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
+                    $templateType = $this->activeFormId ? 'custom_form_' . $this->activeFormId : null;
+                    $template = null;
+                    
+                    if ($templateType) {
+                        $template = \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::where('type', $templateType)->first();
+                    }
+                    
+                    if (!$template) {
+                        $template = \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::first();
+                    }
+
+                    if (!$template) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('No Document Template Found')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
+                    $renderer = app(\Chanthoeun\FilamentDocumentBuilder\Services\DocumentRenderer::class);
+                    
+                    if (method_exists($renderer, 'renderMultiple')) {
+                        $pdf = $renderer->renderMultiple($template, $records);
+                    } else {
+                        // Fallback for older versions
+                        $pdf = $renderer->render($template, $records->first());
+                    }
+
+                    return response()->streamDownload(function () use ($pdf) {
+                        echo $pdf->output();
+                    }, $formName . '-' . now()->format('Y-m-d-His') . '.pdf');
                 }),
             Actions\CreateAction::make()
                 ->label($createLabel)

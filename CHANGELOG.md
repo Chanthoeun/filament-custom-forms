@@ -4,8 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
- 
- ## [v1.0.8] - 2026-03-04
+
+## [v1.0.9] - 2026-06-03
+### Added
+- Added `CustomFormObserver` to automatically provision a `DocumentTemplate` when a new Custom Form is created.
+- Added `download_pdf` action to `CustomFormEntriesTable` to instantly download a PDF of form submissions.
+- Added `chanthoeun/filament-document-builder` to composer `require` block for deep integration.
+
+## [v1.0.8] - 2026-03-04
  ### Fixed
  - Fixed translation fallback logic in `ListCustomFormEntries` to correctly show database names when translations are missing.
  - Added missing `names` array to `fcf.php` locale files for dynamic form name translations.

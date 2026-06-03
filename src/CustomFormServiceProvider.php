@@ -20,4 +20,9 @@ class CustomFormServiceProvider extends PackageServiceProvider
                 'create_custom_form_entries_table',
             ]);
     }
+
+    public function packageBooted(): void
+    {
+        \Chanthoeun\FilamentCustomForms\Models\CustomForm::observe(\Chanthoeun\FilamentCustomForms\Observers\CustomFormObserver::class);
+    }
 }

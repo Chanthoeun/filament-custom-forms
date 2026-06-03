@@ -66,6 +66,14 @@ class CustomFormsTable
                                 'name' => $record->name . ' Template',
                                 'model_class' => \Chanthoeun\FilamentCustomForms\Models\CustomFormEntry::class,
                                 'content' => '',
+                                'page_settings' => [
+                                    'format' => 'a4',
+                                    'orientation' => 'portrait',
+                                    'margin_left' => 15,
+                                    'margin_right' => 15,
+                                    'margin_top' => 15,
+                                    'margin_bottom' => 15,
+                                ],
                             ]
                         );
 

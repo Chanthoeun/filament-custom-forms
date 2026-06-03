@@ -145,9 +145,9 @@ class ListCustomFormEntries extends ListRecords
                     }
                 }),
             Actions\Action::make('export_pdf')
-                ->label('Export PDF')
+                ->label('Download PDF')
                 ->icon('heroicon-o-document-arrow-down')
-                ->color('gray')
+                ->color('success')
                 ->action(function () {
                     $query = $this->getFilteredTableQuery();
 

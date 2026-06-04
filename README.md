@@ -4,7 +4,8 @@ A powerful and simplified FilamentPHP plugin to manage and submit dynamic custom
 
 ## Features
 
-- Dynamic form builder with custom fields.
+- Dynamic form builder with extensive custom fields (Text, Select, Checkbox, Radio, Date, Time, File Upload, etc.).
+- Secure password fields with automatic hashing and confirm password validation.
 - Submission management with a clean interface.
 - Support for Filament v4 and v5.
 - Easy integration as a standalone package.

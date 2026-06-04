@@ -93,6 +93,14 @@ class CustomFormForm
                     TextInput::make('label')->label(__('filament-custom-forms::fcf.builder.fields.label'))->required(),
                     Toggle::make('required')->label(__('filament-custom-forms::fcf.builder.fields.required')),
                 ]),
+            FormBuilder\Block::make('confirm_password')
+                ->label('Confirm Password')
+                ->schema([
+                    TextInput::make('name')->label(__('filament-custom-forms::fcf.builder.fields.name'))->required(),
+                    TextInput::make('label')->label(__('filament-custom-forms::fcf.builder.fields.label'))->required(),
+                    TextInput::make('match_field')->label('Match Field (Name)')->required()->helperText('Enter the name of the password field this should match.'),
+                    Toggle::make('required')->label(__('filament-custom-forms::fcf.builder.fields.required')),
+                ]),
             FormBuilder\Block::make('date_picker')
                 ->label(__('filament-custom-forms::fcf.builder.blocks.date_picker'))
                 ->schema([

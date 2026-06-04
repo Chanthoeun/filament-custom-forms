@@ -62,10 +62,16 @@ class CustomFormEntryForm
                             return [];
                         }
 
-                        // Fetch only root fields, subsequent recursion will lazy load children or we can eager load if needed.
-                        // Ideally we should eager load 'children' recursively but simplified for now:
-            
-                        $rootFields = $customForm->fields()->roots()->get();
+                        // Eager load all fields and build the relationship tree in memory
+                        // to prevent massive N+1 queries during recursive form building.
+                        $allFields = $customForm->fields()->orderBy('sort')->get();
+                        $fieldsByParent = $allFields->groupBy('parent_id');
+                        
+                        foreach ($allFields as $field) {
+                            $field->setRelation('children', $fieldsByParent->get($field->id, collect()));
+                        }
+                        
+                        $rootFields = $fieldsByParent->get('', collect());
 
                         return self::getFields($rootFields);
                     })
@@ -220,10 +226,33 @@ class CustomFormEntryForm
                         }
                         break;
                     case 'password':
-                        $component = TextInput::make("data.{$name}")->password();
+                        $component = TextInput::make("data.{$name}")
+                            ->password()
+                            ->dehydrateStateUsing(function ($state, ?Model $record) use ($name) {
+                                if (filled($state)) {
+                                    return \Illuminate\Support\Facades\Hash::make($state);
+                                }
+                                return $record ? data_get($record->data, $name) : null;
+                            })
+                            ->revealable();
+                        break;
+                    case 'confirm_password':
+                        $component = TextInput::make("data.{$name}")
+                            ->password()
+                            ->revealable()
+                            ->dehydrated(false);
+                            
+                        $matchField = $options['match_field'] ?? null;
+                        if ($matchField) {
+                            $component->same("data.{$matchField}");
+                        }
                         break;
                     case 'boolean':
+                    case 'checkbox':
                         $component = Toggle::make("data.{$name}");
+                        if ($type === 'checkbox') {
+                            $component = \Filament\Forms\Components\Checkbox::make("data.{$name}");
+                        }
                         if ($options['default'] ?? false) {
                             $component->default(true);
                         }
@@ -234,6 +263,14 @@ class CustomFormEntryForm
                             ->disk(CustomFormPlugin::get()->getUploadDisk())
                             ->directory(CustomFormPlugin::get()->getUploadDirectory())
                             ->visibility(CustomFormPlugin::get()->getUploadVisibility());
+                        break;
+                    case 'radio':
+                        $selectOptions = $options['choices'] ?? [];
+                        $component = \Filament\Forms\Components\Radio::make("data.{$name}")->options($selectOptions);
+                        break;
+                    case 'checkbox_list':
+                        $selectOptions = $options['choices'] ?? [];
+                        $component = \Filament\Forms\Components\CheckboxList::make("data.{$name}")->options($selectOptions);
                         break;
                     case 'select':
                         $selectOptions = $options['choices'] ?? [];

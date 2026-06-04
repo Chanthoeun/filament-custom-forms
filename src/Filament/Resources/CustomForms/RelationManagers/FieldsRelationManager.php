@@ -67,9 +67,13 @@ class FieldsRelationManager extends RelationManager
                                     'date_picker' => __('filament-custom-forms::fcf.builder.blocks.date_picker'),
                                     'time_picker' => __('filament-custom-forms::fcf.builder.blocks.time_picker'),
                                     'boolean' => __('filament-custom-forms::fcf.builder.blocks.boolean'),
+                                    'checkbox' => 'Checkbox (Single)',
+                                    'checkbox_list' => 'Checkbox List',
+                                    'radio' => 'Radio',
                                     'select' => __('filament-custom-forms::fcf.builder.blocks.select'),
                                     'image' => __('filament-custom-forms::fcf.builder.blocks.image'),
                                     'password' => __('filament-custom-forms::fcf.builder.blocks.password'),
+                                    'confirm_password' => 'Confirm Password',
                                     'phone' => __('filament-custom-forms::fcf.builder.blocks.phone'),
                                 ],
                             ])
@@ -78,7 +82,6 @@ class FieldsRelationManager extends RelationManager
                         \Filament\Forms\Components\Toggle::make('required')
                             ->label(__('filament-custom-forms::fcf.field.is_required'))
                             ->default(false)
-                            ->visible(fn($get) => in_array($get('type'), ['repeater']))
                             ->hidden(fn($get) => in_array($get('type'), ['section', 'grid', 'fieldset', 'wizard'])),
 
                         \Filament\Schemas\Components\Section::make(__('filament-custom-forms::fcf.admin.configuration'))
@@ -86,7 +89,7 @@ class FieldsRelationManager extends RelationManager
                             ->components([
                                 \Filament\Forms\Components\Select::make('options.columns')
                                     ->label(__('filament-custom-forms::fcf.admin.columns'))
-                                    ->visible(fn($get) => in_array($get('type'), ['grid', 'section', 'fieldset', 'repeater', 'wizard']))
+                                    ->visible(fn($get) => in_array($get('type'), ['grid', 'section', 'fieldset', 'repeater', 'wizard', 'checkbox_list']))
                                     ->options([
                                         '1' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 1),
                                         '2' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 2),
@@ -97,8 +100,13 @@ class FieldsRelationManager extends RelationManager
 
                                 \Filament\Forms\Components\KeyValue::make('options.choices')
                                     ->label(__('filament-custom-forms::fcf.admin.select_options'))
-                                    ->visible(fn($get) => $get('type') === 'select')
+                                    ->visible(fn($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']))
                                     ->helperText('Key corresponds to value, Label is displayed text.'),
+
+                                \Filament\Forms\Components\TextInput::make('options.match_field')
+                                    ->label('Match Field (Name)')
+                                    ->visible(fn($get) => $get('type') === 'confirm_password')
+                                    ->helperText('Enter the name of the password field this should match.'),
 
                                 \Filament\Forms\Components\KeyValue::make('options.column_span')
                                     ->label('Column Span (Responsive)')
@@ -158,7 +166,7 @@ class FieldsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name')->label(__('filament-custom-forms::fcf.field.name'))->searchable(),
                 TextColumn::make('label')->label(__('filament-custom-forms::fcf.field.label'))->searchable(),
-                IconColumn::make('required')->label(__('filament-custom-forms::fcf.field.is_required'))->boolean(),
+                \Filament\Tables\Columns\ToggleColumn::make('required')->label(__('filament-custom-forms::fcf.field.is_required')),
                 TextColumn::make('type')->label(__('filament-custom-forms::fcf.field.type'))->badge()->color(fn(string $state): string => match ($state) {
                     'section', 'grid', 'fieldset', 'wizard' => 'info',
                     default => 'gray',

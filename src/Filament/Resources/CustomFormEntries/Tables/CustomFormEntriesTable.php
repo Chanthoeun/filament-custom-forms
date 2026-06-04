@@ -57,16 +57,7 @@ class CustomFormEntriesTable
 
         $definedKeys = $fieldsMetadata->keys();
 
-        // Fetch keys from existing entries to catch any legacy/extra data (Limited to 20 for performance)
-        $dataKeys = \Chanthoeun\FilamentCustomForms\Models\CustomFormEntry::query()
-            ->when($formId, fn($query) => $query->where('custom_form_id', $formId))
-            ->latest()
-            ->limit(20)
-            ->get()
-            ->flatMap(fn($entry) => array_keys(is_array($entry->data) ? $entry->data : []))
-            ->unique();
-
-        $keys = $definedKeys->merge($dataKeys)->unique();
+        $keys = $definedKeys->unique();
 
         $sortOrder = $fieldsMetadata->pluck('sort', 'name');
         $fieldTypes = $fieldsMetadata->pluck('type', 'name');
@@ -74,6 +65,8 @@ class CustomFormEntriesTable
         $fieldsById = $fieldsMetadata->keyBy('id');
 
         $sortedKeys = $keys->sortBy(fn($key) => $sortOrder[$key] ?? 999999);
+
+        $visibleColumnCount = 0;
 
         foreach ($sortedKeys as $key) {
             if (in_array(($fieldTypes[$key] ?? null), ['repeater', 'section', 'grid', 'fieldset'])) {
@@ -93,8 +86,12 @@ class CustomFormEntriesTable
 
             $column = TextColumn::make($columnKey)
                 ->label($label)
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false);
+                ->toggleable(isToggledHiddenByDefault: $visibleColumnCount >= 4);
+
+            // Only make the first 4 columns searchable by default to prevent massive slow SQL JSON queries
+            if ($visibleColumnCount < 4) {
+                $column->searchable();
+            }
 
             if (($fieldTypes[$key] ?? null) === 'number_input') {
                 $column->numeric();
@@ -109,11 +106,8 @@ class CustomFormEntriesTable
                 $column->time();
             }
 
-            if (($fieldTypes[$key] ?? null) === 'time_picker') {
-                $column->time();
-            }
-
             $columns[] = $column;
+            $visibleColumnCount++;
         }
 
         if (count($columns) > 0) {

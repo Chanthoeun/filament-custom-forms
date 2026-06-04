@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.0] - 2026-06-04
+### Added
+- Added `checkbox`, `checkbox_list`, and `radio` field types.
+- Added `password` and `confirm_password` field types with automatic hashing and "match field" validation.
+- Converted `is_required` in the Fields table to an interactive `ToggleColumn`.
+
+### Fixed
+- Fixed an issue where the 'is_required' toggle was hidden for standard fields in the form builder.
+- Fixed a massive performance bottleneck caused by N+1 queries during component schema hydration.
+- Updated Composer `symlink` config to `false` for Docker/Sail compatibility.
+
 ## [v1.0.9] - 2026-06-03
 ### Added
 - Added `CustomFormObserver` to automatically provision a `DocumentTemplate` when a new Custom Form is created.

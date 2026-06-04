@@ -76,6 +76,7 @@ class ListCustomFormEntries extends ListRecords
                         ->options([
                             'excel' => __('filament-custom-forms::fcf.entry.option.excel'),
                             'json' => __('filament-custom-forms::fcf.entry.option.json'),
+                            'pdf' => 'PDF (.pdf)',
                         ])
                         ->default('excel')
                         ->inline()
@@ -121,6 +122,12 @@ class ListCustomFormEntries extends ListRecords
                         return \Maatwebsite\Excel\Facades\Excel::download(
                             new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport($records, $this->activeFormId),
                             $formName . '-' . now()->format('Y-m-d-His') . '.xlsx'
+                        );
+                    } elseif ($format === 'pdf') {
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport($records, $this->activeFormId),
+                            $formName . '-' . now()->format('Y-m-d-His') . '.pdf',
+                            \Maatwebsite\Excel\Excel::MPDF
                         );
                     } elseif ($format === 'json') {
                         // Reuse the Export class to get consistent formatting

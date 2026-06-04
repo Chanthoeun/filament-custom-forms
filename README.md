@@ -82,6 +82,7 @@ To release a new version:
 1.  **Form Creation**: Navigate to the **Custom Forms** resource to create dynamic forms using the builder.
 2.  **Data Collection**: Users can submit entries through the generated forms.
 3.  **Entry Management**: View and export entries in the **Custom Form Entries** resource.
+4.  **Data Exporting**: Export the data grid to JSON, heavily formatted Excel files, or instantly as beautifully formatted PDF tables.
 
 ## Changelog
 

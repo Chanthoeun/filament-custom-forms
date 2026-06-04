@@ -192,6 +192,19 @@ class CustomFormPlugin implements Plugin
                 CustomFormResource::class,
                 CustomFormEntryResource::class,
             ]);
+
+        // Automatically register the DocumentBuilder plugin if available
+        if (class_exists(\Chanthoeun\FilamentDocumentBuilder\DocumentBuilderPlugin::class)) {
+            $documentBuilderPlugin = \Chanthoeun\FilamentDocumentBuilder\DocumentBuilderPlugin::make();
+            
+            // Sync the navigation group to merge them into one (e.g., "Form Builder")
+            if (method_exists($documentBuilderPlugin, 'navigationGroup')) {
+                $documentBuilderPlugin->navigationGroup($this->getNavigationGroup());
+            }
+            
+            // Register it into the panel
+            $panel->plugin($documentBuilderPlugin);
+        }
     }
 
     public function boot(Panel $panel): void

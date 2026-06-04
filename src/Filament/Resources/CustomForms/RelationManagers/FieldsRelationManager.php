@@ -144,6 +144,11 @@ class FieldsRelationManager extends RelationManager
                                     ->label(__('filament-custom-forms::fcf.admin.hide_in_view'))
                                     ->default(false),
 
+                                \Filament\Forms\Components\Toggle::make('options.is_inline')
+                                    ->label('Display Inline')
+                                    ->visible(fn($get) => in_array($get('type'), ['radio', 'checkbox_list']))
+                                    ->default(false),
+
                                 \Filament\Forms\Components\Toggle::make('options.is_table')
                                     ->label('Use Table Layout (Simple)')
                                     ->visible(fn($get) => $get('type') === 'repeater')

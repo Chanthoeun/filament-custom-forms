@@ -267,10 +267,16 @@ class CustomFormEntryForm
                     case 'radio':
                         $selectOptions = $options['choices'] ?? [];
                         $component = \Filament\Forms\Components\Radio::make("data.{$name}")->options($selectOptions);
+                        if (!empty($options['is_inline'])) {
+                            $component->inline();
+                        }
                         break;
                     case 'checkbox_list':
                         $selectOptions = $options['choices'] ?? [];
                         $component = \Filament\Forms\Components\CheckboxList::make("data.{$name}")->options($selectOptions);
+                        if (!empty($options['is_inline'])) {
+                            $component->inline();
+                        }
                         break;
                     case 'select':
                         $selectOptions = $options['choices'] ?? [];

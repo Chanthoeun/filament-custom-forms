@@ -19,7 +19,7 @@
         "php": "^8.2",
         "filament/filament": "^4.0|^5.0",
         "filament/schemas": "^4.0|^5.0",
-        "chanthoeun/filament-document-builder": "*",
+        "chanthoeun/filament-document-builder": "^1.1",
         "maatwebsite/excel": "^3.1 || dev-master || 4.x-dev"
     },
     "require-dev": {

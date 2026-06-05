@@ -20,6 +20,20 @@ jobs:
         php: [8.2, 8.3, 8.4, 8.5]
         laravel: [11.*, 12.*, 13.*]
         dependency-version: [prefer-stable]
+        include:
+          - laravel: 11.*
+            testbench: 9.*
+          - laravel: 12.*
+            testbench: 10.*
+          - laravel: 13.*
+            testbench: 11.*
+        exclude:
+          - php: 8.2
+            laravel: 12.*
+          - php: 8.2
+            laravel: 13.*
+          - php: 8.3
+            laravel: 13.*
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
 
@@ -37,6 +51,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer require "illuminate/contracts:${{ matrix.laravel }}" --no-update
+          composer require "orchestra/testbench:${{ matrix.testbench }}" --dev --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
       - name: Check Code Standards (Pint)

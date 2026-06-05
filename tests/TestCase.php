@@ -11,12 +11,15 @@ use Filament\Facades\Filament;
 use Filament\FilamentServiceProvider;
 use Filament\Forms\FormsServiceProvider;
 use Filament\Notifications\NotificationsServiceProvider;
+use Filament\Schemas\SchemasServiceProvider;
 use Filament\Support\SupportServiceProvider;
 use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Livewire\LivewireServiceProvider;
@@ -27,7 +30,7 @@ class TestCase extends Orchestra
     protected function setUp(): void
     {
         // Workaround for Livewire 4.3.1 ViewErrorBag testing bug
-        $livewireSupportFile = __DIR__ . '/../vendor/livewire/livewire/src/Features/SupportValidation/SupportValidation.php';
+        $livewireSupportFile = __DIR__.'/../vendor/livewire/livewire/src/Features/SupportValidation/SupportValidation.php';
         if (file_exists($livewireSupportFile)) {
             $content = file_get_contents($livewireSupportFile);
             if (strpos($content, '(new ViewErrorBag)->put(\'default\', $this->component->getErrorBag())') !== false) {
@@ -49,9 +52,10 @@ class TestCase extends Orchestra
         $this->setUpDatabase();
 
         $this->app['router']->pushMiddlewareToGroup('web', function ($request, $next) {
-            $errors = new \Illuminate\Support\ViewErrorBag;
-            $errors->put('default', new \Illuminate\Support\MessageBag);
-            \Illuminate\Support\Facades\View::share('errors', $errors);
+            $errors = new ViewErrorBag;
+            $errors->put('default', new MessageBag);
+            View::share('errors', $errors);
+
             return $next($request);
         });
 
@@ -69,7 +73,7 @@ class TestCase extends Orchestra
     protected function setUpDatabase()
     {
         $this->loadLaravelMigrations();
-        
+
         $migration1 = include __DIR__.'/../database/migrations/create_custom_forms_table.php.stub';
         $migration1->up();
 
@@ -110,7 +114,7 @@ class TestCase extends Orchestra
             SupportServiceProvider::class,
             TablesServiceProvider::class,
             WidgetsServiceProvider::class,
-            \Filament\Schemas\SchemasServiceProvider::class,
+            SchemasServiceProvider::class,
             CustomFormServiceProvider::class,
             TestPanelProvider::class,
         ];

@@ -50,9 +50,10 @@ jobs:
 
       - name: Install dependencies
         run: |
+          composer config policy.advisories.block false
           composer require "illuminate/contracts:${{ matrix.laravel }}" --no-update
           composer require "orchestra/testbench:${{ matrix.testbench }}" --dev --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --ignore-platform-req=php+
 
       - name: Check Code Standards (Pint)
         run: |

@@ -1,0 +1,20 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+
+    paths:
+        - src/
+        - config/
+        - database/
+
+    # Level 9 is the highest level
+    level: 5
+
+    ignoreErrors:
+        # Add any errors you want to ignore here
+
+    excludePaths:
+        - tests/
+
+    # checkMissingIterableValueType: false

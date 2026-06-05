@@ -2,23 +2,37 @@
 
 namespace Chanthoeun\FilamentCustomForms;
 
+use App\Models\User;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
+use Chanthoeun\FilamentDocumentBuilder\DocumentBuilderPlugin;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
-use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
 
 class CustomFormPlugin implements Plugin
 {
     protected ?string $formModel = null;
+
     protected ?string $entryModel = null;
+
     protected ?string $userModel = null;
+
     protected ?string $uploadDisk = null;
+
     protected ?string $uploadDirectory = null;
+
     protected ?string $uploadVisibility = null;
+
     protected string|bool|null $navigationGroup = null;
+
     protected string|bool|null $navigationEntryGroup = null;
+
     protected ?string $navigationFormIcon = null;
+
     protected ?string $navigationEntryIcon = null;
+
     protected ?int $navigationSort = null;
 
     public function getId(): string
@@ -43,40 +57,44 @@ class CustomFormPlugin implements Plugin
     public function formModel(string $model): static
     {
         $this->formModel = $model;
+
         return $this;
     }
 
     public function getFormModel(): string
     {
-        return $this->formModel ?? config('filament-custom-forms.models.form', \Chanthoeun\FilamentCustomForms\Models\CustomForm::class);
+        return $this->formModel ?? config('filament-custom-forms.models.form', CustomForm::class);
     }
 
     public function entryModel(string $model): static
     {
         $this->entryModel = $model;
+
         return $this;
     }
 
     public function getEntryModel(): string
     {
-        return $this->entryModel ?? config('filament-custom-forms.models.entry', \Chanthoeun\FilamentCustomForms\Models\CustomFormEntry::class);
+        return $this->entryModel ?? config('filament-custom-forms.models.entry', CustomFormEntry::class);
     }
 
     public function userModel(string $model): static
     {
         $this->userModel = $model;
+
         return $this;
     }
 
     public function getUserModel(): string
     {
-        return $this->userModel ?? config('filament-custom-forms.models.user', \App\Models\User::class);
+        return $this->userModel ?? config('filament-custom-forms.models.user', User::class);
     }
 
     // --- Uploads ---
     public function uploadDisk(string $disk): static
     {
         $this->uploadDisk = $disk;
+
         return $this;
     }
 
@@ -88,6 +106,7 @@ class CustomFormPlugin implements Plugin
     public function uploadDirectory(string $directory): static
     {
         $this->uploadDirectory = $directory;
+
         return $this;
     }
 
@@ -99,6 +118,7 @@ class CustomFormPlugin implements Plugin
     public function uploadVisibility(string $visibility): static
     {
         $this->uploadVisibility = $visibility;
+
         return $this;
     }
 
@@ -111,6 +131,7 @@ class CustomFormPlugin implements Plugin
     public function navigationGroup(string|bool|null $group): static
     {
         $this->navigationGroup = $group;
+
         return $this;
     }
 
@@ -119,12 +140,14 @@ class CustomFormPlugin implements Plugin
         if ($this->navigationGroup === false) {
             return null;
         }
+
         return $this->navigationGroup ?? config('filament-custom-forms.navigation.group', __('filament-custom-forms::fcf.form.builder_group'));
     }
 
     public function navigationEntryGroup(string|bool|null $group): static
     {
         $this->navigationEntryGroup = $group;
+
         return $this;
     }
 
@@ -133,9 +156,10 @@ class CustomFormPlugin implements Plugin
         if ($this->navigationEntryGroup === false) {
             return null;
         }
+
         return $this->navigationEntryGroup ?? config('filament-custom-forms.navigation.entry_group', __('filament-custom-forms::fcf.form.entry_group'));
     }
- 
+
     /**
      * @deprecated Use navigationEntryGroup() instead.
      */
@@ -143,7 +167,7 @@ class CustomFormPlugin implements Plugin
     {
         return $this->navigationEntryGroup($group);
     }
- 
+
     /**
      * @deprecated Use getNavigationEntryGroup() instead.
      */
@@ -155,6 +179,7 @@ class CustomFormPlugin implements Plugin
     public function navigationFormIcon(string $icon): static
     {
         $this->navigationFormIcon = $icon;
+
         return $this;
     }
 
@@ -166,6 +191,7 @@ class CustomFormPlugin implements Plugin
     public function navigationEntryIcon(string $icon): static
     {
         $this->navigationEntryIcon = $icon;
+
         return $this;
     }
 
@@ -177,6 +203,7 @@ class CustomFormPlugin implements Plugin
     public function navigationSort(?int $sort): static
     {
         $this->navigationSort = $sort;
+
         return $this;
     }
 
@@ -194,14 +221,14 @@ class CustomFormPlugin implements Plugin
             ]);
 
         // Automatically register the DocumentBuilder plugin if available
-        if (class_exists(\Chanthoeun\FilamentDocumentBuilder\DocumentBuilderPlugin::class)) {
-            $documentBuilderPlugin = \Chanthoeun\FilamentDocumentBuilder\DocumentBuilderPlugin::make();
-            
+        if (class_exists(DocumentBuilderPlugin::class)) {
+            $documentBuilderPlugin = DocumentBuilderPlugin::make();
+
             // Sync the navigation group to merge them into one (e.g., "Form Builder")
             if (method_exists($documentBuilderPlugin, 'navigationGroup')) {
                 $documentBuilderPlugin->navigationGroup($this->getNavigationGroup());
             }
-            
+
             // Register it into the panel
             $panel->plugin($documentBuilderPlugin);
         }
@@ -212,4 +239,3 @@ class CustomFormPlugin implements Plugin
         //
     }
 }
-

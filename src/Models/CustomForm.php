@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-
-
 class CustomForm extends Model
 {
     use HasFactory, SoftDeletes;
@@ -26,8 +24,6 @@ class CustomForm extends Model
         'is_active' => 'boolean',
         'allowed_roles' => 'array',
     ];
-
-
 
     public function entries(): HasMany
     {

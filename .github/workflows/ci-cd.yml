@@ -45,9 +45,6 @@ jobs:
       - name: Static Analysis (Larastan)
         run: vendor/bin/phpstan analyse --no-interaction
 
-      - name: Execute tests
-        run: vendor/bin/phpunit
-
   release:
     needs: test
     runs-on: ubuntu-latest

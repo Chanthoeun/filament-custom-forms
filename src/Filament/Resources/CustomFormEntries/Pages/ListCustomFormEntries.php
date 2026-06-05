@@ -2,9 +2,18 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
 
+use Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport;
+use Chanthoeun\FilamentCustomForms\Exports\CustomFormEntrySqlExport;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentDocumentBuilder\Actions\DownloadAllPdfAction;
+use Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate;
 use Filament\Actions;
+use Filament\Forms\Components\Radio;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Contracts\Support\Htmlable;
+use Maatwebsite\Excel\Excel;
 
 class ListCustomFormEntries extends ListRecords
 {
@@ -27,16 +36,17 @@ class ListCustomFormEntries extends ListRecords
         $this->activeFormId = data_get($this->tableFilters, 'custom_form_id.value');
     }
 
-    public function getHeading(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getHeading(): string|Htmlable
     {
         // Use the manually tracked state which is robust across updates
         if ($this->activeFormId) {
-            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->activeFormId);
+            $customForm = CustomForm::find($this->activeFormId);
             if ($customForm) {
                 $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}");
                 if ($name === "filament-custom-forms::fcf.form.names.{$customForm->slug}") {
                     $name = $customForm->name;
                 }
+
                 return $name;
             }
         }
@@ -55,7 +65,7 @@ class ListCustomFormEntries extends ListRecords
         $createLabel = __('filament-custom-forms::fcf.entry.action.create', ['name' => __('filament-custom-forms::fcf.entry.single')]);
 
         if ($customFormId) {
-            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($customFormId);
+            $customForm = CustomForm::find($customFormId);
             if ($customForm) {
                 $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}");
                 if ($name === "filament-custom-forms::fcf.form.names.{$customForm->slug}") {
@@ -71,7 +81,7 @@ class ListCustomFormEntries extends ListRecords
                 ->label(__('filament-custom-forms::fcf.entry.action.export_data'))
                 ->icon('heroicon-o-arrow-up-tray')
                 ->form([
-                    \Filament\Forms\Components\Radio::make('format')
+                    Radio::make('format')
                         ->label(__('filament-custom-forms::fcf.entry.field.export_format'))
                         ->options([
                             'excel' => __('filament-custom-forms::fcf.entry.option.excel'),
@@ -90,12 +100,13 @@ class ListCustomFormEntries extends ListRecords
                     }
 
                     $records = $query->get();
-                    
+
                     if ($records->isEmpty()) {
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('No records to export')
                             ->warning()
                             ->send();
+
                         return;
                     }
 
@@ -103,7 +114,7 @@ class ListCustomFormEntries extends ListRecords
 
                     $formName = 'custom-entries';
                     if ($this->activeFormId) {
-                        $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->activeFormId);
+                        $customForm = CustomForm::find($this->activeFormId);
                         if ($customForm) {
                             $name = trim($customForm->name);
                             if ($format === 'sql') {
@@ -120,38 +131,39 @@ class ListCustomFormEntries extends ListRecords
 
                     if ($format === 'excel') {
                         return \Maatwebsite\Excel\Facades\Excel::download(
-                            new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport($records, $this->activeFormId),
-                            $formName . '-' . now()->format('Y-m-d-His') . '.xlsx'
+                            new CustomFormEntryExport($records, $this->activeFormId),
+                            $formName.'-'.now()->format('Y-m-d-His').'.xlsx'
                         );
                     } elseif ($format === 'pdf') {
                         return \Maatwebsite\Excel\Facades\Excel::download(
-                            new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport($records, $this->activeFormId),
-                            $formName . '-' . now()->format('Y-m-d-His') . '.pdf',
-                            \Maatwebsite\Excel\Excel::MPDF
+                            new CustomFormEntryExport($records, $this->activeFormId),
+                            $formName.'-'.now()->format('Y-m-d-His').'.pdf',
+                            Excel::MPDF
                         );
                     } elseif ($format === 'json') {
                         // Reuse the Export class to get consistent formatting
-                        $exporter = new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport($records, $this->activeFormId);
+                        $exporter = new CustomFormEntryExport($records, $this->activeFormId);
                         $headings = $exporter->headings();
 
                         $data = $records->map(function ($record) use ($exporter, $headings) {
                             $values = $exporter->map($record);
+
                             return array_combine($headings, $values);
                         });
 
                         return response()->streamDownload(function () use ($data) {
                             echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                        }, $formName . '-' . now()->format('Y-m-d-His') . '.json');
+                        }, $formName.'-'.now()->format('Y-m-d-His').'.json');
                     } elseif ($format === 'sql') {
-                        $exporter = new \Chanthoeun\FilamentCustomForms\Exports\CustomFormEntrySqlExport($records, $this->activeFormId, $formName);
+                        $exporter = new CustomFormEntrySqlExport($records, $this->activeFormId, $formName);
                         $sql = $exporter->generate();
 
                         return response()->streamDownload(function () use ($sql) {
                             echo $sql;
-                        }, $formName . '-' . now()->format('Y-m-d-His') . '.sql');
+                        }, $formName.'-'.now()->format('Y-m-d-His').'.sql');
                     }
                 }),
-            \Chanthoeun\FilamentDocumentBuilder\Actions\DownloadAllPdfAction::make('export_pdf')
+            DownloadAllPdfAction::make('export_pdf')
                 ->label('Download PDF')
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('success')
@@ -160,25 +172,27 @@ class ListCustomFormEntries extends ListRecords
                     if ($this->activeFormId) {
                         $query->where('custom_form_id', $this->activeFormId);
                     }
+
                     return $query->get();
                 })
-                ->templateType(fn () => $this->activeFormId ? 'custom_form_' . $this->activeFormId : null)
+                ->templateType(fn () => $this->activeFormId ? 'custom_form_'.$this->activeFormId : null)
                 ->filename(function () {
                     $formName = 'custom-entries';
                     if ($this->activeFormId) {
-                        $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->activeFormId);
+                        $customForm = CustomForm::find($this->activeFormId);
                         if ($customForm) {
                             $name = trim($customForm->name);
                             $name = preg_replace('/[^A-Za-z0-9\-\_ ]/', '', $name);
                             $formName = str_replace(' ', '-', $name);
                         }
                     }
-                    return $formName . '-' . now()->format('Y-m-d-His') . '.pdf';
+
+                    return $formName.'-'.now()->format('Y-m-d-His').'.pdf';
                 })
-                ->visible(fn () => class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)),
+                ->visible(fn () => class_exists(DocumentTemplate::class)),
             Actions\CreateAction::make()
                 ->label($createLabel)
-                ->url(fn() => CustomFormEntryResource::getUrl('create', [
+                ->url(fn () => CustomFormEntryResource::getUrl('create', [
                     'form_id' => $this->activeFormId,
                 ])),
         ];

@@ -5,16 +5,21 @@ namespace Chanthoeun\FilamentCustomForms\Exports;
 use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Chanthoeun\FilamentCustomForms\Models\CustomFormField;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class CustomFormEntryExport implements FromCollection, WithStyles, ShouldAutoSize
+class CustomFormEntryExport implements FromCollection, ShouldAutoSize, WithStyles
 {
     protected Collection $records;
+
     protected ?string $formId;
+
     protected Collection $fields;
 
     public function __construct(Collection $records, ?string $formId = null)
@@ -22,12 +27,12 @@ class CustomFormEntryExport implements FromCollection, WithStyles, ShouldAutoSiz
         $this->records = $records;
         $this->formId = $formId;
         $this->fields = CustomFormField::query()
-            ->when($this->formId, fn($query) => $query->where('custom_form_id', $this->formId))
+            ->when($this->formId, fn ($query) => $query->where('custom_form_id', $this->formId))
             ->orderBy('sort')
             ->get();
     }
 
-    public function collection(): \Illuminate\Support\Enumerable
+    public function collection(): Enumerable
     {
         $headings = $this->fields->map(function ($field) {
             return $field->label ?: $field->name;
@@ -53,15 +58,16 @@ class CustomFormEntryExport implements FromCollection, WithStyles, ShouldAutoSiz
                 $row[] = $value;
             }
             $row[] = $record->created_at ? $record->created_at->toDateTimeString() : '';
+
             return $row;
         });
 
         $mapped->prepend($headings);
-        
+
         $titleRow = array_fill(0, count($headings), '');
         $titleRow[0] = $formName;
         $mapped->prepend($titleRow);
-        
+
         return $mapped;
     }
 
@@ -83,7 +89,7 @@ class CustomFormEntryExport implements FromCollection, WithStyles, ShouldAutoSiz
 
         foreach ($this->fields as $field) {
             $value = $data[$field->name] ?? '';
-            
+
             if (is_array($value)) {
                 $value = json_encode($value, JSON_UNESCAPED_UNICODE);
             }
@@ -100,17 +106,17 @@ class CustomFormEntryExport implements FromCollection, WithStyles, ShouldAutoSiz
     {
         $highestRow = $sheet->getHighestRow();
         $highestColumn = $sheet->getHighestColumn();
-        
-        $sheet->mergeCells('A1:' . $highestColumn . '1');
-        
-        $dataRange = 'A2:' . $highestColumn . $highestRow;
+
+        $sheet->mergeCells('A1:'.$highestColumn.'1');
+
+        $dataRange = 'A2:'.$highestColumn.$highestRow;
 
         return [
             1 => [
                 'font' => ['bold' => true, 'size' => 14],
                 'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
                 ],
                 'borders' => [
                     'outline' => [
@@ -122,7 +128,7 @@ class CustomFormEntryExport implements FromCollection, WithStyles, ShouldAutoSiz
             2 => [
                 'font' => ['bold' => true],
                 'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'fillType' => Fill::FILL_SOLID,
                     'startColor' => ['rgb' => 'E0E0E0'],
                 ],
             ],

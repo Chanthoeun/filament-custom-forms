@@ -1,0 +1,222 @@
+ ------ ---------------------------------------------------------------------- 
+  Line   src/CustomFormPlugin.php                                              
+ ------ ---------------------------------------------------------------------- 
+  73     Class App\Models\User not found.                                      
+         🪪  class.notFound                                                    
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols  
+  201    Call to function method_exists() with                                 
+         Chanthoeun\FilamentDocumentBuilder\DocumentBuilderPlugin and          
+         'navigationGroup' will always evaluate to true.                       
+         🪪  function.alreadyNarrowedType                                      
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   src/Exports/CustomFormEntryExport.php                                  
+ ------ ----------------------------------------------------------------------- 
+  41     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   src/Exports/CustomFormEntrySqlExport.php                               
+ ------ ----------------------------------------------------------------------- 
+  67     Method                                                                 
+         Chanthoeun\FilamentCustomForms\Exports\CustomFormEntrySqlExport::quot  
+         eValue() should return string but returns float|int.                   
+         🪪  return.type                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   src/Filament/Resources/CustomFormEntries/CustomFormEntryResource.php   
+ ------ ----------------------------------------------------------------------- 
+  44     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  55     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  97     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   src/Filament/Resources/CustomFormEntries/Pages/CreateCustomFormEntry.  
+         php                                                                    
+ ------ ----------------------------------------------------------------------- 
+  27     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  42     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  63     Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$custom_form_id.                   
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   src/Filament/Resources/CustomFormEntries/Pages/EditCustomFormEntry.ph  
+         p                                                                      
+ ------ ----------------------------------------------------------------------- 
+  15     Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$customForm.                       
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  33     Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$customForm.                       
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   src/Filament/Resources/CustomFormEntries/Pages/ListCustomFormEntries.  
+         php                                                                    
+ ------ ----------------------------------------------------------------------- 
+  36     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$slug.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  37     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$slug.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  38     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  60     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm|Illuminate\Database\  
+         Eloquent\Collection<int, Chanthoeun\FilamentCustomForms\Models\Custom  
+         Form>::$slug.                                                          
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  61     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm|Illuminate\Database\  
+         Eloquent\Collection<int, Chanthoeun\FilamentCustomForms\Models\Custom  
+         Form>::$slug.                                                          
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  62     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm|Illuminate\Database\  
+         Eloquent\Collection<int, Chanthoeun\FilamentCustomForms\Models\Custom  
+         Form>::$name.                                                          
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  108    Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  171    Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   src/Filament/Resources/CustomFormEntries/Schemas/CustomFormEntryForm.  
+         php                                                                    
+ ------ ----------------------------------------------------------------------- 
+  48     Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$custom_form_id.                   
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  71     Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$id.                               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  235    Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$data.                             
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  278    Call to an undefined method                                            
+         Filament\Forms\Components\CheckboxList::inline().                      
+         🪪  method.notFound                                                    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   src/Filament/Resources/CustomFormEntries/Tables/CustomFormEntriesTabl  
+         e.php                                                                  
+ ------ ----------------------------------------------------------------------- 
+  77     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomFormField::$parent_id.     
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  79     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomFormField::$type.          
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  133    Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$name.                             
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  134    Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$name.                             
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  136    Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$type.                             
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  138    Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$name.                             
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  152    Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$name.                             
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+  166    Access to an undefined property                                        
+         Illuminate\Database\Eloquent\Model::$name.                             
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   src/Observers/CustomFormObserver.php                                   
+ ------ ----------------------------------------------------------------------- 
+  14     Access to an undefined property                                        
+         Chanthoeun\FilamentCustomForms\Models\CustomForm::$name.               
+         🪪  property.notFound                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ [ERROR] Found 33 errors                                                        
+

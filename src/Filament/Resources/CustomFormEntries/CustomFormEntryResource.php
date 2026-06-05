@@ -2,18 +2,17 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries;
 
-use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
+use BackedEnum;
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Schemas\CustomFormEntryForm;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Tables\CustomFormEntriesTable;
-use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
-use BackedEnum;
-use Chanthoeun\FilamentCustomForms\Models\CustomForm;
-use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 
 class CustomFormEntryResource extends Resource
 {
@@ -24,7 +23,7 @@ class CustomFormEntryResource extends Resource
 
     protected static ?string $slug = 'custom-form-entries';
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery();
     }
@@ -40,9 +39,11 @@ class CustomFormEntryResource extends Resource
         if ($id) {
             // Using find() here is technically 1 query, but if called multiple times it's better to cache
             $form = static::getFormFromCache($id);
-            if ($form)
+            if ($form) {
                 return __('filament-custom-forms::fcf.entry.entry', ['form' => $form->name]);
+            }
         }
+
         return __('filament-custom-forms::fcf.entry.single');
     }
 
@@ -51,9 +52,11 @@ class CustomFormEntryResource extends Resource
         $id = request()->input('tableFilters.custom_form_id.value');
         if ($id) {
             $form = static::getFormFromCache($id);
-            if ($form)
+            if ($form) {
                 return __('filament-custom-forms::fcf.entry.entries', ['form' => $form->name]);
+            }
         }
+
         return __('filament-custom-forms::fcf.entry.plural');
     }
 
@@ -61,9 +64,10 @@ class CustomFormEntryResource extends Resource
 
     protected static function getFormFromCache(string $id): ?CustomForm
     {
-        if (!isset(static::$formCache[$id])) {
+        if (! isset(static::$formCache[$id])) {
             static::$formCache[$id] = CustomForm::find($id);
         }
+
         return static::$formCache[$id];
     }
 
@@ -72,17 +76,17 @@ class CustomFormEntryResource extends Resource
         $items = [];
 
         try {
-            if (!config('filament-custom-forms.navigation.dynamic_navigation', true)) {
+            if (! config('filament-custom-forms.navigation.dynamic_navigation', true)) {
                 return [
                     NavigationItem::make(__('filament-custom-forms::fcf.entry.plural'))
                         ->group(CustomFormPlugin::get()->getNavigationEntryGroup())
                         ->icon(CustomFormPlugin::get()->getNavigationEntryIcon())
-                        ->isActiveWhen(fn() => request()->routeIs(static::getRouteBaseName() . '.*'))
+                        ->isActiveWhen(fn () => request()->routeIs(static::getRouteBaseName().'.*'))
                         ->url(static::getUrl('index')),
                 ];
             }
 
-            if (!\Illuminate\Support\Facades\Schema::hasTable('custom_forms')) {
+            if (! \Illuminate\Support\Facades\Schema::hasTable('custom_forms')) {
                 return [];
             }
 
@@ -97,7 +101,7 @@ class CustomFormEntryResource extends Resource
                 $items[] = NavigationItem::make($form->name)
                     ->group(CustomFormPlugin::get()->getNavigationEntryGroup())
                     ->icon(CustomFormPlugin::get()->getNavigationEntryIcon())
-                    ->isActiveWhen(fn() => $activeFormId == $form->id)
+                    ->isActiveWhen(fn () => $activeFormId == $form->id)
                     ->url(static::getUrl('index', [
                         'tableFilters' => [
                             'custom_form_id' => [
@@ -107,7 +111,7 @@ class CustomFormEntryResource extends Resource
                     ]));
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('CustomFormEntryResource Navigation Error: ' . $e->getMessage());
+            Log::error('CustomFormEntryResource Navigation Error: '.$e->getMessage());
         }
 
         return $items;

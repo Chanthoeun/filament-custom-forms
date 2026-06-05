@@ -2,16 +2,22 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\RelationManagers;
 
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
-use Filament\Actions\CreateAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Table;
+use Illuminate\Validation\Rules\Unique;
 
 class FieldsRelationManager extends RelationManager
 {
@@ -21,33 +27,33 @@ class FieldsRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                \Filament\Schemas\Components\Section::make()
+                Section::make()
                     ->columns(2)
                     ->columnSpanFull()
                     ->components([
-                        \Filament\Forms\Components\Select::make('parent_id')
+                        Select::make('parent_id')
                             ->label(__('filament-custom-forms::fcf.admin.parent_container'))
                             ->options(function ($livewire) {
                                 return $livewire->getOwnerRecord()->fields()
                                     ->whereIn('type', ['section', 'grid', 'fieldset', 'repeater', 'wizard'])
                                     ->get()
-                                    ->mapWithKeys(fn($field) => [$field->id => $field->label ?? $field->name]);
+                                    ->mapWithKeys(fn ($field) => [$field->id => $field->label ?? $field->name]);
                             })
                             ->searchable()
                             ->preload()
                             ->nullable(),
 
-                        \Filament\Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label(__('filament-custom-forms::fcf.field.name'))
                             ->required()
                             ->unique(
                                 ignoreRecord: true,
-                                modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, $livewire) => $rule->where('custom_form_id', $livewire->getOwnerRecord()->id)
+                                modifyRuleUsing: fn (Unique $rule, $livewire) => $rule->where('custom_form_id', $livewire->getOwnerRecord()->id)
                             )
                             ->helperText(__('filament-custom-forms::fcf.builder.fields.name_help')),
-                        \Filament\Forms\Components\TextInput::make('label')
+                        TextInput::make('label')
                             ->label(__('filament-custom-forms::fcf.field.label')),
-                        \Filament\Forms\Components\Select::make('type')
+                        Select::make('type')
                             ->label(__('filament-custom-forms::fcf.field.type'))
                             ->required()
                             ->options([
@@ -79,17 +85,17 @@ class FieldsRelationManager extends RelationManager
                             ])
                             ->default('text_input')
                             ->live(),
-                        \Filament\Forms\Components\Toggle::make('required')
+                        Toggle::make('required')
                             ->label(__('filament-custom-forms::fcf.field.is_required'))
                             ->default(false)
-                            ->hidden(fn($get) => in_array($get('type'), ['section', 'grid', 'fieldset', 'wizard'])),
+                            ->hidden(fn ($get) => in_array($get('type'), ['section', 'grid', 'fieldset', 'wizard'])),
 
-                        \Filament\Schemas\Components\Section::make(__('filament-custom-forms::fcf.admin.configuration'))
+                        Section::make(__('filament-custom-forms::fcf.admin.configuration'))
                             ->columnSpanFull()
                             ->components([
-                                \Filament\Forms\Components\Select::make('options.columns')
+                                Select::make('options.columns')
                                     ->label(__('filament-custom-forms::fcf.admin.columns'))
-                                    ->visible(fn($get) => in_array($get('type'), ['grid', 'section', 'fieldset', 'repeater', 'wizard', 'checkbox_list']))
+                                    ->visible(fn ($get) => in_array($get('type'), ['grid', 'section', 'fieldset', 'repeater', 'wizard', 'checkbox_list']))
                                     ->options([
                                         '1' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 1),
                                         '2' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 2),
@@ -98,68 +104,68 @@ class FieldsRelationManager extends RelationManager
                                     ])
                                     ->default('2'),
 
-                                \Filament\Forms\Components\KeyValue::make('options.choices')
+                                KeyValue::make('options.choices')
                                     ->label(__('filament-custom-forms::fcf.admin.select_options'))
-                                    ->visible(fn($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']))
+                                    ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']))
                                     ->helperText('Key corresponds to value, Label is displayed text.'),
 
-                                \Filament\Forms\Components\TextInput::make('options.match_field')
+                                TextInput::make('options.match_field')
                                     ->label('Match Field (Name)')
-                                    ->visible(fn($get) => $get('type') === 'confirm_password')
+                                    ->visible(fn ($get) => $get('type') === 'confirm_password')
                                     ->helperText('Enter the name of the password field this should match.'),
 
-                                \Filament\Forms\Components\KeyValue::make('options.column_span')
+                                KeyValue::make('options.column_span')
                                     ->label('Column Span (Responsive)')
                                     ->helperText('Key: Breakpoint (default, sm, md, lg, xl, 2xl). Value: Columns (1-12, full).')
                                     ->keyLabel('Breakpoint')
                                     ->valueLabel('Columns')
-                                    ->formatStateUsing(fn($state) => is_array($state) ? $state : (empty($state) ? [] : ['default' => $state])),
+                                    ->formatStateUsing(fn ($state) => is_array($state) ? $state : (empty($state) ? [] : ['default' => $state])),
 
-                                \Filament\Forms\Components\Toggle::make('options.column_span_full')
+                                Toggle::make('options.column_span_full')
                                     ->label(__('filament-custom-forms::fcf.admin.full_width'))
                                     ->default(false),
 
-                                \Filament\Forms\Components\Toggle::make('options.image_editor')
+                                Toggle::make('options.image_editor')
                                     ->label(__('filament-custom-forms::fcf.admin.enable_image_editor'))
-                                    ->visible(fn($get) => $get('type') === 'image'),
+                                    ->visible(fn ($get) => $get('type') === 'image'),
 
-                                \Filament\Forms\Components\Toggle::make('options.is_revealable')
+                                Toggle::make('options.is_revealable')
                                     ->label(__('filament-custom-forms::fcf.admin.allow_password_reveal'))
-                                    ->visible(fn($get) => $get('type') === 'password'),
+                                    ->visible(fn ($get) => $get('type') === 'password'),
 
-                                \Filament\Forms\Components\Toggle::make('options.is_copyable')
+                                Toggle::make('options.is_copyable')
                                     ->label(__('filament-custom-forms::fcf.admin.allow_copy'))
-                                    ->visible(fn($get) => in_array($get('type'), ['text_input', 'email', 'number_input', 'phone'])),
+                                    ->visible(fn ($get) => in_array($get('type'), ['text_input', 'email', 'number_input', 'phone'])),
 
-                                \Filament\Forms\Components\Toggle::make('options.is_decimal')
+                                Toggle::make('options.is_decimal')
                                     ->label('Allow Decimals')
-                                    ->visible(fn($get) => in_array($get('type'), ['number_input', 'number']))
+                                    ->visible(fn ($get) => in_array($get('type'), ['number_input', 'number']))
                                     ->default(true),
 
-                                \Filament\Forms\Components\Toggle::make('options.is_hidden_label')
+                                Toggle::make('options.is_hidden_label')
                                     ->label('Hide Label')
                                     ->default(false),
 
-                                \Filament\Forms\Components\Toggle::make('options.is_hidden_on_view')
+                                Toggle::make('options.is_hidden_on_view')
                                     ->label(__('filament-custom-forms::fcf.admin.hide_in_view'))
                                     ->default(false),
 
-                                \Filament\Forms\Components\Toggle::make('options.is_inline')
+                                Toggle::make('options.is_inline')
                                     ->label('Display Inline')
-                                    ->visible(fn($get) => in_array($get('type'), ['radio', 'checkbox_list']))
+                                    ->visible(fn ($get) => in_array($get('type'), ['radio', 'checkbox_list']))
                                     ->default(false),
 
-                                \Filament\Forms\Components\Toggle::make('options.is_table')
+                                Toggle::make('options.is_table')
                                     ->label('Use Table Layout (Simple)')
-                                    ->visible(fn($get) => $get('type') === 'repeater')
+                                    ->visible(fn ($get) => $get('type') === 'repeater')
                                     ->default(false),
 
-                                \Filament\Forms\Components\Toggle::make('options.is_compact')
+                                Toggle::make('options.is_compact')
                                     ->label('Compact Mode')
-                                    ->visible(fn($get) => $get('type') === 'repeater')
+                                    ->visible(fn ($get) => $get('type') === 'repeater')
                                     ->default(false),
                             ]),
-                    ])
+                    ]),
             ]);
     }
 
@@ -171,8 +177,8 @@ class FieldsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name')->label(__('filament-custom-forms::fcf.field.name'))->searchable(),
                 TextColumn::make('label')->label(__('filament-custom-forms::fcf.field.label'))->searchable(),
-                \Filament\Tables\Columns\ToggleColumn::make('required')->label(__('filament-custom-forms::fcf.field.is_required')),
-                TextColumn::make('type')->label(__('filament-custom-forms::fcf.field.type'))->badge()->color(fn(string $state): string => match ($state) {
+                ToggleColumn::make('required')->label(__('filament-custom-forms::fcf.field.is_required')),
+                TextColumn::make('type')->label(__('filament-custom-forms::fcf.field.type'))->badge()->color(fn (string $state): string => match ($state) {
                     'section', 'grid', 'fieldset', 'wizard' => 'info',
                     default => 'gray',
                 }),

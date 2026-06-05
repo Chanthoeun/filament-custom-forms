@@ -3,11 +3,14 @@
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
 
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Contracts\Support\Htmlable;
+use Livewire\Attributes\Url;
 
 class CreateCustomFormEntry extends CreateRecord
 {
-    #[\Livewire\Attributes\Url]
+    #[Url]
     public ?string $form_id = null;
 
     protected function mutateFormDataBeforeCreate(array $data): array
@@ -15,21 +18,24 @@ class CreateCustomFormEntry extends CreateRecord
         if ($this->form_id) {
             $data['custom_form_id'] = $this->form_id;
         }
+
         return $data;
     }
 
     protected static string $resource = CustomFormEntryResource::class;
-    public function getHeading(): string|\Illuminate\Contracts\Support\Htmlable
+
+    public function getHeading(): string|Htmlable
     {
         if ($this->form_id) {
-            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->form_id);
+            $customForm = CustomForm::find($this->form_id);
             if ($customForm) {
-                return 'Create ' . $customForm->name;
+                return 'Create '.$customForm->name;
             }
         }
 
         return parent::getHeading();
     }
+
     public function getBreadcrumbs(): array
     {
         $breadcrumbs = [];
@@ -37,16 +43,16 @@ class CreateCustomFormEntry extends CreateRecord
         $urlParams = [];
 
         if ($this->form_id) {
-            $customForm = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($this->form_id);
+            $customForm = CustomForm::find($this->form_id);
             if ($customForm) {
-                $label = $customForm->name . ' Entries';
+                $label = $customForm->name.' Entries';
                 $urlParams = ['tableFilters' => ['custom_form_id' => ['value' => $this->form_id]]];
             }
         }
 
         $url = CustomFormEntryResource::getUrl('index');
-        if (!empty($urlParams)) {
-            $url .= '?' . http_build_query($urlParams);
+        if (! empty($urlParams)) {
+            $url .= '?'.http_build_query($urlParams);
         }
 
         $breadcrumbs[$url] = $label;

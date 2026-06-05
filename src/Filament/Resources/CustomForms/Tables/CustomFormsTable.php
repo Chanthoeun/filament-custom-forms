@@ -2,18 +2,22 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\Tables;
 
+use App\Filament\Resources\DocumentTemplateResource;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
+use Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\RestoreAction;
 use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
 
 class CustomFormsTable
 {
@@ -51,20 +55,20 @@ class CustomFormsTable
                 TrashedFilter::make(),
             ])
             ->actions([ // Standard way is actions()
-                \Filament\Actions\Action::make('edit_template')
+                Action::make('edit_template')
                     ->label('Build Template')
                     ->icon('heroicon-o-document-text')
                     ->color('info')
                     ->action(function ($record) {
-                        if (!class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)) {
+                        if (! class_exists(DocumentTemplate::class)) {
                             return;
                         }
-                        
-                        $template = \Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::firstOrCreate(
-                            ['type' => 'custom_form_' . $record->id],
+
+                        $template = DocumentTemplate::firstOrCreate(
+                            ['type' => 'custom_form_'.$record->id],
                             [
-                                'name' => $record->name . ' Template',
-                                'model_class' => \Chanthoeun\FilamentCustomForms\Models\CustomFormEntry::class,
+                                'name' => $record->name.' Template',
+                                'model_class' => CustomFormEntry::class,
                                 'content' => '',
                                 'page_settings' => [
                                     'format' => 'a4',
@@ -77,12 +81,12 @@ class CustomFormsTable
                             ]
                         );
 
-                        if (class_exists(\App\Filament\Resources\DocumentTemplateResource::class)) {
-                            $url = \App\Filament\Resources\DocumentTemplateResource::getUrl('edit', ['record' => $template]);
+                        if (class_exists(DocumentTemplateResource::class)) {
+                            $url = DocumentTemplateResource::getUrl('edit', ['record' => $template]);
                         } else {
                             $url = \Chanthoeun\FilamentDocumentBuilder\Resources\DocumentTemplateResource::getUrl('edit', ['record' => $template]);
                         }
-                        
+
                         return redirect($url);
                     }),
                 EditAction::make(),

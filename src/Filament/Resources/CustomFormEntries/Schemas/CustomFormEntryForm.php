@@ -2,9 +2,15 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Schemas;
 
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -13,20 +19,21 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Wizard;
-use Filament\Schemas\Components\Wizard\Step as WizardStep;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step as WizardStep;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
+use Illuminate\Support\Facades\Hash;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class CustomFormEntryForm
 {
     public static function configure(Schema $schema): Schema
     {
         $livewire = $schema->getLivewire();
-        
+
         $preselectedFormId = property_exists($livewire, 'form_id') && $livewire->form_id
             ? $livewire->form_id
             : (request()->query('form_id') ?? request()->input('tableFilters.custom_form_id.value'));
@@ -38,7 +45,7 @@ class CustomFormEntryForm
                     ->options(fn () => CustomForm::where('is_active', true)->whereNotNull('name')->pluck('name', 'id'))
                     ->required()
                     ->default($preselectedFormId)
-                    ->hidden(fn() => !empty($preselectedFormId))
+                    ->hidden(fn () => ! empty($preselectedFormId))
                     ->live()
                     ->columnSpanFull(),
                 Grid::make()
@@ -48,17 +55,17 @@ class CustomFormEntryForm
                         $formId = $get('custom_form_id') ?? $record?->custom_form_id;
 
                         // Fallback to pre-selected ID if not set in state (e.g. initial load)
-                        if (!$formId && $preselectedFormId) {
+                        if (! $formId && $preselectedFormId) {
                             $formId = $preselectedFormId;
                         }
 
-                        if (!$formId) {
+                        if (! $formId) {
                             return [];
                         }
 
                         $customForm = CustomForm::find($formId);
 
-                        if (!$customForm) {
+                        if (! $customForm) {
                             return [];
                         }
 
@@ -66,16 +73,16 @@ class CustomFormEntryForm
                         // to prevent massive N+1 queries during recursive form building.
                         $allFields = $customForm->fields()->orderBy('sort')->get();
                         $fieldsByParent = $allFields->groupBy('parent_id');
-                        
+
                         foreach ($allFields as $field) {
                             $field->setRelation('children', $fieldsByParent->get($field->id, collect()));
                         }
-                        
+
                         $rootFields = $fieldsByParent->get('', collect());
 
                         return self::getFields($rootFields);
                     })
-                    ->columns(2)
+                    ->columns(2),
             ]);
     }
 
@@ -109,12 +116,12 @@ class CustomFormEntryForm
                 // If children are sections, each section becomes a step
                 // If children are fields, group them all into a single step
                 $steps = [];
-                
+
                 // Check if children are sections/containers or actual fields
                 $hasContainers = $fieldModel->children->contains(function ($child) {
                     return in_array($child->type, ['section', 'fieldset', 'grid']);
                 });
-                
+
                 if ($hasContainers) {
                     // Children are sections/containers - each becomes a step
                     foreach ($fieldModel->children as $child) {
@@ -127,29 +134,29 @@ class CustomFormEntryForm
                     $stepFields = self::getFields($fieldModel->children);
                     $step = WizardStep::make($fieldModel->label)
                         ->schema($stepFields);
-                    
+
                     // Apply columns from wizard options
                     $wizardOpts = $fieldModel->options ?? [];
-                    if (!empty($wizardOpts['columns'])) {
+                    if (! empty($wizardOpts['columns'])) {
                         $step->columns($wizardOpts['columns']);
                     }
-                    
+
                     $steps[] = $step;
                 }
-                
+
                 $component = Wizard::make()
                     ->schema($steps);
             } elseif ($type === 'repeater') {
-                $component = \Filament\Forms\Components\Repeater::make("data.{$fieldModel->name}")
+                $component = Repeater::make("data.{$fieldModel->name}")
                     ->label($fieldModel->label);
 
-                if (!empty($options['is_table'])) {
+                if (! empty($options['is_table'])) {
                     // Table Layout: Headers + Hidden Label Fields
                     $headers = [];
                     foreach ($fieldModel->children as $child) {
                         $label = $child->label ?? $child->name;
                         // Use Fully Qualified Name if importing is ambiguous, assuming it matches ContractForm usage
-                        $headers[] = \Filament\Forms\Components\Repeater\TableColumn::make($label);
+                        $headers[] = TableColumn::make($label);
                     }
 
                     $component->table($headers);
@@ -165,7 +172,7 @@ class CustomFormEntryForm
                         ->columns($options['columns'] ?? 1);
                 }
 
-                if (!empty($options['is_compact'])) {
+                if (! empty($options['is_compact'])) {
                     $component->compact();
                 }
 
@@ -219,8 +226,8 @@ class CustomFormEntryForm
                         break;
                     case 'phone':
                         // Use PhoneInput if available, falling back to TextInput
-                        if (class_exists(\Ysfkaya\FilamentPhoneInput\Forms\PhoneInput::class)) {
-                            $component = \Ysfkaya\FilamentPhoneInput\Forms\PhoneInput::make("data.{$name}");
+                        if (class_exists(PhoneInput::class)) {
+                            $component = PhoneInput::make("data.{$name}");
                         } else {
                             $component = TextInput::make("data.{$name}")->tel();
                         }
@@ -230,8 +237,9 @@ class CustomFormEntryForm
                             ->password()
                             ->dehydrateStateUsing(function ($state, ?Model $record) use ($name) {
                                 if (filled($state)) {
-                                    return \Illuminate\Support\Facades\Hash::make($state);
+                                    return Hash::make($state);
                                 }
+
                                 return $record ? data_get($record->data, $name) : null;
                             })
                             ->revealable();
@@ -241,7 +249,7 @@ class CustomFormEntryForm
                             ->password()
                             ->revealable()
                             ->dehydrated(false);
-                            
+
                         $matchField = $options['match_field'] ?? null;
                         if ($matchField) {
                             $component->same("data.{$matchField}");
@@ -251,7 +259,7 @@ class CustomFormEntryForm
                     case 'checkbox':
                         $component = Toggle::make("data.{$name}");
                         if ($type === 'checkbox') {
-                            $component = \Filament\Forms\Components\Checkbox::make("data.{$name}");
+                            $component = Checkbox::make("data.{$name}");
                         }
                         if ($options['default'] ?? false) {
                             $component->default(true);
@@ -266,15 +274,15 @@ class CustomFormEntryForm
                         break;
                     case 'radio':
                         $selectOptions = $options['choices'] ?? [];
-                        $component = \Filament\Forms\Components\Radio::make("data.{$name}")->options($selectOptions);
-                        if (!empty($options['is_inline'])) {
+                        $component = Radio::make("data.{$name}")->options($selectOptions);
+                        if (! empty($options['is_inline'])) {
                             $component->inline();
                         }
                         break;
                     case 'checkbox_list':
                         $selectOptions = $options['choices'] ?? [];
-                        $component = \Filament\Forms\Components\CheckboxList::make("data.{$name}")->options($selectOptions);
-                        if (!empty($options['is_inline'])) {
+                        $component = CheckboxList::make("data.{$name}")->options($selectOptions);
+                        if (! empty($options['is_inline'])) {
                             $component->inline();
                         }
                         break;
@@ -287,8 +295,9 @@ class CustomFormEntryForm
                 if ($component) {
                     $component->label($label);
 
-                    if ($required)
+                    if ($required) {
                         $component->required();
+                    }
 
                     if ($isHiddenLabel) {
                         $component->hiddenLabel();
@@ -299,15 +308,15 @@ class CustomFormEntryForm
                     }
 
                     // Safe Option Application
-                    if (!empty($options['is_revealable']) && method_exists($component, 'revealable')) {
+                    if (! empty($options['is_revealable']) && method_exists($component, 'revealable')) {
                         $component->revealable();
                     }
 
-                    if (!empty($options['image_editor']) && method_exists($component, 'imageEditor')) {
+                    if (! empty($options['image_editor']) && method_exists($component, 'imageEditor')) {
                         $component->imageEditor();
                     }
 
-                    if (!empty($options['is_copyable']) && method_exists($component, 'copyable')) {
+                    if (! empty($options['is_copyable']) && method_exists($component, 'copyable')) {
                         $component->copyable();
                     }
                 }
@@ -319,7 +328,7 @@ class CustomFormEntryForm
                 // Column Span
                 if ($options['column_span_full'] ?? false) {
                     $component->columnSpanFull();
-                } elseif (!empty($options['column_span'])) {
+                } elseif (! empty($options['column_span'])) {
                     $component->columnSpan($options['column_span']);
                 }
 

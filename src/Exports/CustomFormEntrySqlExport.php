@@ -4,13 +4,15 @@ namespace Chanthoeun\FilamentCustomForms\Exports;
 
 use Chanthoeun\FilamentCustomForms\Models\CustomFormField;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class CustomFormEntrySqlExport
 {
     protected Collection $records;
+
     protected ?string $formId;
+
     protected string $tableName;
+
     protected Collection $fields;
 
     public function __construct(Collection $records, ?string $formId, string $tableName)
@@ -19,7 +21,7 @@ class CustomFormEntrySqlExport
         $this->formId = $formId;
         $this->tableName = $tableName;
         $this->fields = CustomFormField::query()
-            ->when($this->formId, fn($query) => $query->where('custom_form_id', $this->formId))
+            ->when($this->formId, fn ($query) => $query->where('custom_form_id', $this->formId))
             ->orderBy('sort')
             ->get();
     }
@@ -31,12 +33,12 @@ class CustomFormEntrySqlExport
         }
 
         $sql = "-- Custom Form Export: {$this->tableName}\n";
-        $sql .= "-- Generated at: " . now()->toDateTimeString() . "\n\n";
+        $sql .= '-- Generated at: '.now()->toDateTimeString()."\n\n";
 
         $columns = $this->fields->pluck('name')->toArray();
         $columns[] = 'created_at';
-        
-        $quotedColumns = array_map(fn($col) => "`{$col}`", $columns);
+
+        $quotedColumns = array_map(fn ($col) => "`{$col}`", $columns);
         $columnList = implode(', ', $quotedColumns);
 
         foreach ($this->records as $record) {
@@ -60,10 +62,10 @@ class CustomFormEntrySqlExport
     protected function quoteValue($value): string
     {
         if (is_null($value)) {
-            return "NULL";
+            return 'NULL';
         }
 
-        if (is_numeric($value) && !is_string($value)) {
+        if (is_numeric($value) && ! is_string($value)) {
             return $value;
         }
 
@@ -71,7 +73,7 @@ class CustomFormEntrySqlExport
             $value = json_encode($value, JSON_UNESCAPED_UNICODE);
         }
 
-        $value = str_replace(["\\", "'"], ["\\\\", "''"], $value);
+        $value = str_replace(['\\', "'"], ['\\\\', "''"], $value);
 
         return "'{$value}'";
     }

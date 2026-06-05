@@ -5,16 +5,17 @@ namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pa
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditCustomFormEntry extends EditRecord
 {
     protected static string $resource = CustomFormEntryResource::class;
 
-    public function getHeading(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getHeading(): string|Htmlable
     {
         $customForm = $this->getRecord()->customForm;
         if ($customForm) {
-            return 'Edit ' . $customForm->name;
+            return 'Edit '.$customForm->name;
         }
 
         return parent::getHeading();
@@ -26,6 +27,7 @@ class EditCustomFormEntry extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
     public function getBreadcrumbs(): array
     {
         $breadcrumbs = [];
@@ -36,13 +38,13 @@ class EditCustomFormEntry extends EditRecord
         $urlParams = [];
 
         if ($customForm) {
-            $label = $customForm->name . ' Entries';
+            $label = $customForm->name.' Entries';
             $urlParams = ['tableFilters' => ['custom_form_id' => ['value' => $customForm->id]]];
         }
 
         $url = CustomFormEntryResource::getUrl('index');
-        if (!empty($urlParams)) {
-            $url .= '?' . http_build_query($urlParams);
+        if (! empty($urlParams)) {
+            $url .= '?'.http_build_query($urlParams);
         }
 
         $breadcrumbs[$url] = $label;

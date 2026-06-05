@@ -9,7 +9,6 @@ class CustomFormField extends Model
 {
     use HasFactory;
 
-
     protected $fillable = [
         'custom_form_id',
         'parent_id',
@@ -26,8 +25,6 @@ class CustomFormField extends Model
         'options' => 'array',
         'sort' => 'integer',
     ];
-
-
 
     public function form()
     {

@@ -2,12 +2,11 @@
 
 namespace Chanthoeun\FilamentCustomForms\Tests\Feature;
 
-use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\Pages;
 use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Tests\Models\User;
 use Chanthoeun\FilamentCustomForms\Tests\TestCase;
 use Filament\Actions\DeleteAction;
-use Filament\Forms\Components\TextInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -18,13 +17,13 @@ class CustomFormResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
-        $user = \Chanthoeun\FilamentCustomForms\Tests\Models\User::create([
+
+        $user = User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
         ]);
-        
+
         $this->actingAs($user);
     }
 

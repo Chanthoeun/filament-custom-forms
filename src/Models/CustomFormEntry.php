@@ -2,10 +2,10 @@
 
 namespace Chanthoeun\FilamentCustomForms\Models;
 
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 
 class CustomFormEntry extends Model
 {
@@ -30,8 +30,8 @@ class CustomFormEntry extends Model
     {
         $userModel = CustomFormPlugin::get()->getUserModel();
 
-        if (!class_exists($userModel)) {
-            return $this->belongsTo(\Illuminate\Database\Eloquent\Model::class, 'created_by')->withDefault([
+        if (! class_exists($userModel)) {
+            return $this->belongsTo(Model::class, 'created_by')->withDefault([
                 'name' => 'Guest',
             ]);
         }

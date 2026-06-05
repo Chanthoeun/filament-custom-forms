@@ -2,18 +2,23 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Tables;
 
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormField;
+use Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate;
+use Chanthoeun\FilamentDocumentBuilder\Tables\Actions\DownloadPdfAction;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\TextColumn; // Use generic Action
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Actions\Action; // Use generic Action
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class CustomFormEntriesTable
 {
@@ -30,7 +35,7 @@ class CustomFormEntriesTable
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn(Builder $query) => self::applyQueryConstraints($query, $formId));
+            ->modifyQueryUsing(fn (Builder $query) => self::applyQueryConstraints($query, $formId));
     }
 
     protected static function getFormId(Table $table): ?string
@@ -49,8 +54,8 @@ class CustomFormEntriesTable
         $columns = [];
 
         // Fetch fields metadata from parent CustomFormField table first
-        $fieldsMetadata = \Chanthoeun\FilamentCustomForms\Models\CustomFormField::query()
-            ->when($formId, fn($query) => $query->where('custom_form_id', $formId))
+        $fieldsMetadata = CustomFormField::query()
+            ->when($formId, fn ($query) => $query->where('custom_form_id', $formId))
             ->orderBy('sort')
             ->get()
             ->keyBy('name');
@@ -64,7 +69,7 @@ class CustomFormEntriesTable
         $fieldOptions = $fieldsMetadata->pluck('options', 'name');
         $fieldsById = $fieldsMetadata->keyBy('id');
 
-        $sortedKeys = $keys->sortBy(fn($key) => $sortOrder[$key] ?? 999999);
+        $sortedKeys = $keys->sortBy(fn ($key) => $sortOrder[$key] ?? 999999);
 
         $visibleColumnCount = 0;
 
@@ -82,7 +87,7 @@ class CustomFormEntriesTable
             }
 
             $columnKey = "data.{$key}";
-            $label = \Illuminate\Support\Str::headline($key);
+            $label = Str::headline($key);
 
             $column = TextColumn::make($columnKey)
                 ->label($label)
@@ -125,7 +130,7 @@ class CustomFormEntriesTable
         $filters = [];
 
         if ($formId) {
-            $formSchema = \Chanthoeun\FilamentCustomForms\Models\CustomForm::find($formId);
+            $formSchema = CustomForm::find($formId);
             if ($formSchema) {
                 $schemaFields = $formSchema->fields()->orderBy('sort')->get();
 
@@ -138,25 +143,23 @@ class CustomFormEntriesTable
                             $filters[] = TernaryFilter::make($field->name)
                                 ->label($label)
                                 ->query(
-                                    fn(Builder $query, array $data) =>
-                                    $query->when(
+                                    fn (Builder $query, array $data) => $query->when(
                                         isset($data['value']),
-                                        fn($q) => $q->where("data->{$jsonKey}", $data['value'] === '1' || $data['value'] === true)
+                                        fn ($q) => $q->where("data->{$jsonKey}", $data['value'] === '1' || $data['value'] === true)
                                     )
                                 );
                             break;
 
                         case 'select':
                             $choices = $field->options['choices'] ?? [];
-                            if (!empty($choices)) {
+                            if (! empty($choices)) {
                                 $filters[] = SelectFilter::make($field->name)
                                     ->label($label)
                                     ->options($choices)
                                     ->query(
-                                        fn(Builder $query, array $data) =>
-                                        $query->when(
+                                        fn (Builder $query, array $data) => $query->when(
                                             $data['value'],
-                                            fn($q) => $q->where("data->{$jsonKey}", $data['value'])
+                                            fn ($q) => $q->where("data->{$jsonKey}", $data['value'])
                                         )
                                     );
                             }
@@ -166,13 +169,13 @@ class CustomFormEntriesTable
                             $filters[] = Filter::make($field->name)
                                 ->label($label)
                                 ->form([
-                                    DatePicker::make('from')->label($label . ' From'),
-                                    DatePicker::make('until')->label($label . ' Until'),
+                                    DatePicker::make('from')->label($label.' From'),
+                                    DatePicker::make('until')->label($label.' Until'),
                                 ])
                                 ->query(function (Builder $query, array $data) use ($jsonKey) {
                                     return $query
-                                        ->when($data['from'], fn($q) => $q->where("data->{$jsonKey}", '>=', $data['from']))
-                                        ->when($data['until'], fn($q) => $q->where("data->{$jsonKey}", '<=', $data['until']));
+                                        ->when($data['from'], fn ($q) => $q->where("data->{$jsonKey}", '>=', $data['from']))
+                                        ->when($data['until'], fn ($q) => $q->where("data->{$jsonKey}", '<=', $data['until']));
                                 });
                             break;
                     }
@@ -182,7 +185,7 @@ class CustomFormEntriesTable
 
         $filters[] = SelectFilter::make('custom_form_id')
             ->label(__('filament-custom-forms::fcf.form.single'))
-            ->options(\Chanthoeun\FilamentCustomForms\Models\CustomForm::pluck('name', 'id'))
+            ->options(CustomForm::pluck('name', 'id'))
             ->hidden();
 
         return $filters;
@@ -195,10 +198,10 @@ class CustomFormEntriesTable
             DeleteAction::make(),
         ];
 
-        if (class_exists(\Chanthoeun\FilamentDocumentBuilder\Models\DocumentTemplate::class)) {
-            $actions[] = \Chanthoeun\FilamentDocumentBuilder\Tables\Actions\DownloadPdfAction::make('download_pdf')
-                ->templateType(fn ($record) => 'custom_form_' . $record->custom_form_id)
-                ->filename(fn ($record) => 'document-' . $record->id . '.pdf');
+        if (class_exists(DocumentTemplate::class)) {
+            $actions[] = DownloadPdfAction::make('download_pdf')
+                ->templateType(fn ($record) => 'custom_form_'.$record->custom_form_id)
+                ->filename(fn ($record) => 'document-'.$record->id.'.pdf');
         }
 
         return $actions;
@@ -207,6 +210,6 @@ class CustomFormEntriesTable
     protected static function applyQueryConstraints(Builder $query, ?string $formId): Builder
     {
         return $query->with(['creator', 'customForm'])
-            ->when($formId, fn($q, $id) => $q->where('custom_form_id', $id));
+            ->when($formId, fn ($q, $id) => $q->where('custom_form_id', $id));
     }
 }

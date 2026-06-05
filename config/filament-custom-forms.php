@@ -1,5 +1,8 @@
 <?php
 
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -11,8 +14,8 @@ return [
     |
     */
     'models' => [
-        'form' => \Chanthoeun\FilamentCustomForms\Models\CustomForm::class,
-        'entry' => \Chanthoeun\FilamentCustomForms\Models\CustomFormEntry::class,
+        'form' => CustomForm::class,
+        'entry' => CustomFormEntry::class,
         'user' => config('auth.providers.users.model') ?? 'App\Models\User',
     ],
 

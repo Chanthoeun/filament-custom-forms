@@ -15,6 +15,8 @@ parameters:
 
     ignoreErrors:
         - '#Class App\\Models\\User not found#'
+        - '#Class Spatie\\Permission\\Models\\Role not found#'
+        - '#Class Spatie\\Permission\\Models\\Permission not found#'
         - '#Call to function method_exists\(\) with .* will always evaluate to true.#'
         - '#should return string but returns float\|int.#'
         - '#Call to an undefined method .*CheckboxList::inline\(\).#'

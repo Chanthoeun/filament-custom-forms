@@ -13,6 +13,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn; // Use generic Action
+use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -33,19 +34,25 @@ class CustomFormEntriesTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(function (\Filament\Tables\Contracts\HasTable $livewire) {
+                        ->visible(function (HasTable $livewire) {
                             $panelId = filament()->getCurrentPanel()?->getId();
-                            if (!$panelId) return true;
-                            
+                            if (! $panelId) {
+                                return true;
+                            }
+
                             $formId = data_get($livewire, 'tableFilters.custom_form_id.value')
                                 ?? data_get($livewire, 'activeFormId')
                                 ?? request()->input('tableFilters.custom_form_id.value');
-                            
-                            if (!$formId) return true;
-                            
+
+                            if (! $formId) {
+                                return true;
+                            }
+
                             $form = CustomForm::find($formId);
-                            if (!$form) return true;
-                            
+                            if (! $form) {
+                                return true;
+                            }
+
                             return $form->hasPermissionInPanel($panelId, 'DeleteAny:CustomFormEntry');
                         }),
                 ]),
@@ -219,10 +226,14 @@ class CustomFormEntriesTable
                 ->filename(fn ($record) => 'document-'.$record->id.'.pdf')
                 ->visible(function ($record) {
                     $panelId = filament()->getCurrentPanel()?->getId();
-                    if (!$panelId) return true;
-                    
-                    if (!$record->customForm) return true;
-                    
+                    if (! $panelId) {
+                        return true;
+                    }
+
+                    if (! $record->customForm) {
+                        return true;
+                    }
+
                     return $record->customForm->hasPermissionInPanel($panelId, 'ViewAny:CustomFormEntry');
                 });
         }

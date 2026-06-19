@@ -26,7 +26,7 @@ class CustomFormEntryResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
-        
+
         // In Filament 3, the panel ID is available
         $panelId = filament()->getCurrentPanel()?->getId();
         $user = auth()->user();
@@ -41,14 +41,14 @@ class CustomFormEntryResource extends Resource
                 foreach ($accessibleForms as $form) {
                     $q->orWhere(function ($formQuery) use ($form, $panelId, $user) {
                         $formQuery->where('custom_form_id', $form->id);
-                        
+
                         // If isolation is enabled and user is not a super admin, restrict to their own entries
-                        if ($form->shouldIsolateUsersInPanel($panelId) && !(method_exists($user, 'hasRole') && $user->hasRole('super_admin'))) {
+                        if ($form->shouldIsolateUsersInPanel($panelId) && ! (method_exists($user, 'hasRole') && $user->hasRole('super_admin'))) {
                             $formQuery->where('created_by', $user->id);
                         }
                     });
                 }
-                
+
                 // If no forms are accessible, ensure no results are returned
                 if ($accessibleForms->isEmpty()) {
                     $q->whereRaw('1 = 0');
@@ -127,7 +127,7 @@ class CustomFormEntryResource extends Resource
 
             foreach ($forms as $form) {
                 // Check if user has access to this form in the current panel
-                if (!$form->canAccessInPanel(filament()->getCurrentPanel()->getId(), auth()->user())) {
+                if (! $form->canAccessInPanel(filament()->getCurrentPanel()->getId(), auth()->user())) {
                     continue;
                 }
 

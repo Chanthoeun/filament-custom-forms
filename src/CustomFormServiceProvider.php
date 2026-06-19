@@ -5,6 +5,7 @@ namespace Chanthoeun\FilamentCustomForms;
 use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Chanthoeun\FilamentCustomForms\Observers\CustomFormObserver;
 use Chanthoeun\FilamentDocumentBuilder\FilamentDocumentBuilderServiceProvider;
+use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -23,7 +24,7 @@ class CustomFormServiceProvider extends PackageServiceProvider
                 'create_custom_form_entries_table',
                 'add_panel_access_to_custom_forms_table',
             ])
-            ->hasInstallCommand(function (\Spatie\LaravelPackageTools\Commands\InstallCommand $command) {
+            ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->publishConfigFile()
                     ->publishMigrations()

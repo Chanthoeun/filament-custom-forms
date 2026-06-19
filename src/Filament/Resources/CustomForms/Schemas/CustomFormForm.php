@@ -2,14 +2,18 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\Schemas;
 
-use Filament\Forms;
+use App\Models\User;
 use Filament\Forms\Components\Builder as FormBuilder;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class CustomFormForm
 {
@@ -36,7 +40,7 @@ class CustomFormForm
                             ->label(__('filament-custom-forms::fcf.form.is_active'))
                             ->default(true)
                             ->required(),
-                        \Filament\Forms\Components\Repeater::make('panel_access')
+                        Repeater::make('panel_access')
                             ->label('Panel Access Configuration')
                             ->columnSpanFull()
                             ->collapsible()
@@ -49,56 +53,58 @@ class CustomFormForm
                                     })
                                     ->required()
                                     ->columnSpan(1),
-                                
-                                \Filament\Forms\Components\Select::make('allowed_users')
+
+                                Select::make('allowed_users')
                                     ->label('Allowed Users')
                                     ->multiple()
                                     ->searchable()
                                     ->options(function () {
-                                        $userModel = config('auth.providers.users.model', \App\Models\User::class);
+                                        $userModel = config('auth.providers.users.model', User::class);
+
                                         return class_exists($userModel) ? $userModel::pluck('email', 'id')->toArray() : [];
                                     })
                                     ->columnSpan(1),
-                                \Filament\Forms\Components\Select::make('allowed_roles')
+                                Select::make('allowed_roles')
                                     ->label('Allowed Roles')
                                     ->multiple()
                                     ->searchable()
-                                    ->hidden(!class_exists(\Spatie\Permission\Models\Role::class))
+                                    ->hidden(! class_exists(Role::class))
                                     ->options(function () {
-                                        $roleClass = config('permission.models.role', \Spatie\Permission\Models\Role::class);
-                                        return class_exists($roleClass) 
-                                            ? $roleClass::pluck('name', 'name')->toArray() 
+                                        $roleClass = config('permission.models.role', Role::class);
+
+                                        return class_exists($roleClass)
+                                            ? $roleClass::pluck('name', 'name')->toArray()
                                             : [];
                                     })
                                     ->columnSpan(1),
-                                
-                                \Filament\Forms\Components\Toggle::make('isolate_users')
+
+                                Toggle::make('isolate_users')
                                     ->label('Isolate User Data')
                                     ->helperText('If enabled, users can only see form entries they created themselves.')
                                     ->default(false)
                                     ->columnSpan(1),
 
-                                \Filament\Schemas\Components\Section::make('Permissions')
-                                    ->hidden(!class_exists(\Spatie\Permission\Models\Permission::class))
+                                Section::make('Permissions')
+                                    ->hidden(! class_exists(Permission::class))
                                     ->schema([
-                                        \Filament\Forms\Components\CheckboxList::make('custom_form_entry_permissions')
+                                        CheckboxList::make('custom_form_entry_permissions')
                                             ->hiddenLabel()
                                             ->options(function () {
-                                                $permissionClass = config('permission.models.permission', \Spatie\Permission\Models\Permission::class);
-                                                if (!class_exists($permissionClass)) {
+                                                $permissionClass = config('permission.models.permission', Permission::class);
+                                                if (! class_exists($permissionClass)) {
                                                     return [];
                                                 }
-                                                
+
                                                 $permissions = $permissionClass::pluck('name', 'name')
-                                                    ->filter(fn($name) => str_contains($name, 'CustomFormEntry'))
+                                                    ->filter(fn ($name) => str_contains($name, 'CustomFormEntry'))
                                                     ->toArray();
-                                                    
+
                                                 $options = [];
                                                 foreach ($permissions as $name) {
                                                     $label = str_replace(['CustomFormEntry', ':'], ['', ' '], $name);
-                                                    $options[$name] = \Illuminate\Support\Str::headline($label);
+                                                    $options[$name] = Str::headline($label);
                                                 }
-                                                
+
                                                 return $options;
                                             })
                                             ->bulkToggleable()
@@ -207,7 +213,7 @@ class CustomFormForm
                 ->schema([
                     TextInput::make('name')->label(__('filament-custom-forms::fcf.builder.fields.name'))->required(),
                     TextInput::make('label')->label(__('filament-custom-forms::fcf.builder.fields.label'))->required(),
-                    Forms\Components\Repeater::make('options')
+                    Repeater::make('options')
                         ->label(__('filament-custom-forms::fcf.builder.fields.choices'))
                         ->schema([
                             TextInput::make('value')->label(__('filament-custom-forms::fcf.builder.fields.value'))->required(),

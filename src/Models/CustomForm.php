@@ -2,6 +2,7 @@
 
 namespace Chanthoeun\FilamentCustomForms\Models;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,31 +38,33 @@ class CustomForm extends Model
         return $this->hasMany(CustomFormField::class)->orderBy('sort');
     }
 
-    public function canAccessInPanel(string $panelId, \Illuminate\Contracts\Auth\Authenticatable $user): bool
+    public function canAccessInPanel(string $panelId, Authenticatable $user): bool
     {
         // First check if there are any specific panel restrictions defined
         if (empty($this->panel_access)) {
             // If no panel configurations, fallback to global allowed_roles if it exists
-            if (!empty($this->allowed_roles)) {
+            if (! empty($this->allowed_roles)) {
                 if (method_exists($user, 'hasAnyRole')) {
                     return $user->hasAnyRole($this->allowed_roles);
                 }
+
                 return false; // Roles required but user doesn't support hasAnyRole
             }
+
             return false; // Explicit opt-in required for panel access
         }
 
         // Check if the current panel is in the panel_access rules
         $panelConfig = collect($this->panel_access)->firstWhere('panel_id', $panelId);
 
-        if (!$panelConfig) {
+        if (! $panelConfig) {
             // If panel_access array exists but doesn't include this panel, deny access.
             // (Or we could allow access? Usually, if rules exist, anything not explicitly allowed is denied).
             return false;
         }
 
         $roles = data_get($panelConfig, 'allowed_roles', []);
-        
+
         $formPermissions = data_get($panelConfig, 'custom_form_permissions', []);
         $entryPermissions = data_get($panelConfig, 'custom_form_entry_permissions', []);
         $legacyPermissions = data_get($panelConfig, 'allowed_permissions', []);
@@ -71,7 +74,7 @@ class CustomForm extends Model
         // If explicitly in the allowed users list, grant access
         $userId = (string) $user->getAuthIdentifier();
         $stringUsers = array_map('strval', $users);
-        if (!empty($users) && in_array($userId, $stringUsers, true)) {
+        if (! empty($users) && in_array($userId, $stringUsers, true)) {
             return true;
         }
 
@@ -80,7 +83,7 @@ class CustomForm extends Model
             return empty($users); // True if no restrictions at all, false if restricted to specific users
         }
 
-        $hasRole = !empty($roles) && method_exists($user, 'hasAnyRole') && $user->hasAnyRole($roles);
+        $hasRole = ! empty($roles) && method_exists($user, 'hasAnyRole') && $user->hasAnyRole($roles);
 
         return $hasRole;
     }
@@ -93,7 +96,7 @@ class CustomForm extends Model
 
         $panelConfig = collect($this->panel_access)->firstWhere('panel_id', $panelId);
 
-        if (!$panelConfig) {
+        if (! $panelConfig) {
             return true;
         }
 
@@ -117,7 +120,7 @@ class CustomForm extends Model
 
         $panelConfig = collect($this->panel_access)->firstWhere('panel_id', $panelId);
 
-        if (!$panelConfig) {
+        if (! $panelConfig) {
             return false;
         }
 

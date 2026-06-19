@@ -25,7 +25,38 @@ class CustomFormEntryResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery();
+        $query = parent::getEloquentQuery();
+        
+        // In Filament 3, the panel ID is available
+        $panelId = filament()->getCurrentPanel()?->getId();
+        $user = auth()->user();
+
+        if ($panelId && $user) {
+            // Fetch all active forms and see which ones the user can access
+            $accessibleForms = CustomForm::where('is_active', true)
+                ->get()
+                ->filter(fn ($form) => $form->canAccessInPanel($panelId, $user));
+
+            $query->where(function ($q) use ($accessibleForms, $panelId, $user) {
+                foreach ($accessibleForms as $form) {
+                    $q->orWhere(function ($formQuery) use ($form, $panelId, $user) {
+                        $formQuery->where('custom_form_id', $form->id);
+                        
+                        // If isolation is enabled and user is not a super admin, restrict to their own entries
+                        if ($form->shouldIsolateUsersInPanel($panelId) && !(method_exists($user, 'hasRole') && $user->hasRole('super_admin'))) {
+                            $formQuery->where('created_by', $user->id);
+                        }
+                    });
+                }
+                
+                // If no forms are accessible, ensure no results are returned
+                if ($accessibleForms->isEmpty()) {
+                    $q->whereRaw('1 = 0');
+                }
+            });
+        }
+
+        return $query;
     }
 
     public static function getNavigationIcon(): string|BackedEnum|null
@@ -95,6 +126,11 @@ class CustomFormEntryResource extends Resource
             $activeFormId = data_get(request()->query('tableFilters'), 'custom_form_id.value');
 
             foreach ($forms as $form) {
+                // Check if user has access to this form in the current panel
+                if (!$form->canAccessInPanel(filament()->getCurrentPanel()->getId(), auth()->user())) {
+                    continue;
+                }
+
                 // Populate cache for label methods to use if they haven't run yet
                 static::$formCache[$form->id] = $form;
 

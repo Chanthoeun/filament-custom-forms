@@ -21,7 +21,15 @@ class CustomFormServiceProvider extends PackageServiceProvider
                 'create_custom_forms_table',
                 'create_custom_form_fields_table',
                 'create_custom_form_entries_table',
-            ]);
+                'add_panel_access_to_custom_forms_table',
+            ])
+            ->hasInstallCommand(function (\Spatie\LaravelPackageTools\Commands\InstallCommand $command) {
+                $command
+                    ->publishConfigFile()
+                    ->publishMigrations()
+                    ->askToRunMigrations()
+                    ->askToStarRepoOnGitHub('chanthoeun/filament-custom-forms');
+            });
     }
 
     public function packageBooted(): void

@@ -36,6 +36,80 @@ class CustomFormForm
                             ->label(__('filament-custom-forms::fcf.form.is_active'))
                             ->default(true)
                             ->required(),
+                        \Filament\Forms\Components\Repeater::make('panel_access')
+                            ->label('Panel Access Configuration')
+                            ->columnSpanFull()
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => $state['panel_id'] ? ucfirst($state['panel_id']) : null)
+                            ->schema([
+                                Select::make('panel_id')
+                                    ->label('Filament Panel')
+                                    ->options(function () {
+                                        return collect(filament()->getPanels())->mapWithKeys(fn ($panel) => [$panel->getId() => ucfirst($panel->getId())])->toArray();
+                                    })
+                                    ->required()
+                                    ->columnSpan(1),
+                                
+                                \Filament\Forms\Components\Select::make('allowed_users')
+                                    ->label('Allowed Users')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->options(function () {
+                                        $userModel = config('auth.providers.users.model', \App\Models\User::class);
+                                        return class_exists($userModel) ? $userModel::pluck('email', 'id')->toArray() : [];
+                                    })
+                                    ->columnSpan(1),
+                                \Filament\Forms\Components\Select::make('allowed_roles')
+                                    ->label('Allowed Roles')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->hidden(!class_exists(\Spatie\Permission\Models\Role::class))
+                                    ->options(function () {
+                                        $roleClass = config('permission.models.role', \Spatie\Permission\Models\Role::class);
+                                        return class_exists($roleClass) 
+                                            ? $roleClass::pluck('name', 'name')->toArray() 
+                                            : [];
+                                    })
+                                    ->columnSpan(1),
+                                
+                                \Filament\Forms\Components\Toggle::make('isolate_users')
+                                    ->label('Isolate User Data')
+                                    ->helperText('If enabled, users can only see form entries they created themselves.')
+                                    ->default(false)
+                                    ->columnSpan(1),
+
+                                \Filament\Schemas\Components\Section::make('Permissions')
+                                    ->hidden(!class_exists(\Spatie\Permission\Models\Permission::class))
+                                    ->schema([
+                                        \Filament\Forms\Components\CheckboxList::make('custom_form_entry_permissions')
+                                            ->hiddenLabel()
+                                            ->options(function () {
+                                                $permissionClass = config('permission.models.permission', \Spatie\Permission\Models\Permission::class);
+                                                if (!class_exists($permissionClass)) {
+                                                    return [];
+                                                }
+                                                
+                                                $permissions = $permissionClass::pluck('name', 'name')
+                                                    ->filter(fn($name) => str_contains($name, 'CustomFormEntry'))
+                                                    ->toArray();
+                                                    
+                                                $options = [];
+                                                foreach ($permissions as $name) {
+                                                    $label = str_replace(['CustomFormEntry', ':'], ['', ' '], $name);
+                                                    $options[$name] = \Illuminate\Support\Str::headline($label);
+                                                }
+                                                
+                                                return $options;
+                                            })
+                                            ->bulkToggleable()
+                                            ->columns(4)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->collapsible()
+                                    ->compact()
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(3),
                     ]),
             ]);
     }

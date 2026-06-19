@@ -162,6 +162,15 @@ class ListCustomFormEntries extends ListRecords
                             echo $sql;
                         }, $formName.'-'.now()->format('Y-m-d-His').'.sql');
                     }
+                })
+                ->visible(function () {
+                    $panelId = filament()->getCurrentPanel()?->getId();
+                    if (!$panelId || !$this->activeFormId) return true;
+                    
+                    $form = CustomForm::find($this->activeFormId);
+                    if (!$form) return true;
+                    
+                    return $form->hasPermissionInPanel($panelId, 'ViewAny:CustomFormEntry');
                 }),
             DownloadAllPdfAction::make('export_pdf')
                 ->label('Download PDF')
@@ -189,7 +198,17 @@ class ListCustomFormEntries extends ListRecords
 
                     return $formName.'-'.now()->format('Y-m-d-His').'.pdf';
                 })
-                ->visible(fn () => class_exists(DocumentTemplate::class)),
+                ->visible(function () {
+                    if (!class_exists(DocumentTemplate::class)) return false;
+                    
+                    $panelId = filament()->getCurrentPanel()?->getId();
+                    if (!$panelId || !$this->activeFormId) return true;
+                    
+                    $form = CustomForm::find($this->activeFormId);
+                    if (!$form) return true;
+                    
+                    return $form->hasPermissionInPanel($panelId, 'ViewAny:CustomFormEntry');
+                }),
             Actions\CreateAction::make()
                 ->label($createLabel)
                 ->url(fn () => CustomFormEntryResource::getUrl('create', [

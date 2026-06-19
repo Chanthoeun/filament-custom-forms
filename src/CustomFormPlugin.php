@@ -212,16 +212,34 @@ class CustomFormPlugin implements Plugin
         return $this->navigationSort ?? config('filament-custom-forms.navigation.sort');
     }
 
+    protected bool $hideBuilders = false;
+
+    public function hideBuilders(bool $hide = true): static
+    {
+        $this->hideBuilders = $hide;
+
+        return $this;
+    }
+
+    public function isHideBuilders(): bool
+    {
+        return $this->hideBuilders;
+    }
+
     public function register(Panel $panel): void
     {
-        $panel
-            ->resources([
-                CustomFormResource::class,
-                CustomFormEntryResource::class,
-            ]);
+        $resources = [
+            CustomFormEntryResource::class,
+        ];
+
+        if (! $this->isHideBuilders()) {
+            $resources[] = CustomFormResource::class;
+        }
+
+        $panel->resources($resources);
 
         // Automatically register the DocumentBuilder plugin if available
-        if (class_exists(DocumentBuilderPlugin::class)) {
+        if (class_exists(DocumentBuilderPlugin::class) && ! $this->isHideBuilders()) {
             $documentBuilderPlugin = DocumentBuilderPlugin::make();
 
             // Sync the navigation group to merge them into one (e.g., "Form Builder")

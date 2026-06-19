@@ -32,7 +32,22 @@ class CustomFormEntriesTable
             ->recordActions(self::getRecordActions())
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(function (\Filament\Tables\Contracts\HasTable $livewire) {
+                            $panelId = filament()->getCurrentPanel()?->getId();
+                            if (!$panelId) return true;
+                            
+                            $formId = data_get($livewire, 'tableFilters.custom_form_id.value')
+                                ?? data_get($livewire, 'activeFormId')
+                                ?? request()->input('tableFilters.custom_form_id.value');
+                            
+                            if (!$formId) return true;
+                            
+                            $form = CustomForm::find($formId);
+                            if (!$form) return true;
+                            
+                            return $form->hasPermissionInPanel($panelId, 'DeleteAny:CustomFormEntry');
+                        }),
                 ]),
             ])
             ->modifyQueryUsing(fn (Builder $query) => self::applyQueryConstraints($query, $formId));
@@ -201,7 +216,15 @@ class CustomFormEntriesTable
         if (class_exists(DocumentTemplate::class)) {
             $actions[] = DownloadPdfAction::make('download_pdf')
                 ->templateType(fn ($record) => 'custom_form_'.$record->custom_form_id)
-                ->filename(fn ($record) => 'document-'.$record->id.'.pdf');
+                ->filename(fn ($record) => 'document-'.$record->id.'.pdf')
+                ->visible(function ($record) {
+                    $panelId = filament()->getCurrentPanel()?->getId();
+                    if (!$panelId) return true;
+                    
+                    if (!$record->customForm) return true;
+                    
+                    return $record->customForm->hasPermissionInPanel($panelId, 'ViewAny:CustomFormEntry');
+                });
         }
 
         return $actions;

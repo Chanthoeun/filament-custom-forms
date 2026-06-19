@@ -19,6 +19,10 @@ class CreateCustomFormEntry extends CreateRecord
             $data['custom_form_id'] = $this->form_id;
         }
 
+        if (auth()->check()) {
+            $data['created_by'] = auth()->id();
+        }
+
         return $data;
     }
 

@@ -2,6 +2,7 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\RelationManagers;
 
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -17,11 +18,14 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\RelationManagers\Concerns\Translatable;
 
 class FieldsRelationManager extends RelationManager
 {
-    use \LaraZeus\SpatieTranslatable\Resources\RelationManagers\Concerns\Translatable;
+    use Translatable;
 
     protected static string $relationship = 'fields';
 
@@ -49,7 +53,7 @@ class FieldsRelationManager extends RelationManager
                             ->label(__('filament-custom-forms::fcf.field.name'))
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($set, $state) => $set('name', \Illuminate\Support\Str::slug($state, '_')))
+                            ->afterStateUpdated(fn ($set, $state) => $set('name', Str::slug($state, '_')))
                             ->unique(
                                 ignoreRecord: true,
                                 modifyRuleUsing: fn (Unique $rule, $livewire) => $rule->where('custom_form_id', $livewire->getOwnerRecord()->id)
@@ -190,10 +194,10 @@ class FieldsRelationManager extends RelationManager
             ])
             ->reorderable('sort')
             ->defaultSort('sort', 'asc')
-            ->headerActions([
-                \LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher::make(),
+            ->headerActions(array_filter([
+                CustomFormPlugin::get()->hasTranslations() ? LocaleSwitcher::make() : null,
                 CreateAction::make(),
-            ])
+            ]))
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),

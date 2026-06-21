@@ -2,15 +2,18 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
 
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
 use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Contracts\Support\Htmlable;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
 use Livewire\Attributes\Url;
 
 class CreateCustomFormEntry extends CreateRecord
 {
-    use \LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+    use Translatable;
 
     #[Url]
     public ?string $form_id = null;
@@ -80,8 +83,8 @@ class CreateCustomFormEntry extends CreateRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-            \LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher::make(),
-        ];
+        return array_filter([
+            CustomFormPlugin::get()->hasTranslations() ? LocaleSwitcher::make() : null,
+        ]);
     }
 }

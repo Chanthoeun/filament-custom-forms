@@ -2,6 +2,7 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
 
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Chanthoeun\FilamentCustomForms\Exports\CustomFormEntryExport;
 use Chanthoeun\FilamentCustomForms\Exports\CustomFormEntrySqlExport;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
@@ -13,11 +14,13 @@ use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\Support\Htmlable;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
 use Maatwebsite\Excel\Excel;
 
 class ListCustomFormEntries extends ListRecords
 {
-    use \LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+    use Translatable;
 
     protected static string $resource = CustomFormEntryResource::class;
 
@@ -89,8 +92,8 @@ class ListCustomFormEntries extends ListRecords
             }
         }
 
-        return [
-            \LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher::make(),
+        return array_filter([
+            CustomFormPlugin::get()->hasTranslations() ? LocaleSwitcher::make() : null,
 
             Actions\Action::make('export_data')
                 ->label(__('filament-custom-forms::fcf.entry.action.export_data'))
@@ -239,6 +242,6 @@ class ListCustomFormEntries extends ListRecords
                 ->url(fn () => CustomFormEntryResource::getUrl('create', [
                     'form_id' => $this->activeFormId,
                 ])),
-        ];
+        ]);
     }
 }

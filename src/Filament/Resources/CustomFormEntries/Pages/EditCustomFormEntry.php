@@ -2,14 +2,17 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Pages;
 
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
 
 class EditCustomFormEntry extends EditRecord
 {
-    use \LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
+    use Translatable;
 
     protected static string $resource = CustomFormEntryResource::class;
 
@@ -25,10 +28,10 @@ class EditCustomFormEntry extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-            \LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher::make(),
+        return array_filter([
+            CustomFormPlugin::get()->hasTranslations() ? LocaleSwitcher::make() : null,
             Actions\DeleteAction::make(),
-        ];
+        ]);
     }
 
     public function getBreadcrumbs(): array

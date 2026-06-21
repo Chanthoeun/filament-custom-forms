@@ -50,9 +50,13 @@ public function panel(Panel $panel): Panel
                 ->navigationGroup('Form Builder')
                 ->navigationFormIcon('heroicon-o-document-duplicate')
                 ->navigationEntryIcon('heroicon-o-clipboard-document-list')
+                ->panelAccess(true)  // Optional: Enable granular panel access controls
+                ->translations(true) // Optional: Enable spatie/laravel-translatable fields
         );
 }
 ```
+
+**Note on Translations**: If you enable `->translations(true)`, ensure you have defined your desired locales in the `config/filament-custom-forms.php` under the `locales` key.
 
 ## Updates
 

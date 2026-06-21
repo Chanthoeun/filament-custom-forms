@@ -10,6 +10,7 @@ use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
 use Chanthoeun\FilamentDocumentBuilder\DocumentBuilderPlugin;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
 class CustomFormPlugin implements Plugin
 {
@@ -34,6 +35,12 @@ class CustomFormPlugin implements Plugin
     protected ?string $navigationEntryIcon = null;
 
     protected ?int $navigationSort = null;
+
+    protected bool $hasPanelAccess = false;
+
+    protected bool $hasTranslations = false;
+
+    protected bool $hideBuilders = false;
 
     public function getId(): string
     {
@@ -212,8 +219,6 @@ class CustomFormPlugin implements Plugin
         return $this->navigationSort ?? config('filament-custom-forms.navigation.sort');
     }
 
-    protected bool $hideBuilders = false;
-
     public function hideBuilders(bool $hide = true): static
     {
         $this->hideBuilders = $hide;
@@ -224,6 +229,30 @@ class CustomFormPlugin implements Plugin
     public function isHideBuilders(): bool
     {
         return $this->hideBuilders;
+    }
+
+    public function panelAccess(bool $condition = true): static
+    {
+        $this->hasPanelAccess = $condition;
+
+        return $this;
+    }
+
+    public function hasPanelAccess(): bool
+    {
+        return $this->hasPanelAccess;
+    }
+
+    public function translations(bool $condition = true): static
+    {
+        $this->hasTranslations = $condition;
+
+        return $this;
+    }
+
+    public function hasTranslations(): bool
+    {
+        return $this->hasTranslations;
     }
 
     public function register(Panel $panel): void
@@ -251,10 +280,14 @@ class CustomFormPlugin implements Plugin
             $panel->plugin($documentBuilderPlugin);
         }
 
-        if (class_exists(\LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin::class) && ! $panel->hasPlugin('spatie-translatable')) {
+        if (class_exists(SpatieTranslatablePlugin::class) && ! $panel->hasPlugin('spatie-translatable')) {
+            $locales = $this->hasTranslations()
+                ? config('filament-custom-forms.locales', ['en', 'km'])
+                : [config('app.fallback_locale', 'en')];
+
             $panel->plugin(
-                \LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin::make()
-                    ->defaultLocales(config('filament-custom-forms.locales', ['en', 'km']))
+                SpatieTranslatablePlugin::make()
+                    ->defaultLocales($locales)
             );
         }
     }

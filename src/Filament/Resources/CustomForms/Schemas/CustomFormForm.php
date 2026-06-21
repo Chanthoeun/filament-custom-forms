@@ -3,6 +3,7 @@
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\Schemas;
 
 use App\Models\User;
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Filament\Forms\Components\Builder as FormBuilder;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Repeater;
@@ -12,6 +13,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
+use Livewire\Component;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -29,7 +31,7 @@ class CustomFormForm
                             ->label(__('filament-custom-forms::fcf.form.name'))
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function ($set, $state, \Livewire\Component $livewire) {
+                            ->afterStateUpdated(function ($set, $state, Component $livewire) {
                                 if (property_exists($livewire, 'activeLocale') && $livewire->activeLocale !== 'en') {
                                     return;
                                 }
@@ -46,7 +48,8 @@ class CustomFormForm
                             ->default(true)
                             ->required(),
                         Repeater::make('panel_access')
-                            ->label('Panel Access Configuration')
+                            ->label('Panel Access & Permissions')
+                            ->hidden(fn () => ! CustomFormPlugin::get()->hasPanelAccess())
                             ->columnSpanFull()
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['panel_id'] ? ucfirst($state['panel_id']) : null)

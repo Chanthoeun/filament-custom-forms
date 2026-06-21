@@ -45,6 +45,7 @@ class CustomFormEntryExport implements FromCollection, ShouldAutoSize, WithStyle
                     $label = $translated;
                 }
             }
+
             return $label;
         })->toArray();
         $headings[] = __('filament-custom-forms::fcf.general.created_at', [], $this->locale ?? app()->getLocale());
@@ -73,7 +74,7 @@ class CustomFormEntryExport implements FromCollection, ShouldAutoSize, WithStyle
                 $data = $record->getTranslation('data', $this->locale, false) ?: $record->getTranslation('data', config('app.fallback_locale', 'en'), false);
             }
             $data = $data ?: ($record->data ?? []);
-            
+
             $row = [];
             foreach ($this->fields as $field) {
                 $value = $data[$field->name] ?? '';
@@ -106,6 +107,7 @@ class CustomFormEntryExport implements FromCollection, ShouldAutoSize, WithStyle
                     $label = $translated;
                 }
             }
+
             return $label;
         })->toArray();
 
@@ -121,7 +123,7 @@ class CustomFormEntryExport implements FromCollection, ShouldAutoSize, WithStyle
             $data = $record->getTranslation('data', $this->locale, false) ?: $record->getTranslation('data', config('app.fallback_locale', 'en'), false);
         }
         $data = $data ?: ($record->data ?? []);
-        
+
         $row = [];
 
         foreach ($this->fields as $field) {

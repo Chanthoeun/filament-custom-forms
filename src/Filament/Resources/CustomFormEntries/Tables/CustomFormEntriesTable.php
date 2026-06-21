@@ -109,12 +109,12 @@ class CustomFormEntriesTable
             }
 
             $columnKey = "data.{$key}";
-            
+
             $column = TextColumn::make($columnKey)
                 ->label(function () use ($field, $key, $table) {
                     $livewire = $table->getLivewire();
                     $locale = property_exists($livewire, 'activeLocale') && $livewire->activeLocale ? $livewire->activeLocale : app()->getLocale();
-                    
+
                     $label = Str::headline($key);
                     if ($field && $field->label) {
                         if (method_exists($field, 'getTranslation')) {
@@ -123,8 +123,10 @@ class CustomFormEntriesTable
                                 return $translated;
                             }
                         }
+
                         return $field->label;
                     }
+
                     return $label;
                 })
                 ->toggleable(isToggledHiddenByDefault: $visibleColumnCount >= 4);

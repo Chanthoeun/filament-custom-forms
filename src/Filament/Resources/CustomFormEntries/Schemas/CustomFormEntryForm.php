@@ -94,7 +94,7 @@ class CustomFormEntryForm
 
         foreach ($fields as $fieldModel) {
             $type = $fieldModel->type;
-            
+
             $label = $fieldModel->label;
             $options = $fieldModel->options ?? [];
             if ($locale && method_exists($fieldModel, 'getTranslation')) {
@@ -102,7 +102,7 @@ class CustomFormEntryForm
                 if ($translatedLabel) {
                     $label = $translatedLabel;
                 }
-                
+
                 $translatedOptions = $fieldModel->getTranslation('options', $locale, false) ?: $fieldModel->getTranslation('options', config('app.fallback_locale', 'en'), false);
                 if ($translatedOptions && is_array($translatedOptions)) {
                     $options = array_merge($options, $translatedOptions);
@@ -141,7 +141,7 @@ class CustomFormEntryForm
                     // Children are sections/containers - each becomes a step
                     foreach ($fieldModel->children as $child) {
                         $stepFields = self::getFields(collect([$child]), $locale);
-                        
+
                         $childLabel = $child->label;
                         if ($locale && method_exists($child, 'getTranslation')) {
                             $childLabel = $child->getTranslation('label', $locale, false) ?: $child->getTranslation('label', config('app.fallback_locale', 'en'), false) ?: $child->label;

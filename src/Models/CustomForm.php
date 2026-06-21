@@ -11,7 +11,7 @@ use Spatie\Translatable\HasTranslations;
 
 class CustomForm extends Model
 {
-    use HasFactory, SoftDeletes, HasTranslations;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     public $translatable = ['name', 'schema'];
 

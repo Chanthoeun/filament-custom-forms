@@ -4,6 +4,7 @@ namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Sc
 
 use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormField;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
@@ -139,7 +140,7 @@ class CustomFormEntryForm
 
                 if ($hasContainers) {
                     // Children are sections/containers - each becomes a step
-                    /** @var \Chanthoeun\FilamentCustomForms\Models\CustomFormField $child */
+                    /** @var CustomFormField $child */
                     foreach ($fieldModel->children as $child) {
                         $stepFields = self::getFields(collect([$child]), $locale);
 
@@ -175,7 +176,7 @@ class CustomFormEntryForm
                 if (! empty($options['is_table'])) {
                     // Table Layout: Headers + Hidden Label Fields
                     $headers = [];
-                    /** @var \Chanthoeun\FilamentCustomForms\Models\CustomFormField $child */
+                    /** @var CustomFormField $child */
                     foreach ($fieldModel->children as $child) {
                         $childLabel = $child->label;
                         if ($locale && method_exists($child, 'getTranslation')) {

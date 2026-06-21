@@ -8,6 +8,7 @@ use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Schemas\
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Tables\CustomFormEntriesTable;
 use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Filament\Navigation\NavigationItem;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class CustomFormEntryResource extends Resource
 {
+    use Translatable;
     public static function getModel(): string
     {
         return CustomFormPlugin::get()->getEntryModel();

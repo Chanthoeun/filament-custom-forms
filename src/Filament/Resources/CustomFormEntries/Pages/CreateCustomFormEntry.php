@@ -10,6 +10,8 @@ use Livewire\Attributes\Url;
 
 class CreateCustomFormEntry extends CreateRecord
 {
+    use \LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+
     #[Url]
     public ?string $form_id = null;
 
@@ -74,5 +76,12 @@ class CreateCustomFormEntry extends CreateRecord
                 ],
             ],
         ]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            \LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher::make(),
+        ];
     }
 }

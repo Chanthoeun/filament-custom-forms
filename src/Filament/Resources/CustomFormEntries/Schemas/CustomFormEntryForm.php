@@ -51,7 +51,7 @@ class CustomFormEntryForm
                 Grid::make()
                     ->columns(1)
                     ->columnSpanFull()
-                    ->schema(function (Get $get, ?Model $record) use ($preselectedFormId) {
+                    ->schema(function (Get $get, ?Model $record) use ($preselectedFormId, $livewire) {
                         $formId = $get('custom_form_id') ?? $record?->custom_form_id;
 
                         // Fallback to pre-selected ID if not set in state (e.g. initial load)
@@ -80,19 +80,34 @@ class CustomFormEntryForm
 
                         $rootFields = $fieldsByParent->get('', collect());
 
-                        return self::getFields($rootFields);
+                        $locale = property_exists($livewire, 'activeLocale') && $livewire->activeLocale ? $livewire->activeLocale : app()->getLocale();
+
+                        return self::getFields($rootFields, $locale);
                     })
                     ->columns(2),
             ]);
     }
 
-    protected static function getFields($fields): array
+    protected static function getFields($fields, ?string $locale = null): array
     {
         $components = [];
 
         foreach ($fields as $fieldModel) {
             $type = $fieldModel->type;
+            
+            $label = $fieldModel->label;
             $options = $fieldModel->options ?? [];
+            if ($locale && method_exists($fieldModel, 'getTranslation')) {
+                $translatedLabel = $fieldModel->getTranslation('label', $locale, false) ?: $fieldModel->getTranslation('label', config('app.fallback_locale', 'en'), false);
+                if ($translatedLabel) {
+                    $label = $translatedLabel;
+                }
+                
+                $translatedOptions = $fieldModel->getTranslation('options', $locale, false) ?: $fieldModel->getTranslation('options', config('app.fallback_locale', 'en'), false);
+                if ($translatedOptions && is_array($translatedOptions)) {
+                    $options = array_merge($options, $translatedOptions);
+                }
+            }
 
             // Handle Hidden Label
             $isHiddenLabel = $options['is_hidden_label'] ?? false;
@@ -101,15 +116,15 @@ class CustomFormEntryForm
 
             // Handle Layouts
             if ($type === 'section') {
-                $component = Section::make($isHiddenLabel ? null : $fieldModel->label) // Use label as heading
-                    ->schema(self::getFields($fieldModel->children))
+                $component = Section::make($isHiddenLabel ? null : $label) // Use label as heading
+                    ->schema(self::getFields($fieldModel->children, $locale))
                     ->columns($options['columns'] ?? 2);
             } elseif ($type === 'grid') {
                 $component = Grid::make($options['columns'] ?? 2)
-                    ->schema(self::getFields($fieldModel->children));
+                    ->schema(self::getFields($fieldModel->children, $locale));
             } elseif ($type === 'fieldset') {
-                $component = Fieldset::make($isHiddenLabel ? null : $fieldModel->label)
-                    ->schema(self::getFields($fieldModel->children))
+                $component = Fieldset::make($isHiddenLabel ? null : $label)
+                    ->schema(self::getFields($fieldModel->children, $locale))
                     ->columns($options['columns'] ?? 2);
             } elseif ($type === 'wizard') {
                 // Convert children into wizard steps
@@ -125,14 +140,20 @@ class CustomFormEntryForm
                 if ($hasContainers) {
                     // Children are sections/containers - each becomes a step
                     foreach ($fieldModel->children as $child) {
-                        $stepFields = self::getFields(collect([$child]));
-                        $steps[] = WizardStep::make($child->label)
+                        $stepFields = self::getFields(collect([$child]), $locale);
+                        
+                        $childLabel = $child->label;
+                        if ($locale && method_exists($child, 'getTranslation')) {
+                            $childLabel = $child->getTranslation('label', $locale, false) ?: $child->getTranslation('label', config('app.fallback_locale', 'en'), false) ?: $child->label;
+                        }
+
+                        $steps[] = WizardStep::make($childLabel)
                             ->schema($stepFields);
                     }
                 } else {
                     // Children are fields - put them all in a single step
-                    $stepFields = self::getFields($fieldModel->children);
-                    $step = WizardStep::make($fieldModel->label)
+                    $stepFields = self::getFields($fieldModel->children, $locale);
+                    $step = WizardStep::make($label)
                         ->schema($stepFields);
 
                     // Apply columns from wizard options
@@ -148,27 +169,29 @@ class CustomFormEntryForm
                     ->schema($steps);
             } elseif ($type === 'repeater') {
                 $component = Repeater::make("data.{$fieldModel->name}")
-                    ->label($fieldModel->label);
+                    ->label($label);
 
                 if (! empty($options['is_table'])) {
                     // Table Layout: Headers + Hidden Label Fields
                     $headers = [];
                     foreach ($fieldModel->children as $child) {
-                        $label = $child->label ?? $child->name;
-                        // Use Fully Qualified Name if importing is ambiguous, assuming it matches ContractForm usage
-                        $headers[] = TableColumn::make($label);
+                        $childLabel = $child->label;
+                        if ($locale && method_exists($child, 'getTranslation')) {
+                            $childLabel = $child->getTranslation('label', $locale, false) ?: $child->getTranslation('label', config('app.fallback_locale', 'en'), false) ?: $child->label;
+                        }
+                        $headers[] = TableColumn::make($childLabel ?? $child->name);
                     }
 
                     $component->table($headers);
 
                     // Fields must hide labels in table mode
-                    $fields = self::getFields($fieldModel->children);
+                    $fields = self::getFields($fieldModel->children, $locale);
                     foreach ($fields as $field) {
                         $field->hiddenLabel();
                     }
                     $component->schema($fields);
                 } else {
-                    $component->schema(self::getFields($fieldModel->children))
+                    $component->schema(self::getFields($fieldModel->children, $locale))
                         ->columns($options['columns'] ?? 1);
                 }
 
@@ -182,7 +205,6 @@ class CustomFormEntryForm
             } else {
                 // Handle Fields
                 $name = $fieldModel->name;
-                $label = $fieldModel->label;
                 $required = $fieldModel->required;
 
                 switch ($type) {

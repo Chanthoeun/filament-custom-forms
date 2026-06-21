@@ -6,10 +6,13 @@ use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Translatable\HasTranslations;
 
 class CustomFormEntry extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    public $translatable = ['data'];
 
     protected $fillable = [
         'custom_form_id',

@@ -21,6 +21,7 @@ return [
         'slug' => 'Slug',
         'is_active' => 'សកម្ម',
         'details' => 'ព័ត៌មានលម្អិតនៃទម្រង់',
+        'builder' => 'ឧបករណ៍បង្កើតទម្រង់',
         'names' => [],
     ],
     'entry' => [

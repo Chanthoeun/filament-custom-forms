@@ -22,10 +22,13 @@ class CustomFormEntryExport implements FromCollection, ShouldAutoSize, WithStyle
 
     protected Collection $fields;
 
-    public function __construct(Collection $records, ?string $formId = null)
+    protected ?string $locale;
+
+    public function __construct(Collection $records, ?string $formId = null, ?string $locale = null)
     {
         $this->records = $records;
         $this->formId = $formId;
+        $this->locale = $locale;
         $this->fields = CustomFormField::query()
             ->when($this->formId, fn ($query) => $query->where('custom_form_id', $this->formId))
             ->orderBy('sort')
@@ -35,20 +38,42 @@ class CustomFormEntryExport implements FromCollection, ShouldAutoSize, WithStyle
     public function collection(): Enumerable
     {
         $headings = $this->fields->map(function ($field) {
-            return $field->label ?: $field->name;
+            $label = $field->label ?: $field->name;
+            if ($this->locale && method_exists($field, 'getTranslation')) {
+                $translated = $field->getTranslation('label', $this->locale, false) ?: $field->getTranslation('label', config('app.fallback_locale', 'en'), false);
+                if ($translated) {
+                    $label = $translated;
+                }
+            }
+            return $label;
         })->toArray();
-        $headings[] = __('filament-custom-forms::fcf.general.created_at');
+        $headings[] = __('filament-custom-forms::fcf.general.created_at', [], $this->locale ?? app()->getLocale());
 
-        $formName = __('filament-custom-forms::fcf.entry.plural');
+        $locale = $this->locale ?? app()->getLocale();
+        $formName = __('filament-custom-forms::fcf.entry.plural', [], $locale);
         if ($this->formId) {
             $customForm = CustomForm::find($this->formId);
             if ($customForm) {
-                $formName = $customForm->name;
+                $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}", [], $locale);
+                if ($name === "filament-custom-forms::fcf.form.names.{$customForm->slug}") {
+                    if ($this->locale && method_exists($customForm, 'getTranslation')) {
+                        $translatedName = $customForm->getTranslation('name', $this->locale, false) ?: $customForm->getTranslation('name', config('app.fallback_locale', 'en'), false);
+                        $name = $translatedName ?: $customForm->name;
+                    } else {
+                        $name = $customForm->name;
+                    }
+                }
+                $formName = $name;
             }
         }
 
         $mapped = $this->records->map(function ($record) {
-            $data = $record->data ?? [];
+            $data = null;
+            if ($this->locale && method_exists($record, 'getTranslation')) {
+                $data = $record->getTranslation('data', $this->locale, false) ?: $record->getTranslation('data', config('app.fallback_locale', 'en'), false);
+            }
+            $data = $data ?: ($record->data ?? []);
+            
             $row = [];
             foreach ($this->fields as $field) {
                 $value = $data[$field->name] ?? '';
@@ -74,17 +99,29 @@ class CustomFormEntryExport implements FromCollection, ShouldAutoSize, WithStyle
     public function headings(): array
     {
         $headings = $this->fields->map(function ($field) {
-            return $field->label ?: $field->name;
+            $label = $field->label ?: $field->name;
+            if ($this->locale && method_exists($field, 'getTranslation')) {
+                $translated = $field->getTranslation('label', $this->locale, false) ?: $field->getTranslation('label', config('app.fallback_locale', 'en'), false);
+                if ($translated) {
+                    $label = $translated;
+                }
+            }
+            return $label;
         })->toArray();
 
-        $headings[] = __('filament-custom-forms::fcf.general.created_at');
+        $headings[] = __('filament-custom-forms::fcf.general.created_at', [], $this->locale ?? app()->getLocale());
 
         return $headings;
     }
 
     public function map($record): array
     {
-        $data = $record->data ?? [];
+        $data = null;
+        if ($this->locale && method_exists($record, 'getTranslation')) {
+            $data = $record->getTranslation('data', $this->locale, false) ?: $record->getTranslation('data', config('app.fallback_locale', 'en'), false);
+        }
+        $data = $data ?: ($record->data ?? []);
+        
         $row = [];
 
         foreach ($this->fields as $field) {

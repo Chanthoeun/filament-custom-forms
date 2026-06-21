@@ -48,4 +48,14 @@ return [
         'entry_icon' => 'heroicon-o-document-text',
         'dynamic_navigation' => true,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Locales
+    |--------------------------------------------------------------------------
+    |
+    | Define the locales that should be available for translations.
+    |
+    */
+    'locales' => ['en', 'km'],
 ];

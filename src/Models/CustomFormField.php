@@ -5,9 +5,13 @@ namespace Chanthoeun\FilamentCustomForms\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Spatie\Translatable\HasTranslations;
+
 class CustomFormField extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    public $translatable = ['label', 'options'];
 
     protected $fillable = [
         'custom_form_id',

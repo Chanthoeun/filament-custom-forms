@@ -250,6 +250,13 @@ class CustomFormPlugin implements Plugin
             // Register it into the panel
             $panel->plugin($documentBuilderPlugin);
         }
+
+        if (class_exists(\LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin::class) && ! $panel->hasPlugin('spatie-translatable')) {
+            $panel->plugin(
+                \LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin::make()
+                    ->defaultLocales(config('filament-custom-forms.locales', ['en', 'km']))
+            );
+        }
     }
 
     public function boot(Panel $panel): void

@@ -29,7 +29,12 @@ class CustomFormForm
                             ->label(__('filament-custom-forms::fcf.form.name'))
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($set, $state) => $set('slug', Str::slug($state)))
+                            ->afterStateUpdated(function ($set, $state, \Livewire\Component $livewire) {
+                                if (property_exists($livewire, 'activeLocale') && $livewire->activeLocale !== 'en') {
+                                    return;
+                                }
+                                $set('slug', Str::slug($state));
+                            })
                             ->maxLength(255),
                         TextInput::make('slug')
                             ->label(__('filament-custom-forms::fcf.form.slug'))
@@ -239,6 +244,7 @@ class CustomFormForm
                         ->default(2),
                     FormBuilder::make('schema')
                         ->label(__('filament-custom-forms::fcf.builder.fields.section_content'))
+                        ->blockPickerColumns(2)
                         ->blocks(self::getFormBlocks(includeLayouts: false)), // Prevent infinite nesting for simplicity
                 ]);
 
@@ -255,6 +261,7 @@ class CustomFormForm
                         ->default(2),
                     FormBuilder::make('schema')
                         ->label(__('filament-custom-forms::fcf.builder.fields.grid_content'))
+                        ->blockPickerColumns(2)
                         ->blocks(self::getFormBlocks(includeLayouts: false)),
                 ]);
 
@@ -272,6 +279,7 @@ class CustomFormForm
                         ->default(2),
                     FormBuilder::make('schema')
                         ->label(__('filament-custom-forms::fcf.builder.fields.fieldset_content'))
+                        ->blockPickerColumns(2)
                         ->blocks(self::getFormBlocks(includeLayouts: false)),
                 ]);
 
@@ -290,6 +298,7 @@ class CustomFormForm
                     Toggle::make('required')->label(__('filament-custom-forms::fcf.builder.fields.required')),
                     FormBuilder::make('schema')
                         ->label(__('filament-custom-forms::fcf.builder.fields.repeater_fields'))
+                        ->blockPickerColumns(2)
                         ->blocks(self::getFormBlocks(includeLayouts: false)),
                 ]);
         }

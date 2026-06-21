@@ -28,7 +28,7 @@ class CustomFormEntriesTable
         $formId = self::getFormId($table);
 
         return $table
-            ->columns(self::getColumns($formId))
+            ->columns(self::getColumns($table, $formId))
             ->filters(self::getFilters($formId))
             ->recordActions(self::getRecordActions())
             ->toolbarActions([
@@ -71,7 +71,7 @@ class CustomFormEntriesTable
             ?? request()->query('form_id');
     }
 
-    protected static function getColumns(?string $formId): array
+    protected static function getColumns(Table $table, ?string $formId): array
     {
         $columns = [];
 
@@ -109,10 +109,24 @@ class CustomFormEntriesTable
             }
 
             $columnKey = "data.{$key}";
-            $label = Str::headline($key);
-
+            
             $column = TextColumn::make($columnKey)
-                ->label($label)
+                ->label(function () use ($field, $key, $table) {
+                    $livewire = $table->getLivewire();
+                    $locale = property_exists($livewire, 'activeLocale') && $livewire->activeLocale ? $livewire->activeLocale : app()->getLocale();
+                    
+                    $label = Str::headline($key);
+                    if ($field && $field->label) {
+                        if (method_exists($field, 'getTranslation')) {
+                            $translated = $field->getTranslation('label', $locale, false) ?: $field->getTranslation('label', config('app.fallback_locale', 'en'), false);
+                            if ($translated) {
+                                return $translated;
+                            }
+                        }
+                        return $field->label;
+                    }
+                    return $label;
+                })
                 ->toggleable(isToggledHiddenByDefault: $visibleColumnCount >= 4);
 
             // Only make the first 4 columns searchable by default to prevent massive slow SQL JSON queries

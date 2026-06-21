@@ -21,6 +21,7 @@ return [
         'slug' => 'Slug',
         'is_active' => 'Is Active',
         'details' => 'Form Details',
+        'builder' => 'Form Builder',
         'names' => [],
     ],
     'entry' => [

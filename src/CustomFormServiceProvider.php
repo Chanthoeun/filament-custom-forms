@@ -24,6 +24,7 @@ class CustomFormServiceProvider extends PackageServiceProvider
                 'create_custom_form_entries_table',
                 'add_panel_access_to_custom_forms_table',
             ])
+            ->hasCommand(\Chanthoeun\FilamentCustomForms\Commands\MigrateToTranslatableCommand::class)
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->publishConfigFile()

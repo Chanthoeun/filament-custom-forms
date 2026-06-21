@@ -21,6 +21,8 @@ use Illuminate\Validation\Rules\Unique;
 
 class FieldsRelationManager extends RelationManager
 {
+    use \LaraZeus\SpatieTranslatable\Resources\RelationManagers\Concerns\Translatable;
+
     protected static string $relationship = 'fields';
 
     public function form(Schema $schema): Schema
@@ -46,6 +48,8 @@ class FieldsRelationManager extends RelationManager
                         TextInput::make('name')
                             ->label(__('filament-custom-forms::fcf.field.name'))
                             ->required()
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn ($set, $state) => $set('name', \Illuminate\Support\Str::slug($state, '_')))
                             ->unique(
                                 ignoreRecord: true,
                                 modifyRuleUsing: fn (Unique $rule, $livewire) => $rule->where('custom_form_id', $livewire->getOwnerRecord()->id)
@@ -187,6 +191,7 @@ class FieldsRelationManager extends RelationManager
             ->reorderable('sort')
             ->defaultSort('sort', 'asc')
             ->headerActions([
+                \LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher::make(),
                 CreateAction::make(),
             ])
             ->actions([

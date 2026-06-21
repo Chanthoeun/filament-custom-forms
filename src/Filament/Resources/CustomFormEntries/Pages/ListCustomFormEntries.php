@@ -17,6 +17,8 @@ use Maatwebsite\Excel\Excel;
 
 class ListCustomFormEntries extends ListRecords
 {
+    use \LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+
     protected static string $resource = CustomFormEntryResource::class;
 
     public ?string $activeFormId = null;
@@ -42,9 +44,15 @@ class ListCustomFormEntries extends ListRecords
         if ($this->activeFormId) {
             $customForm = CustomForm::find($this->activeFormId);
             if ($customForm) {
-                $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}");
+                $locale = property_exists($this, 'activeLocale') && $this->activeLocale ? $this->activeLocale : app()->getLocale();
+                $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}", [], $locale);
                 if ($name === "filament-custom-forms::fcf.form.names.{$customForm->slug}") {
-                    $name = $customForm->name;
+                    if ($locale && method_exists($customForm, 'getTranslation')) {
+                        $translatedName = $customForm->getTranslation('name', $locale, false) ?: $customForm->getTranslation('name', config('app.fallback_locale', 'en'), false);
+                        $name = $translatedName ?: $customForm->name;
+                    } else {
+                        $name = $customForm->name;
+                    }
                 }
 
                 return $name;
@@ -65,17 +73,24 @@ class ListCustomFormEntries extends ListRecords
         $createLabel = __('filament-custom-forms::fcf.entry.action.create', ['name' => __('filament-custom-forms::fcf.entry.single')]);
 
         if ($customFormId) {
+            $locale = property_exists($this, 'activeLocale') && $this->activeLocale ? $this->activeLocale : app()->getLocale();
             $customForm = CustomForm::find($customFormId);
             if ($customForm) {
-                $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}");
+                $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}", [], $locale);
                 if ($name === "filament-custom-forms::fcf.form.names.{$customForm->slug}") {
-                    $name = $customForm->name;
+                    if ($locale && method_exists($customForm, 'getTranslation')) {
+                        $translatedName = $customForm->getTranslation('name', $locale, false) ?: $customForm->getTranslation('name', config('app.fallback_locale', 'en'), false);
+                        $name = $translatedName ?: $customForm->name;
+                    } else {
+                        $name = $customForm->name;
+                    }
                 }
-                $createLabel = __('filament-custom-forms::fcf.entry.action.create', ['name' => $name]);
+                $createLabel = __('filament-custom-forms::fcf.entry.action.create', ['name' => $name], $locale);
             }
         }
 
         return [
+            \LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher::make(),
 
             Actions\Action::make('export_data')
                 ->label(__('filament-custom-forms::fcf.entry.action.export_data'))
@@ -131,18 +146,18 @@ class ListCustomFormEntries extends ListRecords
 
                     if ($format === 'excel') {
                         return \Maatwebsite\Excel\Facades\Excel::download(
-                            new CustomFormEntryExport($records, $this->activeFormId),
+                            new CustomFormEntryExport($records, $this->activeFormId, property_exists($this, 'activeLocale') ? $this->activeLocale : null),
                             $formName.'-'.now()->format('Y-m-d-His').'.xlsx'
                         );
                     } elseif ($format === 'pdf') {
                         return \Maatwebsite\Excel\Facades\Excel::download(
-                            new CustomFormEntryExport($records, $this->activeFormId),
+                            new CustomFormEntryExport($records, $this->activeFormId, property_exists($this, 'activeLocale') ? $this->activeLocale : null),
                             $formName.'-'.now()->format('Y-m-d-His').'.pdf',
                             Excel::MPDF
                         );
                     } elseif ($format === 'json') {
                         // Reuse the Export class to get consistent formatting
-                        $exporter = new CustomFormEntryExport($records, $this->activeFormId);
+                        $exporter = new CustomFormEntryExport($records, $this->activeFormId, property_exists($this, 'activeLocale') ? $this->activeLocale : null);
                         $headings = $exporter->headings();
 
                         $data = $records->map(function ($record) use ($exporter, $headings) {

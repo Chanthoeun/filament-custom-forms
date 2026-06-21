@@ -47,7 +47,7 @@ class ListCustomFormEntries extends ListRecords
         if ($this->activeFormId) {
             $customForm = CustomForm::find($this->activeFormId);
             if ($customForm) {
-                $locale = property_exists($this, 'activeLocale') && $this->activeLocale ? $this->activeLocale : app()->getLocale();
+                $locale = isset($this->activeLocale) && $this->activeLocale ? $this->activeLocale : app()->getLocale();
                 $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}", [], $locale);
                 if ($name === "filament-custom-forms::fcf.form.names.{$customForm->slug}") {
                     if ($locale && method_exists($customForm, 'getTranslation')) {
@@ -76,7 +76,7 @@ class ListCustomFormEntries extends ListRecords
         $createLabel = __('filament-custom-forms::fcf.entry.action.create', ['name' => __('filament-custom-forms::fcf.entry.single')]);
 
         if ($customFormId) {
-            $locale = property_exists($this, 'activeLocale') && $this->activeLocale ? $this->activeLocale : app()->getLocale();
+            $locale = isset($this->activeLocale) && $this->activeLocale ? $this->activeLocale : app()->getLocale();
             $customForm = CustomForm::find($customFormId);
             if ($customForm) {
                 $name = __("filament-custom-forms::fcf.form.names.{$customForm->slug}", [], $locale);
@@ -149,18 +149,18 @@ class ListCustomFormEntries extends ListRecords
 
                     if ($format === 'excel') {
                         return \Maatwebsite\Excel\Facades\Excel::download(
-                            new CustomFormEntryExport($records, $this->activeFormId, property_exists($this, 'activeLocale') ? $this->activeLocale : null),
+                            new CustomFormEntryExport($records, $this->activeFormId, isset($this->activeLocale) ? $this->activeLocale : null),
                             $formName.'-'.now()->format('Y-m-d-His').'.xlsx'
                         );
                     } elseif ($format === 'pdf') {
                         return \Maatwebsite\Excel\Facades\Excel::download(
-                            new CustomFormEntryExport($records, $this->activeFormId, property_exists($this, 'activeLocale') ? $this->activeLocale : null),
+                            new CustomFormEntryExport($records, $this->activeFormId, isset($this->activeLocale) ? $this->activeLocale : null),
                             $formName.'-'.now()->format('Y-m-d-His').'.pdf',
                             Excel::MPDF
                         );
                     } elseif ($format === 'json') {
                         // Reuse the Export class to get consistent formatting
-                        $exporter = new CustomFormEntryExport($records, $this->activeFormId, property_exists($this, 'activeLocale') ? $this->activeLocale : null);
+                        $exporter = new CustomFormEntryExport($records, $this->activeFormId, isset($this->activeLocale) ? $this->activeLocale : null);
                         $headings = $exporter->headings();
 
                         $data = $records->map(function ($record) use ($exporter, $headings) {

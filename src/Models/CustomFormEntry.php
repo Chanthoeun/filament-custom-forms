@@ -12,6 +12,28 @@ class CustomFormEntry extends Model
 {
     use HasFactory, HasTranslations;
 
+    public function toArray()
+    {
+        $attributes = parent::toArray();
+
+        $hasTranslations = false;
+        try {
+            $hasTranslations = CustomFormPlugin::get()->hasTranslations();
+        } catch (\Throwable $e) {
+            $hasTranslations = false;
+        }
+
+        if (! $hasTranslations) {
+            foreach ($this->getTranslatableAttributes() as $field) {
+                if (array_key_exists($field, $attributes)) {
+                    $attributes[$field] = $this->getAttribute($field);
+                }
+            }
+        }
+
+        return $attributes;
+    }
+
     public $translatable = ['data'];
 
     protected $fillable = [

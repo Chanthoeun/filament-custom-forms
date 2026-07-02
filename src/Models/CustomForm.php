@@ -12,7 +12,10 @@ use Spatie\Translatable\HasTranslations;
 
 class CustomForm extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, SoftDeletes;
+    use HasTranslations {
+        getTranslations as traitGetTranslations;
+    }
 
     public function toArray()
     {
@@ -151,5 +154,20 @@ class CustomForm extends Model
         }
 
         return (bool) data_get($panelConfig, 'isolate_users', false);
+    }
+
+    public function getTranslations(?string $key = null, ?array $allowedLocales = null): array
+    {
+        $translations = $this->traitGetTranslations($key, $allowedLocales);
+
+        if ($key !== null && empty($translations)) {
+            $raw = $this->getRawOriginal($key);
+            if (! empty($raw) && is_string($raw) && ! str_starts_with(trim($raw), '{')) {
+                $fallback = config('app.fallback_locale', 'en');
+                return [$fallback => $raw];
+            }
+        }
+
+        return $translations;
     }
 }

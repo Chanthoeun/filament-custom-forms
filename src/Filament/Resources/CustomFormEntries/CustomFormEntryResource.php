@@ -112,7 +112,8 @@ class CustomFormEntryResource extends Resource
         try {
             if (! config('filament-custom-forms.navigation.dynamic_navigation', true)) {
                 return [
-                    NavigationItem::make(__('filament-custom-forms::fcf.entry.plural'))
+                    NavigationItem::make()
+                        ->label(__('filament-custom-forms::fcf.entry.plural'))
                         ->group(CustomFormPlugin::get()->getNavigationEntryGroup())
                         ->icon(CustomFormPlugin::get()->getNavigationEntryIcon())
                         ->isActiveWhen(fn () => request()->routeIs(static::getRouteBaseName().'.*'))
@@ -137,7 +138,8 @@ class CustomFormEntryResource extends Resource
                 // Populate cache for label methods to use if they haven't run yet
                 static::$formCache[$form->id] = $form;
 
-                $items[] = NavigationItem::make($form->name)
+                $items[] = NavigationItem::make()
+                    ->label($form->name ?: 'Unnamed Form')
                     ->group(CustomFormPlugin::get()->getNavigationEntryGroup())
                     ->icon(CustomFormPlugin::get()->getNavigationEntryIcon())
                     ->isActiveWhen(fn () => $activeFormId == $form->id)

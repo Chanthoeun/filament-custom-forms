@@ -164,6 +164,7 @@ class CustomForm extends Model
             $raw = $this->getRawOriginal($key);
             if (! empty($raw) && is_string($raw) && ! str_starts_with(trim($raw), '{')) {
                 $fallback = config('app.fallback_locale', 'en');
+
                 return [$fallback => $raw];
             }
         }

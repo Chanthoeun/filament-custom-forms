@@ -3,6 +3,7 @@
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\GlobalFields\Pages;
 
 use Chanthoeun\FilamentCustomForms\Filament\Resources\GlobalFields\GlobalFieldResource;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormField;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -14,7 +15,7 @@ class EditGlobalField extends EditRecord
     {
         return [
             DeleteAction::make()
-                ->hidden(fn ($record) => \Chanthoeun\FilamentCustomForms\Models\CustomFormField::where('global_field_id', $record->id)->exists()),
+                ->hidden(fn ($record) => CustomFormField::where('global_field_id', $record->id)->exists()),
         ];
     }
 }

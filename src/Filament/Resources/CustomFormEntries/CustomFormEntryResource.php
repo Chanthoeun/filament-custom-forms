@@ -128,8 +128,8 @@ class CustomFormEntryResource extends Resource
             // Pre-fetch all active forms at once to avoid N+1 in the loop
             $forms = CustomForm::where('is_active', true)->whereNotNull('name')->get();
             $activeFormId = null;
-            
-            if (request()->routeIs(static::getRouteBaseName() . '.*')) {
+
+            if (request()->routeIs(static::getRouteBaseName().'.*')) {
                 $activeFormId = data_get(request()->query('tableFilters'), 'custom_form_id.value') ?? request()->query('form_id');
                 if (! $activeFormId && request()->route('record')) {
                     $recordId = request()->route('record');
@@ -140,7 +140,7 @@ class CustomFormEntryResource extends Resource
                     }
                 }
 
-                if (! $activeFormId && request()->routeIs(static::getRouteBaseName() . '.index')) {
+                if (! $activeFormId && request()->routeIs(static::getRouteBaseName().'.index')) {
                     $firstForm = CustomForm::where('is_active', true)->whereNotNull('name')->first();
                     if ($firstForm) {
                         $activeFormId = $firstForm->id;

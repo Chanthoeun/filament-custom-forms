@@ -58,6 +58,16 @@ public function panel(Panel $panel): Panel
 
 **Note on Translations**: If you enable `->translations(true)`, ensure you have defined your desired locales in the `config/filament-custom-forms.php` under the `locales` key.
 
+## Multi-Language Support & Translations
+
+This plugin natively supports `spatie/laravel-translatable` for robust multi-language forms:
+
+1. **Form Labels & Names**: The Form Name and all Field Labels are fully translatable. When a user creates a form, they can provide translated names and labels which will automatically render correctly based on the active locale.
+2. **Submissions (Entries)**: Submitted data is saved securely and can be isolated by language.
+3. **Translating Manual Choices**: Form Configuration and Layout Options (such as Columns, Required, Unique Rules, and Manual Choices) are intentionally shared across languages to prevent admins from having to re-configure the entire layout for every language.
+    * If you use "Manual Input" for Select, Radio, or Checkbox options and want them translated, simply **enter your Laravel Translation Key** (e.g., `messages.gender_male`) into the choice label field. The plugin automatically detects translation keys and applies Laravel's `__()` helper on the frontend. (If no translation file exists, it elegantly falls back to the exact text you typed).
+    * Alternatively, use the **Model** or **Enum** Option Sources, which handle translations natively.
+
 ## Updates
 
 To update the package to the latest version, run:

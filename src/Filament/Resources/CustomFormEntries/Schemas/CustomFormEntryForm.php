@@ -4,6 +4,7 @@ namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\Sc
 
 use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Chanthoeun\FilamentCustomForms\Models\CustomForm;
+use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
 use Chanthoeun\FilamentCustomForms\Models\CustomFormField;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
@@ -27,6 +28,7 @@ use Filament\Schemas\Components\Wizard\Step as WizardStep;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Unique;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class CustomFormEntryForm
@@ -87,13 +89,13 @@ class CustomFormEntryForm
 
                         $locale = property_exists($livewire, 'activeLocale') && $livewire->activeLocale ? $livewire->activeLocale : app()->getLocale();
 
-                        return self::getFields($rootFields, $locale);
+                        return self::getFields($rootFields, $locale, $formId);
                     })
                     ->columns(2),
             ]);
     }
 
-    protected static function getFields($fields, ?string $locale = null): array
+    protected static function getFields($fields, ?string $locale = null, $formId = null): array
     {
         $components = [];
 
@@ -117,14 +119,14 @@ class CustomFormEntryForm
             // Handle Layouts
             if ($type === 'section') {
                 $component = Section::make($isHiddenLabel ? null : $label) // Use label as heading
-                    ->schema(self::getFields($fieldModel->children, $locale))
+                    ->schema(self::getFields($fieldModel->children, $locale, $formId))
                     ->columns($options['columns'] ?? 2);
             } elseif ($type === 'grid') {
                 $component = Grid::make($options['columns'] ?? 2)
-                    ->schema(self::getFields($fieldModel->children, $locale));
+                    ->schema(self::getFields($fieldModel->children, $locale, $formId));
             } elseif ($type === 'fieldset') {
                 $component = Fieldset::make($isHiddenLabel ? null : $label)
-                    ->schema(self::getFields($fieldModel->children, $locale))
+                    ->schema(self::getFields($fieldModel->children, $locale, $formId))
                     ->columns($options['columns'] ?? 2);
             } elseif ($type === 'wizard') {
                 // Convert children into wizard steps
@@ -149,7 +151,7 @@ class CustomFormEntryForm
                             }
                         }
 
-                        $stepFields = self::getFields($child->children, $locale);
+                        $stepFields = self::getFields($child->children, $locale, $formId);
 
                         $step = WizardStep::make($childLabel)
                             ->schema($stepFields);
@@ -162,7 +164,7 @@ class CustomFormEntryForm
                     }
                 } else {
                     // Children are fields - put them all in a single step
-                    $stepFields = self::getFields($fieldModel->children, $locale);
+                    $stepFields = self::getFields($fieldModel->children, $locale, $formId);
                     $step = WizardStep::make($label)
                         ->schema($stepFields);
 
@@ -196,13 +198,13 @@ class CustomFormEntryForm
                     $component->table($headers);
 
                     // Fields must hide labels in table mode
-                    $fields = self::getFields($fieldModel->children, $locale);
+                    $fields = self::getFields($fieldModel->children, $locale, $formId);
                     foreach ($fields as $field) {
                         $field->hiddenLabel();
                     }
                     $component->schema($fields);
                 } else {
-                    $component->schema(self::getFields($fieldModel->children, $locale))
+                    $component->schema(self::getFields($fieldModel->children, $locale, $formId))
                         ->columns($options['columns'] ?? 1);
                 }
 
@@ -306,27 +308,34 @@ class CustomFormEntryForm
                             ->visibility(CustomFormPlugin::get()->getUploadVisibility());
                         break;
                     case 'radio':
-                        $selectOptions = $options['choices'] ?? [];
-                        $component = Radio::make("data.{$name}")->options($selectOptions);
+                        $component = Radio::make("data.{$name}")->options($fieldModel->getParsedOptions());
                         if (! empty($options['is_inline'])) {
                             $component->inline();
                         }
                         break;
                     case 'checkbox_list':
-                        $selectOptions = $options['choices'] ?? [];
-                        $component = CheckboxList::make("data.{$name}")->options($selectOptions);
+                        $component = CheckboxList::make("data.{$name}")->options($fieldModel->getParsedOptions());
                         if (! empty($options['is_inline'])) {
                             $component->inline();
                         }
                         break;
                     case 'select':
-                        $selectOptions = $options['choices'] ?? [];
-                        $component = Select::make("data.{$name}")->options($selectOptions);
+                        $component = Select::make("data.{$name}")->options($fieldModel->getParsedOptions());
                         break;
                 }
 
                 if ($component) {
                     $component->label($label);
+
+                    if (isset($options['default_source']) && method_exists($component, 'default')) {
+                        if ($options['default_source'] === 'auth_user' && ! empty($options['auth_user_attribute'])) {
+                            $component->default(function () use ($options) {
+                                return auth()->check() ? auth()->user()->{$options['auth_user_attribute']} : null;
+                            });
+                        } elseif ($options['default_source'] === 'manual' && array_key_exists('default_value', $options)) {
+                            $component->default($options['default_value']);
+                        }
+                    }
 
                     if ($required) {
                         $component->required();
@@ -351,6 +360,17 @@ class CustomFormEntryForm
 
                     if (! empty($options['is_copyable']) && method_exists($component, 'copyable')) {
                         $component->copyable();
+                    }
+
+                    if (! empty($options['is_unique']) && method_exists($component, 'unique')) {
+                        $component->unique(
+                            table: CustomFormEntry::class,
+                            column: "data->{$name}",
+                            ignoreRecord: true,
+                            modifyRuleUsing: function (Unique $rule) use ($formId) {
+                                return $rule->where('custom_form_id', $formId);
+                            }
+                        );
                     }
                 }
             }

@@ -5,11 +5,14 @@ namespace Chanthoeun\FilamentCustomForms;
 use App\Models\User;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomFormEntries\CustomFormEntryResource;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\CustomFormResource;
+use Chanthoeun\FilamentCustomForms\Filament\Resources\GlobalFields\GlobalFieldResource;
 use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Chanthoeun\FilamentCustomForms\Models\CustomFormEntry;
 use Chanthoeun\FilamentDocumentBuilder\DocumentBuilderPlugin;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
 class CustomFormPlugin implements Plugin
@@ -263,7 +266,7 @@ class CustomFormPlugin implements Plugin
 
         if (! $this->isHideBuilders()) {
             $resources[] = CustomFormResource::class;
-            $resources[] = \Chanthoeun\FilamentCustomForms\Filament\Resources\GlobalFields\GlobalFieldResource::class;
+            $resources[] = GlobalFieldResource::class;
         }
 
         $panel->resources($resources);
@@ -296,5 +299,40 @@ class CustomFormPlugin implements Plugin
     public function boot(Panel $panel): void
     {
         //
+    }
+
+    public static function getAvailableModels(): array
+    {
+        $models = config('filament-custom-forms.field_options.models', []);
+
+        $modelPath = app_path('Models');
+        if (is_dir($modelPath)) {
+            $files = glob($modelPath.'/*.php');
+            foreach ($files as $file) {
+                $class = 'App\\Models\\'.basename($file, '.php');
+                if (class_exists($class) && is_subclass_of($class, Model::class)) {
+                    $models[$class] = class_basename($class);
+                }
+            }
+        }
+
+        return $models;
+    }
+
+    public static function getModelAttributes(?string $modelClass): array
+    {
+        if (! $modelClass || ! class_exists($modelClass)) {
+            return [];
+        }
+
+        try {
+            $model = new $modelClass;
+            $table = $model->getTable();
+            $columns = Schema::getColumnListing($table);
+
+            return array_combine($columns, $columns);
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 }

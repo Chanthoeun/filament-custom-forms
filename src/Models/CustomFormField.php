@@ -9,7 +9,7 @@ use Spatie\Translatable\HasTranslations;
 
 class CustomFormField extends Model
 {
-    use HasFactory, HasTranslations;
+    use \Chanthoeun\FilamentCustomForms\Models\Concerns\HasParsedOptions, HasFactory, HasTranslations;
 
     public function toArray()
     {

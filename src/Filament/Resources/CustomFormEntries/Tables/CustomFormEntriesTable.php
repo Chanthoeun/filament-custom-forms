@@ -88,7 +88,15 @@ class CustomFormEntriesTable
 
         $sortOrder = $fieldsMetadata->pluck('sort', 'name');
         $fieldTypes = $fieldsMetadata->pluck('type', 'name');
-        $fieldOptions = $fieldsMetadata->pluck('options', 'name');
+
+        $fieldOptions = [];
+        foreach ($fieldsMetadata as $field) {
+            $options = $field->options ?? [];
+            if (in_array($field->type, ['select', 'radio', 'checkbox_list'])) {
+                $options['choices'] = $field->getParsedOptions();
+            }
+            $fieldOptions[$field->name] = $options;
+        }
         $fieldsById = $fieldsMetadata->keyBy('id');
 
         $sortedKeys = $keys->sortBy(fn ($key) => $sortOrder[$key] ?? 999999);
@@ -151,13 +159,15 @@ class CustomFormEntriesTable
 
             if (in_array($fieldTypes[$key] ?? null, ['select', 'radio', 'checkbox_list'])) {
                 $column->formatStateUsing(function ($state) use ($fieldOptions, $key) {
-                    if (blank($state)) return null;
-                    
+                    if (blank($state)) {
+                        return null;
+                    }
+
                     $choices = $fieldOptions[$key]['choices'] ?? [];
                     if (is_array($state)) {
                         return collect($state)->map(fn ($val) => $choices[$val] ?? $val)->implode(', ');
                     }
-                    
+
                     return $choices[$state] ?? $state;
                 });
             }

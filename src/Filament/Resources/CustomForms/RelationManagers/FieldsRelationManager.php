@@ -2,7 +2,10 @@
 
 namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\RelationManagers;
 
+use App\Models\User;
 use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
+use Chanthoeun\FilamentCustomForms\Models\GlobalField;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -14,6 +17,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -92,86 +97,181 @@ class FieldsRelationManager extends RelationManager
                                 ],
                             ])
                             ->default('text_input')
-                            ->live(),
+                            ->live()
+                            ->afterStateUpdated(function ($get, $set, $state) {
+                                if (in_array($state, ['select', 'radio', 'checkbox_list']) && ! $get('options.source')) {
+                                    $set('options.source', 'manual');
+                                }
+                                if (! in_array($state, ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'image', 'file_upload']) && ! $get('options.default_source')) {
+                                    $set('options.default_source', 'manual');
+                                }
+                            }),
                         Toggle::make('required')
                             ->label(__('filament-custom-forms::fcf.field.is_required'))
                             ->default(false)
                             ->hidden(fn ($get) => in_array($get('type'), ['section', 'grid', 'fieldset', 'wizard'])),
 
-                        Section::make(__('filament-custom-forms::fcf.admin.configuration'))
+                        Tabs::make('Configuration')
                             ->columnSpanFull()
-                            ->components([
-                                Select::make('options.columns')
-                                    ->label(__('filament-custom-forms::fcf.admin.columns'))
-                                    ->visible(fn ($get) => in_array($get('type'), ['grid', 'section', 'fieldset', 'repeater', 'wizard', 'checkbox_list']))
-                                    ->options([
-                                        '1' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 1),
-                                        '2' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 2),
-                                        '3' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 3),
-                                        '4' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 4),
-                                    ])
-                                    ->default('2'),
+                            ->tabs([
+                                Tab::make('Default Values')
+                                    ->icon('heroicon-m-document-text')
+                                    ->schema([
+                                        Select::make('options.default_source')
+                                            ->label('Default Value Source')
+                                            ->options([
+                                                'manual' => 'Manual Input',
+                                                'auth_user' => 'Get from Authenticated User',
+                                            ])
+                                            ->default('manual')
+                                            ->live()
+                                            ->visible(fn ($get) => ! in_array($get('type'), ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'image', 'file_upload'])),
 
-                                KeyValue::make('options.choices')
-                                    ->label(__('filament-custom-forms::fcf.admin.select_options'))
-                                    ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']))
-                                    ->helperText('Key corresponds to value, Label is displayed text.'),
+                                        TextInput::make('options.default_value')
+                                            ->label('Default Value')
+                                            ->helperText('Enter a static default value for this field.')
+                                            ->visible(fn ($get) => $get('options.default_source') === 'manual' && ! in_array($get('type'), ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'image', 'file_upload'])),
 
-                                TextInput::make('options.match_field')
-                                    ->label('Match Field (Name)')
-                                    ->visible(fn ($get) => $get('type') === 'confirm_password')
-                                    ->helperText('Enter the name of the password field this should match.'),
+                                        Select::make('options.auth_user_attribute')
+                                            ->label('Auth User Attribute')
+                                            ->options(function () {
+                                                $model = config('auth.providers.users.model', User::class);
+                                                $attributes = CustomFormPlugin::getModelAttributes($model);
 
-                                KeyValue::make('options.column_span')
-                                    ->label('Column Span (Responsive)')
-                                    ->helperText('Key: Breakpoint (default, sm, md, lg, xl, 2xl). Value: Columns (1-12, full).')
-                                    ->keyLabel('Breakpoint')
-                                    ->valueLabel('Columns')
-                                    ->formatStateUsing(fn ($state) => is_array($state) ? $state : (empty($state) ? [] : ['default' => $state])),
+                                                return array_combine($attributes, $attributes);
+                                            })
+                                            ->searchable()
+                                            ->helperText('Select the user attribute to use as the default value.')
+                                            ->visible(fn ($get) => $get('options.default_source') === 'auth_user')
+                                            ->required(fn ($get) => $get('options.default_source') === 'auth_user'),
+                                    ]),
 
-                                Toggle::make('options.column_span_full')
-                                    ->label(__('filament-custom-forms::fcf.admin.full_width'))
-                                    ->default(false),
+                                Tab::make('Options & Choices')
+                                    ->icon('heroicon-m-list-bullet')
+                                    ->schema([
+                                        Select::make('options.source')
+                                            ->label('Options Source')
+                                            ->options([
+                                                'manual' => 'Manual Input',
+                                                'model' => 'Link to Model',
+                                                'enum' => 'Link to Enum',
+                                            ])
+                                            ->default('manual')
+                                            ->live()
+                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list'])),
 
-                                Toggle::make('options.image_editor')
-                                    ->label(__('filament-custom-forms::fcf.admin.enable_image_editor'))
-                                    ->visible(fn ($get) => $get('type') === 'image'),
+                                        KeyValue::make('options.choices')
+                                            ->label(__('filament-custom-forms::fcf.admin.select_options'))
+                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && (! $get('options.source') || $get('options.source') === 'manual'))
+                                            ->helperText('Key corresponds to value, Label is displayed text.'),
 
-                                Toggle::make('options.is_revealable')
-                                    ->label(__('filament-custom-forms::fcf.admin.allow_password_reveal'))
-                                    ->visible(fn ($get) => $get('type') === 'password'),
+                                        Select::make('options.model')
+                                            ->label('Model')
+                                            ->options(CustomFormPlugin::getAvailableModels())
+                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model')
+                                            ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model')
+                                            ->live(),
 
-                                Toggle::make('options.is_copyable')
-                                    ->label(__('filament-custom-forms::fcf.admin.allow_copy'))
-                                    ->visible(fn ($get) => in_array($get('type'), ['text_input', 'email', 'number_input', 'phone'])),
+                                        TextInput::make('options.model_label_attribute')
+                                            ->label('Label Attribute')
+                                            ->default('name')
+                                            ->datalist(fn ($get) => array_values(CustomFormPlugin::getModelAttributes($get('options.model'))))
+                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model')
+                                            ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model'),
 
-                                Toggle::make('options.is_decimal')
-                                    ->label('Allow Decimals')
-                                    ->visible(fn ($get) => in_array($get('type'), ['number_input', 'number']))
-                                    ->default(true),
+                                        TextInput::make('options.model_value_attribute')
+                                            ->label('Value Attribute')
+                                            ->default('id')
+                                            ->datalist(fn ($get) => array_values(CustomFormPlugin::getModelAttributes($get('options.model'))))
+                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model')
+                                            ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model'),
 
-                                Toggle::make('options.is_hidden_label')
-                                    ->label('Hide Label')
-                                    ->default(false),
+                                        Select::make('options.enum')
+                                            ->label('Enum Class')
+                                            ->options(config('filament-custom-forms.field_options.enums', []))
+                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'enum')
+                                            ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'enum'),
+                                    ]),
 
-                                Toggle::make('options.is_hidden_on_view')
-                                    ->label(__('filament-custom-forms::fcf.admin.hide_in_view'))
-                                    ->default(false),
+                                Tab::make('Layout & Display')
+                                    ->icon('heroicon-m-paint-brush')
+                                    ->schema([
+                                        Select::make('options.columns')
+                                            ->label(__('filament-custom-forms::fcf.admin.columns'))
+                                            ->visible(fn ($get) => in_array($get('type'), ['grid', 'section', 'fieldset', 'repeater', 'wizard', 'checkbox_list']))
+                                            ->options([
+                                                '1' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 1),
+                                                '2' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 2),
+                                                '3' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 3),
+                                                '4' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 4),
+                                            ])
+                                            ->default('2'),
 
-                                Toggle::make('options.is_inline')
-                                    ->label('Display Inline')
-                                    ->visible(fn ($get) => in_array($get('type'), ['radio', 'checkbox_list']))
-                                    ->default(false),
+                                        KeyValue::make('options.column_span')
+                                            ->label('Column Span (Responsive)')
+                                            ->helperText('Key: Breakpoint (default, sm, md, lg, xl, 2xl). Value: Columns (1-12, full).')
+                                            ->keyLabel('Breakpoint')
+                                            ->valueLabel('Columns')
+                                            ->formatStateUsing(fn ($state) => is_array($state) ? $state : (empty($state) ? [] : ['default' => $state])),
 
-                                Toggle::make('options.is_table')
-                                    ->label('Use Table Layout (Simple)')
-                                    ->visible(fn ($get) => $get('type') === 'repeater')
-                                    ->default(false),
+                                        Toggle::make('options.column_span_full')
+                                            ->label(__('filament-custom-forms::fcf.admin.full_width'))
+                                            ->default(false),
 
-                                Toggle::make('options.is_compact')
-                                    ->label('Compact Mode')
-                                    ->visible(fn ($get) => $get('type') === 'repeater')
-                                    ->default(false),
+                                        Toggle::make('options.is_hidden_label')
+                                            ->label('Hide Label')
+                                            ->default(false),
+
+                                        Toggle::make('options.is_hidden_on_view')
+                                            ->label(__('filament-custom-forms::fcf.admin.hide_in_view'))
+                                            ->default(false),
+
+                                        Toggle::make('options.is_inline')
+                                            ->label('Display Inline')
+                                            ->visible(fn ($get) => in_array($get('type'), ['radio', 'checkbox_list']))
+                                            ->default(false),
+
+                                        Toggle::make('options.is_table')
+                                            ->label('Use Table Layout (Simple)')
+                                            ->visible(fn ($get) => $get('type') === 'repeater')
+                                            ->default(false),
+
+                                        Toggle::make('options.is_compact')
+                                            ->label('Compact Mode')
+                                            ->visible(fn ($get) => $get('type') === 'repeater')
+                                            ->default(false),
+                                    ]),
+
+                                Tab::make('Field Specifics')
+                                    ->icon('heroicon-m-cog-6-tooth')
+                                    ->schema([
+                                        Toggle::make('options.image_editor')
+                                            ->label(__('filament-custom-forms::fcf.admin.enable_image_editor'))
+                                            ->visible(fn ($get) => $get('type') === 'image'),
+
+                                        Toggle::make('options.is_revealable')
+                                            ->label(__('filament-custom-forms::fcf.admin.allow_password_reveal'))
+                                            ->visible(fn ($get) => $get('type') === 'password'),
+
+                                        TextInput::make('options.match_field')
+                                            ->label('Match Field (Name)')
+                                            ->visible(fn ($get) => $get('type') === 'confirm_password')
+                                            ->helperText('Enter the name of the password field this should match.'),
+
+                                        Toggle::make('options.is_copyable')
+                                            ->label(__('filament-custom-forms::fcf.admin.allow_copy'))
+                                            ->visible(fn ($get) => in_array($get('type'), ['text_input', 'email', 'number_input', 'phone'])),
+
+                                        Toggle::make('options.is_unique')
+                                            ->label('Must be unique')
+                                            ->helperText('Ensure the submitted value is unique across this form.')
+                                            ->visible(fn ($get) => ! in_array($get('type'), ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'image', 'file_upload', 'boolean'])),
+
+                                        Toggle::make('options.is_decimal')
+                                            ->label('Allow Decimals')
+                                            ->visible(fn ($get) => in_array($get('type'), ['number_input', 'number']))
+                                            ->default(true),
+                                    ]),
                             ]),
                     ]),
             ]);
@@ -197,11 +297,11 @@ class FieldsRelationManager extends RelationManager
             ->headerActions(array_filter([
                 CustomFormPlugin::get()->hasTranslations() ? LocaleSwitcher::make() : null,
                 CreateAction::make(),
-                \Filament\Actions\Action::make('import_global_field')
+                Action::make('import_global_field')
                     ->label(__('Import Global Field'))
                     ->icon('heroicon-o-document-duplicate')
                     ->form([
-                        \Filament\Forms\Components\Select::make('parent_id')
+                        Select::make('parent_id')
                             ->label(__('filament-custom-forms::fcf.admin.parent_container'))
                             ->options(function ($livewire) {
                                 return $livewire->getOwnerRecord()->fields()
@@ -209,13 +309,13 @@ class FieldsRelationManager extends RelationManager
                                     ->get()
                                     ->mapWithKeys(fn ($field) => [$field->id => $field->label ?? $field->name]);
                             }),
-                        \Filament\Forms\Components\Select::make('global_field_id')
+                        Select::make('global_field_id')
                             ->label(__('Select Global Field'))
-                            ->options(\Chanthoeun\FilamentCustomForms\Models\GlobalField::all()->pluck('label', 'id'))
+                            ->options(GlobalField::all()->pluck('label', 'id'))
                             ->required(),
                     ])
                     ->action(function (array $data, $livewire) {
-                        $globalField = \Chanthoeun\FilamentCustomForms\Models\GlobalField::find($data['global_field_id']);
+                        $globalField = GlobalField::find($data['global_field_id']);
                         if ($globalField) {
                             $livewire->getOwnerRecord()->fields()->create([
                                 'parent_id' => $data['parent_id'] ?? null,

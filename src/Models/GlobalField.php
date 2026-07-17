@@ -2,13 +2,16 @@
 
 namespace Chanthoeun\FilamentCustomForms\Models;
 
+use Chanthoeun\FilamentCustomForms\Models\Concerns\HasParsedOptions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
 class GlobalField extends Model
 {
-    use \Chanthoeun\FilamentCustomForms\Models\Concerns\HasParsedOptions, HasFactory, HasTranslations;
+    use HasFactory;
+    use HasParsedOptions;
+    use HasTranslations;
 
     protected $fillable = [
         'name',

@@ -3,13 +3,16 @@
 namespace Chanthoeun\FilamentCustomForms\Models;
 
 use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
+use Chanthoeun\FilamentCustomForms\Models\Concerns\HasParsedOptions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
 class CustomFormField extends Model
 {
-    use \Chanthoeun\FilamentCustomForms\Models\Concerns\HasParsedOptions, HasFactory, HasTranslations;
+    use HasFactory;
+    use HasParsedOptions;
+    use HasTranslations;
 
     public function toArray()
     {

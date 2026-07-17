@@ -127,7 +127,26 @@ class CustomFormEntryResource extends Resource
 
             // Pre-fetch all active forms at once to avoid N+1 in the loop
             $forms = CustomForm::where('is_active', true)->whereNotNull('name')->get();
-            $activeFormId = data_get(request()->query('tableFilters'), 'custom_form_id.value');
+            $activeFormId = null;
+            
+            if (request()->routeIs(static::getRouteBaseName() . '.*')) {
+                $activeFormId = data_get(request()->query('tableFilters'), 'custom_form_id.value') ?? request()->query('form_id');
+                if (! $activeFormId && request()->route('record')) {
+                    $recordId = request()->route('record');
+                    $entryModel = CustomFormPlugin::get()->getEntryModel();
+                    $record = $entryModel::find($recordId);
+                    if ($record) {
+                        $activeFormId = $record->custom_form_id;
+                    }
+                }
+
+                if (! $activeFormId && request()->routeIs(static::getRouteBaseName() . '.index')) {
+                    $firstForm = CustomForm::where('is_active', true)->whereNotNull('name')->first();
+                    if ($firstForm) {
+                        $activeFormId = $firstForm->id;
+                    }
+                }
+            }
 
             foreach ($forms as $form) {
                 // Check if user has access to this form in the current panel

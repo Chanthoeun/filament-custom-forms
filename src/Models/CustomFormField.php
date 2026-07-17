@@ -33,11 +33,12 @@ class CustomFormField extends Model
         return $attributes;
     }
 
-    public $translatable = ['label', 'options'];
+    public $translatable = ['label'];
 
     protected $fillable = [
         'custom_form_id',
         'parent_id',
+        'global_field_id',
         'name',
         'label',
         'type',

@@ -39,6 +39,10 @@ class CustomFormEntryForm
             ? $livewire->form_id
             : (request()->query('form_id') ?? request()->input('tableFilters.custom_form_id.value'));
 
+        if (! $preselectedFormId && property_exists($livewire, 'record') && $livewire->record) {
+            $preselectedFormId = $livewire->record->custom_form_id;
+        }
+
         return $schema
             ->components([
                 Select::make('custom_form_id')
@@ -103,11 +107,6 @@ class CustomFormEntryForm
                 if ($translatedLabel) {
                     $label = $translatedLabel;
                 }
-
-                $translatedOptions = $fieldModel->getTranslation('options', $locale, false) ?: $fieldModel->getTranslation('options', config('app.fallback_locale', 'en'), false);
-                if ($translatedOptions && is_array($translatedOptions)) {
-                    $options = array_merge($options, $translatedOptions);
-                }
             }
 
             // Handle Hidden Label
@@ -142,15 +141,24 @@ class CustomFormEntryForm
                     // Children are sections/containers - each becomes a step
                     /** @var CustomFormField $child */
                     foreach ($fieldModel->children as $child) {
-                        $stepFields = self::getFields(collect([$child]), $locale);
-
                         $childLabel = $child->label;
                         if ($locale && method_exists($child, 'getTranslation')) {
-                            $childLabel = $child->getTranslation('label', $locale, false) ?: $child->getTranslation('label', config('app.fallback_locale', 'en'), false) ?: $child->label;
+                            $translated = $child->getTranslation('label', $locale, false) ?: $child->getTranslation('label', config('app.fallback_locale', 'en'), false);
+                            if ($translated) {
+                                $childLabel = $translated;
+                            }
                         }
 
-                        $steps[] = WizardStep::make($childLabel)
+                        $stepFields = self::getFields($child->children, $locale);
+
+                        $step = WizardStep::make($childLabel)
                             ->schema($stepFields);
+
+                        if (! empty($child->options['columns'])) {
+                            $step->columns($child->options['columns']);
+                        }
+
+                        $steps[] = $step;
                     }
                 } else {
                     // Children are fields - put them all in a single step

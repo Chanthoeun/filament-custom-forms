@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('global_fields', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique(); // Internal name e.g. 'contact_phone'
+            $table->json('label'); // Translatable display label
+            $table->string('type'); // 'text', 'select', etc.
+            $table->boolean('required')->default(false);
+            $table->json('config')->nullable(); // Additional config
+            $table->json('options')->nullable(); // Select options
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('global_fields');
+    }
+};

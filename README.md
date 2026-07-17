@@ -84,10 +84,11 @@ To release a new version:
 
 ## Usage
 
-1.  **Form Creation**: Navigate to the **Custom Forms** resource to create dynamic forms using the builder.
-2.  **Data Collection**: Users can submit entries through the generated forms.
-3.  **Entry Management**: View and export entries in the **Custom Form Entries** resource.
-4.  **Data Exporting**: Export the data grid to JSON, heavily formatted Excel files, or instantly as beautifully formatted PDF tables.
+1.  **Global Fields**: Under **Form Builder > Global Fields**, you can create reusable fields (e.g., standard 'Gender' or 'Country' selects) that can be imported into multiple custom forms with a single click.
+2.  **Form Creation**: Navigate to the **Custom Forms** resource to create dynamic forms using the builder. You can define new fields or import existing Global Fields instantly.
+3.  **Data Collection**: Users can submit entries through the generated forms.
+4.  **Entry Management**: View and export entries in the **Custom Form Entries** resource.
+5.  **Data Exporting**: Export the data grid to JSON, heavily formatted Excel files, or instantly as beautifully formatted PDF tables.
 
 ## Changelog
 
@@ -96,4 +97,14 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
+
+## Recent Fixes & Improvements
+
+- **Global Fields**: Prevented deletion of global fields when they are in use by form entries to maintain data integrity.
+- **Translatable Labels**: Dropdowns and table columns now automatically display beautifully translated `label` texts instead of internal `name` slugs (e.g., Parent Container dropdowns, Global Fields Selects).
+- **Table Formatting**: The Form Entries table now dynamically parses and maps JSON key values back to their human-readable labels for Select, Radio, and Checkbox List components.
+- **Data Tables**: Prevented non-data layout elements (like `wizard`, `section`, `grid`) from incorrectly rendering as columns in the Entries data tables.
+- **Navigation active states**: Enhanced the sidebar active state evaluation on the Edit/Create pages to accurately highlight the correct dynamic Form Entry resource without mistakenly highlighting incorrect parent forms due to route parameter bleeding.
+- **Form UI Display**: The Form entry edit page now automatically hides the "Select Custom Form" dropdown when a form ID is already established for the entry.
+
 

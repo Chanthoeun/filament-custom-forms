@@ -192,7 +192,7 @@ class CustomFormPlugin implements Plugin
 
     public function getNavigationFormIcon(): string
     {
-        return $this->navigationFormIcon ?? config('filament-custom-forms.navigation.icon', 'heroicon-o-rectangle-stack');
+        return $this->navigationFormIcon ?? config('filament-custom-forms.navigation.icon', 'heroicon-o-clipboard-document-list');
     }
 
     public function navigationEntryIcon(string $icon): static
@@ -263,6 +263,7 @@ class CustomFormPlugin implements Plugin
 
         if (! $this->isHideBuilders()) {
             $resources[] = CustomFormResource::class;
+            $resources[] = \Chanthoeun\FilamentCustomForms\Filament\Resources\GlobalFields\GlobalFieldResource::class;
         }
 
         $panel->resources($resources);

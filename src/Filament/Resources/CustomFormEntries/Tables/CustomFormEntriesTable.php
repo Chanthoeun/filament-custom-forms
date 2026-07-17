@@ -96,7 +96,7 @@ class CustomFormEntriesTable
         $visibleColumnCount = 0;
 
         foreach ($sortedKeys as $key) {
-            if (in_array(($fieldTypes[$key] ?? null), ['repeater', 'section', 'grid', 'fieldset'])) {
+            if (in_array(($fieldTypes[$key] ?? null), ['repeater', 'section', 'grid', 'fieldset', 'wizard'])) {
                 continue;
             }
 
@@ -147,6 +147,19 @@ class CustomFormEntriesTable
 
             if (($fieldTypes[$key] ?? null) === 'time_picker') {
                 $column->time();
+            }
+
+            if (in_array($fieldTypes[$key] ?? null, ['select', 'radio', 'checkbox_list'])) {
+                $column->formatStateUsing(function ($state) use ($fieldOptions, $key) {
+                    if (blank($state)) return null;
+                    
+                    $choices = $fieldOptions[$key]['choices'] ?? [];
+                    if (is_array($state)) {
+                        return collect($state)->map(fn ($val) => $choices[$val] ?? $val)->implode(', ');
+                    }
+                    
+                    return $choices[$state] ?? $state;
+                });
             }
 
             $columns[] = $column;

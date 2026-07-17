@@ -190,13 +190,44 @@ class FieldsRelationManager extends RelationManager
                     'section', 'grid', 'fieldset', 'wizard' => 'info',
                     default => 'gray',
                 }),
-                TextColumn::make('parent.name')->label(__('filament-custom-forms::fcf.admin.parent_container'))->badge(),
+                TextColumn::make('parent.label')->label(__('filament-custom-forms::fcf.admin.parent_container'))->badge(),
             ])
             ->reorderable('sort')
             ->defaultSort('sort', 'asc')
             ->headerActions(array_filter([
                 CustomFormPlugin::get()->hasTranslations() ? LocaleSwitcher::make() : null,
                 CreateAction::make(),
+                \Filament\Actions\Action::make('import_global_field')
+                    ->label(__('Import Global Field'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->form([
+                        \Filament\Forms\Components\Select::make('parent_id')
+                            ->label(__('filament-custom-forms::fcf.admin.parent_container'))
+                            ->options(function ($livewire) {
+                                return $livewire->getOwnerRecord()->fields()
+                                    ->whereIn('type', ['section', 'grid', 'fieldset', 'repeater', 'wizard'])
+                                    ->get()
+                                    ->mapWithKeys(fn ($field) => [$field->id => $field->label ?? $field->name]);
+                            }),
+                        \Filament\Forms\Components\Select::make('global_field_id')
+                            ->label(__('Select Global Field'))
+                            ->options(\Chanthoeun\FilamentCustomForms\Models\GlobalField::all()->pluck('label', 'id'))
+                            ->required(),
+                    ])
+                    ->action(function (array $data, $livewire) {
+                        $globalField = \Chanthoeun\FilamentCustomForms\Models\GlobalField::find($data['global_field_id']);
+                        if ($globalField) {
+                            $livewire->getOwnerRecord()->fields()->create([
+                                'parent_id' => $data['parent_id'] ?? null,
+                                'global_field_id' => $globalField->id,
+                                'name' => $globalField->name,
+                                'label' => $globalField->getTranslations('label'),
+                                'type' => $globalField->type,
+                                'required' => $globalField->required ?? false,
+                                'options' => $globalField->options,
+                            ]);
+                        }
+                    }),
             ]))
             ->actions([
                 EditAction::make(),

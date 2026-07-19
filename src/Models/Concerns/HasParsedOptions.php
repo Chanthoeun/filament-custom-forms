@@ -28,6 +28,14 @@ trait HasParsedOptions
             }
         } else {
             $choices = data_get($this->options, 'choices', []);
+            $locale = app()->getLocale();
+            $fallback = config('app.fallback_locale', 'en');
+
+            // Check if it's the new localized format
+            if (isset($choices[$fallback]) && is_array($choices[$fallback])) {
+                $choices = $choices[$locale] ?? $choices[$fallback] ?? [];
+            }
+
             $options = [];
             if (is_array($choices)) {
                 foreach ($choices as $key => $val) {

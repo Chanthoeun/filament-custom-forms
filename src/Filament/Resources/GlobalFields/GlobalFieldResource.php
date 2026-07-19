@@ -18,6 +18,7 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -148,7 +149,35 @@ class GlobalFieldResource extends Resource
                                         KeyValue::make('options.choices')
                                             ->label(__('filament-custom-forms::fcf.admin.select_options'))
                                             ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && (! $get('options.source') || $get('options.source') === 'manual'))
-                                            ->helperText('Key corresponds to value, Label is displayed text.'),
+                                            ->helperText('Key corresponds to value, Label is displayed text.')
+                                            ->afterStateHydrated(function (KeyValue $component, $state, $livewire, Set $set) {
+                                                if (empty($state) || ! is_array($state)) {
+                                                    return;
+                                                }
+                                                $locale = property_exists($livewire, 'activeLocale') ? $livewire->activeLocale : app()->getLocale();
+                                                $fallback = config('app.fallback_locale', 'en');
+                                                if (isset($state[$fallback]) && is_array($state[$fallback])) {
+                                                    $set($component->getStatePath(), $state[$locale] ?? $state[$fallback] ?? []);
+                                                }
+                                            })
+                                            ->dehydrateStateUsing(function ($state, $record, $livewire) {
+                                                $locale = property_exists($livewire, 'activeLocale') ? $livewire->activeLocale : app()->getLocale();
+                                                $fallback = config('app.fallback_locale', 'en');
+
+                                                $existingChoices = $record ? data_get($record->options, 'choices', []) : [];
+
+                                                if (! empty($existingChoices) && ! (isset($existingChoices[$fallback]) && is_array($existingChoices[$fallback]))) {
+                                                    $existingChoices = [$fallback => $existingChoices];
+                                                }
+
+                                                if (! is_array($existingChoices)) {
+                                                    $existingChoices = [];
+                                                }
+
+                                                $existingChoices[$locale] = $state ?? [];
+
+                                                return $existingChoices;
+                                            }),
 
                                         Select::make('options.model')
                                             ->label('Model')

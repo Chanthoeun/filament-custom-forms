@@ -150,7 +150,7 @@ class GlobalFieldResource extends Resource
                                             ->label(__('filament-custom-forms::fcf.admin.select_options'))
                                             ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && (! $get('options.source') || $get('options.source') === 'manual'))
                                             ->helperText('Key corresponds to value, Label is displayed text.')
-                                            ->afterStateHydrated(function (KeyValue $component, $state, $livewire, Set $set) {
+                                            ->afterStateHydrated(function (KeyValue $component, $state, $livewire, $set) {
                                                 if (empty($state) || ! is_array($state)) {
                                                     return;
                                                 }

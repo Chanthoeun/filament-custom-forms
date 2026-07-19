@@ -234,6 +234,17 @@ class FieldsRelationManager extends RelationManager
                                             ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model')
                                             ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model'),
 
+                                        TextInput::make('options.parent_field')
+                                            ->label('Parent Field Name')
+                                            ->helperText('The internal name (slug) of the parent field this depends on. Only applicable for Select fields.')
+                                            ->visible(fn ($get) => $get('type') === 'select' && $get('options.source') === 'model'),
+
+                                        TextInput::make('options.parent_foreign_key')
+                                            ->label('Parent Foreign Key')
+                                            ->helperText('The column in this model that links it to the parent model.')
+                                            ->visible(fn ($get) => $get('type') === 'select' && $get('options.source') === 'model' && filled($get('options.parent_field')))
+                                            ->required(fn ($get) => $get('type') === 'select' && $get('options.source') === 'model' && filled($get('options.parent_field'))),
+
                                         Select::make('options.enum')
                                             ->label('Enum Class')
                                             ->options(config('filament-custom-forms.field_options.enums', []))

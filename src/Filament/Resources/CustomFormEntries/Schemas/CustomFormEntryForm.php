@@ -87,15 +87,22 @@ class CustomFormEntryForm
 
                         $rootFields = $fieldsByParent->get('', collect());
 
+                        $parentFields = [];
+                        foreach ($allFields as $field) {
+                            if (! empty($field->options['parent_field'])) {
+                                $parentFields[] = $field->options['parent_field'];
+                            }
+                        }
+
                         $locale = property_exists($livewire, 'activeLocale') && $livewire->activeLocale ? $livewire->activeLocale : app()->getLocale();
 
-                        return self::getFields($rootFields, $locale, $formId);
+                        return self::getFields($rootFields, $locale, $formId, $parentFields);
                     })
                     ->columns(2),
             ]);
     }
 
-    protected static function getFields($fields, ?string $locale = null, $formId = null): array
+    protected static function getFields($fields, ?string $locale = null, $formId = null, array $parentFields = []): array
     {
         $components = [];
 
@@ -119,14 +126,14 @@ class CustomFormEntryForm
             // Handle Layouts
             if ($type === 'section') {
                 $component = Section::make($isHiddenLabel ? null : $label) // Use label as heading
-                    ->schema(self::getFields($fieldModel->children, $locale, $formId))
+                    ->schema(self::getFields($fieldModel->children, $locale, $formId, $parentFields))
                     ->columns($options['columns'] ?? 2);
             } elseif ($type === 'grid') {
                 $component = Grid::make($options['columns'] ?? 2)
-                    ->schema(self::getFields($fieldModel->children, $locale, $formId));
+                    ->schema(self::getFields($fieldModel->children, $locale, $formId, $parentFields));
             } elseif ($type === 'fieldset') {
                 $component = Fieldset::make($isHiddenLabel ? null : $label)
-                    ->schema(self::getFields($fieldModel->children, $locale, $formId))
+                    ->schema(self::getFields($fieldModel->children, $locale, $formId, $parentFields))
                     ->columns($options['columns'] ?? 2);
             } elseif ($type === 'wizard') {
                 // Convert children into wizard steps
@@ -151,7 +158,7 @@ class CustomFormEntryForm
                             }
                         }
 
-                        $stepFields = self::getFields($child->children, $locale, $formId);
+                        $stepFields = self::getFields($child->children, $locale, $formId, $parentFields);
 
                         $step = WizardStep::make($childLabel)
                             ->schema($stepFields);
@@ -164,7 +171,7 @@ class CustomFormEntryForm
                     }
                 } else {
                     // Children are fields - put them all in a single step
-                    $stepFields = self::getFields($fieldModel->children, $locale, $formId);
+                    $stepFields = self::getFields($fieldModel->children, $locale, $formId, $parentFields);
                     $step = WizardStep::make($label)
                         ->schema($stepFields);
 
@@ -198,13 +205,13 @@ class CustomFormEntryForm
                     $component->table($headers);
 
                     // Fields must hide labels in table mode
-                    $fields = self::getFields($fieldModel->children, $locale, $formId);
+                    $fields = self::getFields($fieldModel->children, $locale, $formId, $parentFields);
                     foreach ($fields as $field) {
                         $field->hiddenLabel();
                     }
                     $component->schema($fields);
                 } else {
-                    $component->schema(self::getFields($fieldModel->children, $locale, $formId))
+                    $component->schema(self::getFields($fieldModel->children, $locale, $formId, $parentFields))
                         ->columns($options['columns'] ?? 1);
                 }
 
@@ -320,7 +327,34 @@ class CustomFormEntryForm
                         }
                         break;
                     case 'select':
-                        $component = Select::make("data.{$name}")->options($fieldModel->getParsedOptions());
+                        if (
+                            ! empty($options['source']) && $options['source'] === 'model'
+                            && ! empty($options['parent_field'])
+                            && ! empty($options['parent_foreign_key'])
+                        ) {
+                            $component = Select::make("data.{$name}")
+                                ->options(function (Get $get) use ($options) {
+                                    $parentValue = $get("data.{$options['parent_field']}");
+
+                                    if (blank($parentValue)) {
+                                        return [];
+                                    }
+
+                                    $modelClass = $options['model'] ?? null;
+                                    if (! $modelClass || ! class_exists($modelClass)) {
+                                        return [];
+                                    }
+
+                                    $labelAttr = $options['model_label_attribute'] ?? 'name';
+                                    $valueAttr = $options['model_value_attribute'] ?? 'id';
+
+                                    return app($modelClass)
+                                        ->where($options['parent_foreign_key'], $parentValue)
+                                        ->pluck($labelAttr, $valueAttr);
+                                });
+                        } else {
+                            $component = Select::make("data.{$name}")->options($fieldModel->getParsedOptions());
+                        }
                         break;
                 }
 
@@ -376,6 +410,10 @@ class CustomFormEntryForm
             }
 
             if ($component) {
+                if (in_array($fieldModel->name, $parentFields) && method_exists($component, 'live')) {
+                    $component->live();
+                }
+
                 // Common Layout Options (Applied to BOTH Fields and Layouts)
 
                 // Column Span

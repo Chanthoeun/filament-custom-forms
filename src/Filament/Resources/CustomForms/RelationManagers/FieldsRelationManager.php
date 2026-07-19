@@ -167,7 +167,7 @@ class FieldsRelationManager extends RelationManager
 
                                         KeyValue::make('options.choices')
                                             ->label(__('filament-custom-forms::fcf.admin.select_options'))
-                                            ->visible(fn (Get $get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && (! $get('options.source') || $get('options.source') === 'manual'))
+                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && (! $get('options.source') || $get('options.source') === 'manual'))
                                             ->helperText('Key corresponds to value, Label is displayed text.')
                                             ->formatStateUsing(function ($state, $livewire, $record, $get) {
                                                 $locale = property_exists($livewire, 'activeLocale') ? $livewire->activeLocale : app()->getLocale();

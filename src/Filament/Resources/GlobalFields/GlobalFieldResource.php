@@ -145,30 +145,39 @@ class GlobalFieldResource extends Resource
                                             ->live()
                                             ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list'])),
 
+                                        Hidden::make('options.choices_translations')
+                                            ->default(fn ($record) => $record ? data_get($record->options, 'choices', []) : [])
+                                            ->dehydrated(false),
+
                                         KeyValue::make('options.choices')
                                             ->label(__('filament-custom-forms::fcf.admin.select_options'))
                                             ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && (! $get('options.source') || $get('options.source') === 'manual'))
                                             ->helperText('Key corresponds to value, Label is displayed text.')
-                                            ->formatStateUsing(function ($state, $livewire) {
-                                                if (empty($state) || ! is_array($state)) {
-                                                    return $state;
-                                                }
+                                            ->formatStateUsing(function ($state, $livewire, $record, $get) {
                                                 $locale = property_exists($livewire, 'activeLocale') ? $livewire->activeLocale : app()->getLocale();
+                                                $fullState = $get('options.choices_translations') ?? ($record ? data_get($record->options, 'choices', []) : []);
 
-                                                $firstElement = reset($state);
-                                                if (is_array($firstElement)) {
-                                                    $fallback = config('app.fallback_locale', 'en');
-
-                                                    return $state[$locale] ?? $state[$fallback] ?? [];
+                                                if (empty($fullState) || ! is_array($fullState)) {
+                                                    return [];
                                                 }
 
-                                                return $state;
+                                                $firstElement = reset($fullState);
+                                                if (! is_array($firstElement)) {
+                                                    $fallback = config('app.fallback_locale', 'en');
+                                                    $fullState = [$fallback => $fullState];
+                                                }
+
+                                                return $fullState[$locale] ?? $fullState[config('app.fallback_locale', 'en')] ?? [];
                                             })
-                                            ->dehydrateStateUsing(function ($state, $record, $livewire) {
+                                            ->dehydrateStateUsing(function ($state, $record, $livewire, $get, $set) {
                                                 $locale = property_exists($livewire, 'activeLocale') ? $livewire->activeLocale : app()->getLocale();
                                                 $fallback = config('app.fallback_locale', 'en');
 
-                                                $existingChoices = $record ? data_get($record->options, 'choices', []) : [];
+                                                $existingChoices = $get('options.choices_translations') ?? [];
+
+                                                if (empty($existingChoices) && $record) {
+                                                    $existingChoices = data_get($record->options, 'choices', []);
+                                                }
 
                                                 if (! empty($existingChoices)) {
                                                     $firstElement = reset($existingChoices);
@@ -182,6 +191,8 @@ class GlobalFieldResource extends Resource
                                                 }
 
                                                 $existingChoices[$locale] = $state ?? [];
+
+                                                $set('options.choices_translations', $existingChoices);
 
                                                 return $existingChoices;
                                             }),

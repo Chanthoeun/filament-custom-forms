@@ -165,13 +165,15 @@ class FieldsRelationManager extends RelationManager
                                             ->label(__('filament-custom-forms::fcf.admin.select_options'))
                                             ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && (! $get('options.source') || $get('options.source') === 'manual'))
                                             ->helperText('Key corresponds to value, Label is displayed text.')
-                                            ->afterStateHydrated(function (KeyValue $component, $state, $livewire, $set) {
+                                            ->afterStateHydrated(function (KeyValue $component, $state, $livewire, Set $set) {
                                                 if (empty($state) || ! is_array($state)) {
                                                     return;
                                                 }
                                                 $locale = property_exists($livewire, 'activeLocale') ? $livewire->activeLocale : app()->getLocale();
-                                                $fallback = config('app.fallback_locale', 'en');
-                                                if (isset($state[$fallback]) && is_array($state[$fallback])) {
+
+                                                $firstElement = reset($state);
+                                                if (is_array($firstElement)) {
+                                                    $fallback = config('app.fallback_locale', 'en');
                                                     $set($component->getStatePath(), $state[$locale] ?? $state[$fallback] ?? []);
                                                 }
                                             })
@@ -181,8 +183,11 @@ class FieldsRelationManager extends RelationManager
 
                                                 $existingChoices = $record ? data_get($record->options, 'choices', []) : [];
 
-                                                if (! empty($existingChoices) && ! (isset($existingChoices[$fallback]) && is_array($existingChoices[$fallback]))) {
-                                                    $existingChoices = [$fallback => $existingChoices];
+                                                if (! empty($existingChoices)) {
+                                                    $firstElement = reset($existingChoices);
+                                                    if (! is_array($firstElement)) {
+                                                        $existingChoices = [$fallback => $existingChoices];
+                                                    }
                                                 }
 
                                                 if (! is_array($existingChoices)) {

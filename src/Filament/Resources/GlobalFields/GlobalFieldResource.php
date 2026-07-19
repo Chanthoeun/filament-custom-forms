@@ -18,7 +18,6 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -155,8 +154,10 @@ class GlobalFieldResource extends Resource
                                                     return;
                                                 }
                                                 $locale = property_exists($livewire, 'activeLocale') ? $livewire->activeLocale : app()->getLocale();
-                                                $fallback = config('app.fallback_locale', 'en');
-                                                if (isset($state[$fallback]) && is_array($state[$fallback])) {
+
+                                                $firstElement = reset($state);
+                                                if (is_array($firstElement)) {
+                                                    $fallback = config('app.fallback_locale', 'en');
                                                     $set($component->getStatePath(), $state[$locale] ?? $state[$fallback] ?? []);
                                                 }
                                             })
@@ -166,8 +167,11 @@ class GlobalFieldResource extends Resource
 
                                                 $existingChoices = $record ? data_get($record->options, 'choices', []) : [];
 
-                                                if (! empty($existingChoices) && ! (isset($existingChoices[$fallback]) && is_array($existingChoices[$fallback]))) {
-                                                    $existingChoices = [$fallback => $existingChoices];
+                                                if (! empty($existingChoices)) {
+                                                    $firstElement = reset($existingChoices);
+                                                    if (! is_array($firstElement)) {
+                                                        $existingChoices = [$fallback => $existingChoices];
+                                                    }
                                                 }
 
                                                 if (! is_array($existingChoices)) {

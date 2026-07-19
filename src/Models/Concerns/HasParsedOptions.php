@@ -31,11 +31,13 @@ trait HasParsedOptions
             $locale = app()->getLocale();
             $fallback = config('app.fallback_locale', 'en');
 
-            // Check if it's the new localized format
-            if (isset($choices[$fallback]) && is_array($choices[$fallback])) {
-                $choices = $choices[$locale] ?? $choices[$fallback] ?? [];
+            // Check if it's the new localized format by inspecting the first element
+            if (! empty($choices)) {
+                $firstElement = reset($choices);
+                if (is_array($firstElement)) {
+                    $choices = $choices[$locale] ?? $choices[$fallback] ?? [];
+                }
             }
-
             $options = [];
             if (is_array($choices)) {
                 foreach ($choices as $key => $val) {

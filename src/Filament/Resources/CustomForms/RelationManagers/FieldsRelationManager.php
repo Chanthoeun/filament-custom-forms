@@ -15,7 +15,6 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -165,17 +164,20 @@ class FieldsRelationManager extends RelationManager
                                             ->label(__('filament-custom-forms::fcf.admin.select_options'))
                                             ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && (! $get('options.source') || $get('options.source') === 'manual'))
                                             ->helperText('Key corresponds to value, Label is displayed text.')
-                                            ->afterStateHydrated(function (KeyValue $component, $state, $livewire, Set $set) {
+                                            ->formatStateUsing(function ($state, $livewire) {
                                                 if (empty($state) || ! is_array($state)) {
-                                                    return;
+                                                    return $state;
                                                 }
                                                 $locale = property_exists($livewire, 'activeLocale') ? $livewire->activeLocale : app()->getLocale();
 
                                                 $firstElement = reset($state);
                                                 if (is_array($firstElement)) {
                                                     $fallback = config('app.fallback_locale', 'en');
-                                                    $set($component->getStatePath(), $state[$locale] ?? $state[$fallback] ?? []);
+
+                                                    return $state[$locale] ?? $state[$fallback] ?? [];
                                                 }
+
+                                                return $state;
                                             })
                                             ->dehydrateStateUsing(function ($state, $record, $livewire) {
                                                 $locale = property_exists($livewire, 'activeLocale') ? $livewire->activeLocale : app()->getLocale();

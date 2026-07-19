@@ -213,37 +213,40 @@ class FieldsRelationManager extends RelationManager
                                                 return $existingChoices;
                                             }),
 
-                                        Select::make('options.model')
-                                            ->label('Model')
-                                            ->options(CustomFormPlugin::getAvailableModels())
-                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model')
-                                            ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model')
-                                            ->live(),
+                                        Fieldset::make('Model Configuration')
+                                            ->schema([
+                                                Select::make('options.model')
+                                                    ->label('Model')
+                                                    ->options(CustomFormPlugin::getAvailableModels())
+                                                    ->required()
+                                                    ->live()
+                                                    ->columnSpanFull(),
 
-                                        TextInput::make('options.model_label_attribute')
-                                            ->label('Label Attribute')
-                                            ->default('name')
-                                            ->datalist(fn ($get) => array_values(CustomFormPlugin::getModelAttributes($get('options.model'))))
-                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model')
-                                            ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model'),
+                                                TextInput::make('options.model_label_attribute')
+                                                    ->label('Label Attribute')
+                                                    ->default('name')
+                                                    ->datalist(fn ($get) => array_values(CustomFormPlugin::getModelAttributes($get('options.model'))))
+                                                    ->required(),
 
-                                        TextInput::make('options.model_value_attribute')
-                                            ->label('Value Attribute')
-                                            ->default('id')
-                                            ->datalist(fn ($get) => array_values(CustomFormPlugin::getModelAttributes($get('options.model'))))
-                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model')
-                                            ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model'),
+                                                TextInput::make('options.model_value_attribute')
+                                                    ->label('Value Attribute')
+                                                    ->default('id')
+                                                    ->datalist(fn ($get) => array_values(CustomFormPlugin::getModelAttributes($get('options.model'))))
+                                                    ->required(),
 
-                                        TextInput::make('options.parent_field')
-                                            ->label('Parent Field Name')
-                                            ->helperText('The internal name (slug) of the parent field this depends on. Only applicable for Select fields.')
-                                            ->visible(fn ($get) => $get('type') === 'select' && $get('options.source') === 'model'),
+                                                TextInput::make('options.parent_field')
+                                                    ->label('Parent Field Name')
+                                                    ->helperText('The internal name (slug) of the parent field this depends on. Only applicable for Select fields.')
+                                                    ->visible(fn ($get) => $get('type') === 'select'),
 
-                                        TextInput::make('options.parent_foreign_key')
-                                            ->label('Parent Foreign Key')
-                                            ->helperText('The column in this model that links it to the parent model.')
-                                            ->visible(fn ($get) => $get('type') === 'select' && $get('options.source') === 'model' && filled($get('options.parent_field')))
-                                            ->required(fn ($get) => $get('type') === 'select' && $get('options.source') === 'model' && filled($get('options.parent_field'))),
+                                                TextInput::make('options.parent_foreign_key')
+                                                    ->label('Parent Foreign Key')
+                                                    ->helperText('The column in this model that links it to the parent model.')
+                                                    ->visible(fn ($get) => $get('type') === 'select' && filled($get('options.parent_field')))
+                                                    ->required(fn ($get) => $get('type') === 'select' && filled($get('options.parent_field'))),
+                                            ])
+                                            ->columns(2)
+                                            ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'model'),
 
                                         Select::make('options.enum')
                                             ->label('Enum Class')

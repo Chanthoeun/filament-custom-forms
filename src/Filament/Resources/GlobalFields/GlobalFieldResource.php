@@ -14,13 +14,13 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -210,12 +210,14 @@ class GlobalFieldResource extends Resource
 
                                                 TextInput::make('options.model_label_attribute')
                                                     ->label('Label Attribute')
+                                                    ->helperText('The column to display in the dropdown (e.g., name, title).')
                                                     ->default('name')
                                                     ->datalist(fn ($get) => array_values(CustomFormPlugin::getModelAttributes($get('options.model'))))
                                                     ->required(),
 
                                                 TextInput::make('options.model_value_attribute')
                                                     ->label('Value Attribute')
+                                                    ->helperText('The column to save to the database (e.g., id, uuid).')
                                                     ->default('id')
                                                     ->datalist(fn ($get) => array_values(CustomFormPlugin::getModelAttributes($get('options.model'))))
                                                     ->required(),

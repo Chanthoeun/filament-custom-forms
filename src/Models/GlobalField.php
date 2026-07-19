@@ -2,6 +2,7 @@
 
 namespace Chanthoeun\FilamentCustomForms\Models;
 
+use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Chanthoeun\FilamentCustomForms\Models\Concerns\HasParsedOptions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,28 @@ class GlobalField extends Model
     use HasFactory;
     use HasParsedOptions;
     use HasTranslations;
+
+    public function toArray()
+    {
+        $attributes = parent::toArray();
+
+        $hasTranslations = false;
+        try {
+            $hasTranslations = CustomFormPlugin::get()->hasTranslations();
+        } catch (\Throwable $e) {
+            $hasTranslations = false;
+        }
+
+        if (! $hasTranslations) {
+            foreach ($this->getTranslatableAttributes() as $field) {
+                if (array_key_exists($field, $attributes)) {
+                    $attributes[$field] = $this->getAttribute($field);
+                }
+            }
+        }
+
+        return $attributes;
+    }
 
     protected $fillable = [
         'name',

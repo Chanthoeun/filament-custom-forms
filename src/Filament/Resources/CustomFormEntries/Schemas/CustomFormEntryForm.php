@@ -20,6 +20,7 @@ use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -100,33 +101,33 @@ class CustomFormEntryForm
                         $locale = property_exists($livewire, 'activeLocale') && $livewire->activeLocale ? $livewire->activeLocale : app()->getLocale();
 
                         $footerComponents = [];
-                        
+
                         if (! empty($customForm->linked_forms)) {
                             $linkedForms = CustomForm::whereIn('id', $customForm->linked_forms)->where('is_active', true)->get();
-                            
+
                             if ($linkedForms->isNotEmpty()) {
                                 if ($linkedForms->count() > 1) {
                                     $options = $linkedForms->pluck('name', 'id')->toArray();
-                                    
+
                                     if ($customForm->allow_multiple_linked_forms !== false) {
-                                        $selectField = \Filament\Forms\Components\CheckboxList::make('data.linked_forms_selection')
+                                        $selectField = CheckboxList::make('data.linked_forms_selection')
                                             ->label('Select Additional Forms')
                                             ->options($options)
                                             ->live();
                                     } else {
-                                        $selectField = \Filament\Forms\Components\Radio::make('data.linked_forms_selection')
+                                        $selectField = Radio::make('data.linked_forms_selection')
                                             ->label('Select Additional Forms')
                                             ->options($options)
                                             ->live();
                                     }
-                                    
+
                                     $footerComponents[] = $selectField;
                                 }
                             }
                         }
 
                         $isWizard = (bool) $customForm->is_wizard;
-                        
+
                         $components = self::getFields($rootFields, $locale, $formId, $parentFields, $isWizard, $footerComponents);
 
                         if ($isWizard) {
@@ -134,8 +135,8 @@ class CustomFormEntryForm
                             $looseFields = [];
                             foreach ($components as $component) {
                                 if ($component instanceof WizardStep) {
-                                    if (!empty($looseFields)) {
-                                        $steps[] = WizardStep::make('Step ' . (count($steps) + 1))->schema($looseFields);
+                                    if (! empty($looseFields)) {
+                                        $steps[] = WizardStep::make('Step '.(count($steps) + 1))->schema($looseFields);
                                         $looseFields = [];
                                     }
                                     $steps[] = $component;
@@ -143,8 +144,8 @@ class CustomFormEntryForm
                                     $looseFields[] = $component;
                                 }
                             }
-                            if (!empty($looseFields)) {
-                                $steps[] = WizardStep::make('Step ' . (count($steps) + 1))->schema($looseFields);
+                            if (! empty($looseFields)) {
+                                $steps[] = WizardStep::make('Step '.(count($steps) + 1))->schema($looseFields);
                             }
                             $components = $steps;
                         }
@@ -159,7 +160,7 @@ class CustomFormEntryForm
                                     }
                                     $linkedRootFields = $linkedFieldsByParent->get('', collect());
 
-                                    $group = \Filament\Schemas\Components\Group::make()
+                                    $group = Group::make()
                                         ->schema(self::getFields($linkedRootFields, $locale, $linkedForm->id, []))
                                         ->statePath("data.linked_form_{$linkedForm->slug}");
 
@@ -169,14 +170,14 @@ class CustomFormEntryForm
                                         }
 
                                         $selected = $get('data.linked_forms_selection');
-                                        
+
                                         if ($customForm->allow_multiple_linked_forms !== false) {
                                             if (is_array($selected)) {
                                                 return in_array($linkedForm->id, $selected);
                                             }
                                         }
-                                        
-                                        return (string)$selected === (string)$linkedForm->id;
+
+                                        return (string) $selected === (string) $linkedForm->id;
                                     };
 
                                     $components[] = $isWizard
@@ -224,7 +225,7 @@ class CustomFormEntryForm
             // Handle Layouts
             if ($type === 'section') {
                 $schema = self::getFields($fieldModel->children, $locale, $formId, $parentFields);
-                if ($isLast && empty($parentFields) && !empty($footerComponents)) {
+                if ($isLast && empty($parentFields) && ! empty($footerComponents)) {
                     $schema = array_merge($schema, $footerComponents);
                 }
 
@@ -256,7 +257,7 @@ class CustomFormEntryForm
                         $linkedRootFields = $linkedFieldsByParent->get('', collect());
 
                         // Using a transparent Group to isolate data keys using the nested form's name as a prefix
-                        $component = \Filament\Schemas\Components\Group::make()
+                        $component = Group::make()
                             ->schema(self::getFields($linkedRootFields, $locale, $linkedFormId, $parentFields))
                             ->statePath($fieldModel->name);
                     }
@@ -481,7 +482,7 @@ class CustomFormEntryForm
                         } else {
                             $component = Select::make("data.{$name}")->options($fieldModel->getParsedOptions($locale));
                         }
-                        
+
                         if (! empty($options['is_multiple'])) {
                             $component->multiple();
                         }
@@ -557,23 +558,23 @@ class CustomFormEntryForm
                 if (! empty($options['visible_when_field'])) {
                     $watchField = $options['visible_when_field'];
                     $watchValue = $options['visible_when_value'] ?? null;
-                    
+
                     if (method_exists($component, 'visible')) {
                         $component->visible(function (Get $get) use ($watchField, $watchValue) {
                             $currentValue = $get("data.{$watchField}");
-                            
+
                             // Handle array values (e.g. from multiple selects or checkbox lists)
                             if (is_array($currentValue)) {
                                 return in_array($watchValue, $currentValue);
                             }
-                            
+
                             return (string) $currentValue === (string) $watchValue;
                         });
                     }
                 }
-                
+
                 // If it's not a section (where we already appended), and it's the last root item, append footers
-                if ($isLast && empty($parentFields) && !empty($footerComponents) && $type !== 'section') {
+                if ($isLast && empty($parentFields) && ! empty($footerComponents) && $type !== 'section') {
                     $components[] = $component;
                     $components = array_merge($components, $footerComponents);
                 } else {
@@ -581,9 +582,9 @@ class CustomFormEntryForm
                 }
             }
         }
-        
+
         // If there were no fields at all at the root level, but we have footer components
-        if ($count === 0 && empty($parentFields) && !empty($footerComponents)) {
+        if ($count === 0 && empty($parentFields) && ! empty($footerComponents)) {
             $components = array_merge($components, $footerComponents);
         }
 

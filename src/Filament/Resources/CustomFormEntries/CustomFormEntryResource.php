@@ -127,14 +127,14 @@ class CustomFormEntryResource extends Resource
 
             // Pre-fetch all active forms at once to avoid N+1 in the loop
             $forms = CustomForm::where('is_active', true)->whereNotNull('name')->get();
-            
+
             // Get all linked form IDs to hide them from the navigation
             $linkedFormIds = $forms->pluck('linked_forms')
                 ->filter()
                 ->flatten()
                 ->unique()
                 ->toArray();
-                
+
             $activeFormId = null;
 
             if (request()->routeIs(static::getRouteBaseName().'.*')) {
@@ -149,7 +149,7 @@ class CustomFormEntryResource extends Resource
                 }
 
                 if (! $activeFormId && request()->routeIs(static::getRouteBaseName().'.index')) {
-                    $firstForm = $forms->filter(fn($f) => !in_array($f->id, $linkedFormIds))->first();
+                    $firstForm = $forms->filter(fn ($f) => ! in_array($f->id, $linkedFormIds))->first();
                     if ($firstForm) {
                         $activeFormId = $firstForm->id;
                     }

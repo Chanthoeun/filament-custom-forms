@@ -11,6 +11,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
@@ -48,7 +49,7 @@ class CustomFormForm
                             ->label(__('filament-custom-forms::fcf.form.is_active'))
                             ->default(true)
                             ->required(),
-                        \Filament\Schemas\Components\Fieldset::make('Linked Forms Configuration')
+                        Fieldset::make('Linked Forms Configuration')
                             ->columns(2)
                             ->schema([
                                 Select::make('linked_forms')

@@ -8,6 +8,7 @@ use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\GlobalFields\Pages\CreateGlobalField;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\GlobalFields\Pages\EditGlobalField;
 use Chanthoeun\FilamentCustomForms\Filament\Resources\GlobalFields\Pages\ListGlobalFields;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Chanthoeun\FilamentCustomForms\Models\CustomFormField;
 use Chanthoeun\FilamentCustomForms\Models\GlobalField;
 use Filament\Actions\BulkActionGroup;
@@ -244,10 +245,10 @@ class GlobalFieldResource extends Resource
                                             ->options(config('filament-custom-forms.field_options.enums', []))
                                             ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'enum')
                                             ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'enum'),
-                                            
+
                                         Select::make('options.linked_form_id')
                                             ->label('Select Custom Form')
-                                            ->options(fn () => \Chanthoeun\FilamentCustomForms\Models\CustomForm::where('is_active', true)->pluck('name', 'id'))
+                                            ->options(fn () => CustomForm::where('is_active', true)->pluck('name', 'id'))
                                             ->visible(fn ($get) => $get('type') === 'nested_form')
                                             ->required(fn ($get) => $get('type') === 'nested_form')
                                             ->helperText('Select the form whose fields should be embedded here.'),
@@ -283,11 +284,11 @@ class GlobalFieldResource extends Resource
                                         Toggle::make('options.is_hidden_label')
                                             ->label('Hide Label')
                                             ->default(false),
-                                            
+
                                         TextInput::make('options.visible_when_field')
                                             ->label('Visible When (Field Name)')
                                             ->helperText('Internal name (slug) of the field to watch for conditional visibility.'),
-                                            
+
                                         TextInput::make('options.visible_when_value')
                                             ->label('Visible When (Value)')
                                             ->helperText('Value the watched field must match to become visible.'),
@@ -300,7 +301,7 @@ class GlobalFieldResource extends Resource
                                             ->label('Display Inline')
                                             ->visible(fn ($get) => in_array($get('type'), ['radio', 'checkbox_list']))
                                             ->default(false),
-                                            
+
                                         Toggle::make('options.is_multiple')
                                             ->label('Allow Multiple Selections')
                                             ->visible(fn ($get) => $get('type') === 'select')

@@ -68,6 +68,51 @@ This plugin natively supports `spatie/laravel-translatable` for robust multi-lan
     * If you use "Manual Input" for Select, Radio, or Checkbox options and want them translated, simply **enter your Laravel Translation Key** (e.g., `messages.gender_male`) into the choice label field. The plugin automatically detects translation keys and applies Laravel's `__()` helper on the frontend. (If no translation file exists, it elegantly falls back to the exact text you typed).
     * Alternatively, use the **Model** or **Enum** Option Sources, which handle translations natively.
 
+## Dynamic Models & Enums
+
+By default, to prevent exposing sensitive internal application classes to the form builder, Custom Forms requires you to explicitly opt-in which Models and Enums are allowed to be used as options for Select, Radio, and Checkbox fields.
+
+To make a Model or Enum appear in the Custom Form Builder, simply implement the `IsFormOption` interface! 
+
+### Using Enums
+
+```php
+namespace App\Enums;
+
+use Filament\Support\Contracts\HasLabel;
+use Chanthoeun\FilamentCustomForms\Contracts\IsFormOption;
+
+enum Gender: string implements HasLabel, IsFormOption
+{
+    case Male = 'male';
+    case Female = 'female';
+    
+    public function getLabel(): ?string
+    {
+        return match ($this) {
+            self::Male => __('Male'),
+            self::Female => __('Female'),
+        };
+    }
+}
+```
+
+### Using Models
+
+```php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Chanthoeun\FilamentCustomForms\Contracts\IsFormOption;
+
+class Province extends Model implements IsFormOption
+{
+    protected $fillable = ['name'];
+}
+```
+
+*Note: If you are using Translations and want your Enum labels to automatically adapt to the form's active language, the `IsFormOption` trait automatically handles the Laravel Application Locale swapping for you behind the scenes during resolution!*
+
 ## Updates
 
 To update the package to the latest version, run:

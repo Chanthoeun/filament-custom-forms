@@ -8,10 +8,17 @@ trait HasParsedOptions
      * Get the dynamically parsed options for the field.
      * Evaluates whether options should be sourced manually, from a model, or from an enum.
      */
-    public function getParsedOptions(): array
+    public function getParsedOptions(?string $locale = null): array
     {
         $options = [];
         $source = data_get($this->options, 'source', 'manual');
+
+        $locale = $locale ?: app()->getLocale();
+        $originalLocale = app()->getLocale();
+
+        if ($originalLocale !== $locale) {
+            app()->setLocale($locale);
+        }
 
         if ($source === 'model' && $modelClass = data_get($this->options, 'model')) {
             $labelAttr = data_get($this->options, 'model_label_attribute', 'name');
@@ -45,6 +52,10 @@ trait HasParsedOptions
                     $options[$key] = __($val);
                 }
             }
+        }
+
+        if ($originalLocale !== $locale) {
+            app()->setLocale($originalLocale);
         }
 
         return $options;

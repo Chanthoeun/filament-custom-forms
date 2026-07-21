@@ -315,13 +315,13 @@ class CustomFormEntryForm
                             ->visibility(CustomFormPlugin::get()->getUploadVisibility());
                         break;
                     case 'radio':
-                        $component = Radio::make("data.{$name}")->options($fieldModel->getParsedOptions());
+                        $component = Radio::make("data.{$name}")->options($fieldModel->getParsedOptions($locale));
                         if (! empty($options['is_inline'])) {
                             $component->inline();
                         }
                         break;
                     case 'checkbox_list':
-                        $component = CheckboxList::make("data.{$name}")->options($fieldModel->getParsedOptions());
+                        $component = CheckboxList::make("data.{$name}")->options($fieldModel->getParsedOptions($locale));
                         if (! empty($options['is_inline'])) {
                             $component->inline();
                         }
@@ -353,7 +353,7 @@ class CustomFormEntryForm
                                         ->pluck($labelAttr, $valueAttr);
                                 });
                         } else {
-                            $component = Select::make("data.{$name}")->options($fieldModel->getParsedOptions());
+                            $component = Select::make("data.{$name}")->options($fieldModel->getParsedOptions($locale));
                         }
                         break;
                 }

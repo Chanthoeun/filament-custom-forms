@@ -103,7 +103,10 @@ class CustomFormEntryForm
                         $footerComponents = [];
 
                         if (! empty($customForm->linked_forms)) {
-                            $linkedForms = CustomForm::whereIn('id', $customForm->linked_forms)->where('is_active', true)->get();
+                            $linkedForms = CustomForm::with(['fields' => fn ($q) => $q->orderBy('sort')])
+                                ->whereIn('id', $customForm->linked_forms)
+                                ->where('is_active', true)
+                                ->get();
 
                             if ($linkedForms->isNotEmpty()) {
                                 if ($linkedForms->count() > 1) {
@@ -153,7 +156,7 @@ class CustomFormEntryForm
                         if (! empty($customForm->linked_forms)) {
                             if (isset($linkedForms) && $linkedForms->isNotEmpty()) {
                                 foreach ($linkedForms as $linkedForm) {
-                                    $linkedFields = $linkedForm->fields()->orderBy('sort')->get();
+                                    $linkedFields = $linkedForm->fields;
                                     $linkedFieldsByParent = $linkedFields->groupBy('parent_id');
                                     foreach ($linkedFields as $linkedField) {
                                         $linkedField->setRelation('children', $linkedFieldsByParent->get($linkedField->id, collect()));

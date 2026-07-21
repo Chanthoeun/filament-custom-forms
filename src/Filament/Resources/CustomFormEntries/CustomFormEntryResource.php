@@ -127,6 +127,14 @@ class CustomFormEntryResource extends Resource
 
             // Pre-fetch all active forms at once to avoid N+1 in the loop
             $forms = CustomForm::where('is_active', true)->whereNotNull('name')->get();
+            
+            // Get all linked form IDs to hide them from the navigation
+            $linkedFormIds = $forms->pluck('linked_forms')
+                ->filter()
+                ->flatten()
+                ->unique()
+                ->toArray();
+                
             $activeFormId = null;
 
             if (request()->routeIs(static::getRouteBaseName().'.*')) {
@@ -141,7 +149,7 @@ class CustomFormEntryResource extends Resource
                 }
 
                 if (! $activeFormId && request()->routeIs(static::getRouteBaseName().'.index')) {
-                    $firstForm = CustomForm::where('is_active', true)->whereNotNull('name')->first();
+                    $firstForm = $forms->filter(fn($f) => !in_array($f->id, $linkedFormIds))->first();
                     if ($firstForm) {
                         $activeFormId = $firstForm->id;
                     }
@@ -149,6 +157,11 @@ class CustomFormEntryResource extends Resource
             }
 
             foreach ($forms as $form) {
+                // Skip forms that are linked by other forms
+                if (in_array($form->id, $linkedFormIds)) {
+                    continue;
+                }
+
                 // Check if user has access to this form in the current panel
                 if (! $form->canAccessInPanel(filament()->getCurrentPanel()->getId(), auth()->user())) {
                     continue;

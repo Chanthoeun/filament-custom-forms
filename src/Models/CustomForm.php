@@ -48,6 +48,9 @@ class CustomForm extends Model
         'is_active',
         'allowed_roles',
         'panel_access',
+        'linked_forms',
+        'is_wizard',
+        'allow_multiple_linked_forms',
     ];
 
     protected $casts = [
@@ -55,6 +58,9 @@ class CustomForm extends Model
         'is_active' => 'boolean',
         'allowed_roles' => 'array',
         'panel_access' => 'array',
+        'linked_forms' => 'array',
+        'is_wizard' => 'boolean',
+        'allow_multiple_linked_forms' => 'boolean',
     ];
 
     public function entries(): HasMany

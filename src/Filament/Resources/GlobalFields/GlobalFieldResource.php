@@ -79,6 +79,9 @@ class GlobalFieldResource extends Resource
                                 'radio' => 'Radio',
                                 'select' => __('filament-custom-forms::fcf.builder.blocks.select'),
                                 'image' => __('filament-custom-forms::fcf.builder.blocks.image'),
+                                'repeater' => __('filament-custom-forms::fcf.builder.blocks.repeater'),
+                                'wizard' => __('filament-custom-forms::fcf.builder.blocks.wizard'),
+                                'nested_form' => 'Nested Form',
                                 'password' => __('filament-custom-forms::fcf.builder.blocks.password'),
                                 'confirm_password' => 'Confirm Password',
                                 'phone' => __('filament-custom-forms::fcf.builder.blocks.phone'),
@@ -89,14 +92,14 @@ class GlobalFieldResource extends Resource
                                 if (in_array($state, ['select', 'radio', 'checkbox_list']) && ! $get('options.source')) {
                                     $set('options.source', 'manual');
                                 }
-                                if (! in_array($state, ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'image', 'file_upload']) && ! $get('options.default_source')) {
+                                if (! in_array($state, ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'nested_form', 'image', 'file_upload']) && ! $get('options.default_source')) {
                                     $set('options.default_source', 'manual');
                                 }
                             }),
                         Toggle::make('required')
                             ->label(__('filament-custom-forms::fcf.field.is_required'))
                             ->default(false)
-                            ->hidden(fn ($get) => in_array($get('type'), ['section', 'grid', 'fieldset', 'wizard'])),
+                            ->hidden(fn ($get) => in_array($get('type'), ['section', 'grid', 'fieldset', 'wizard', 'nested_form'])),
 
                         Tabs::make('Configuration')
                             ->columnSpanFull()
@@ -112,12 +115,12 @@ class GlobalFieldResource extends Resource
                                             ])
                                             ->default('manual')
                                             ->live()
-                                            ->visible(fn ($get) => ! in_array($get('type'), ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'image', 'file_upload'])),
+                                            ->visible(fn ($get) => ! in_array($get('type'), ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'nested_form', 'image', 'file_upload'])),
 
                                         TextInput::make('options.default_value')
                                             ->label('Default Value')
                                             ->helperText('Enter a static default value for this field.')
-                                            ->visible(fn ($get) => $get('options.default_source') === 'manual' && ! in_array($get('type'), ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'image', 'file_upload'])),
+                                            ->visible(fn ($get) => $get('options.default_source') === 'manual' && ! in_array($get('type'), ['section', 'grid', 'fieldset', 'repeater', 'wizard', 'nested_form', 'image', 'file_upload'])),
 
                                         Select::make('options.auth_user_attribute')
                                             ->label('Auth User Attribute')
@@ -241,6 +244,13 @@ class GlobalFieldResource extends Resource
                                             ->options(config('filament-custom-forms.field_options.enums', []))
                                             ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'enum')
                                             ->required(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox_list']) && $get('options.source') === 'enum'),
+                                            
+                                        Select::make('options.linked_form_id')
+                                            ->label('Select Custom Form')
+                                            ->options(fn () => \Chanthoeun\FilamentCustomForms\Models\CustomForm::where('is_active', true)->pluck('name', 'id'))
+                                            ->visible(fn ($get) => $get('type') === 'nested_form')
+                                            ->required(fn ($get) => $get('type') === 'nested_form')
+                                            ->helperText('Select the form whose fields should be embedded here.'),
                                     ]),
 
                                 Tab::make('Layout & Display')
@@ -248,7 +258,7 @@ class GlobalFieldResource extends Resource
                                     ->schema([
                                         Select::make('options.columns')
                                             ->label(__('filament-custom-forms::fcf.admin.columns'))
-                                            ->visible(fn ($get) => in_array($get('type'), ['grid', 'section', 'fieldset', 'repeater', 'wizard', 'checkbox_list']))
+                                            ->visible(fn ($get) => in_array($get('type'), ['grid', 'section', 'fieldset', 'repeater', 'wizard', 'nested_form', 'checkbox_list']))
                                             ->options([
                                                 '1' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 1),
                                                 '2' => trans_choice('filament-custom-forms::fcf.builder.fields.columns_help', 2),
@@ -262,15 +272,25 @@ class GlobalFieldResource extends Resource
                                             ->helperText('Key: Breakpoint (default, sm, md, lg, xl, 2xl). Value: Columns (1-12, full).')
                                             ->keyLabel('Breakpoint')
                                             ->valueLabel('Columns')
-                                            ->formatStateUsing(fn ($state) => is_array($state) ? $state : (empty($state) ? [] : ['default' => $state])),
+                                            ->formatStateUsing(fn ($state) => is_array($state) ? $state : (empty($state) ? [] : ['default' => $state]))
+                                            ->visible(fn ($get) => ! in_array($get('type'), ['wizard', 'nested_form']) && ! ($get('options.column_span_full') ?? false)),
 
                                         Toggle::make('options.column_span_full')
                                             ->label(__('filament-custom-forms::fcf.admin.full_width'))
-                                            ->default(false),
+                                            ->default(false)
+                                            ->visible(fn ($get) => ! in_array($get('type'), ['wizard', 'nested_form'])),
 
                                         Toggle::make('options.is_hidden_label')
                                             ->label('Hide Label')
                                             ->default(false),
+                                            
+                                        TextInput::make('options.visible_when_field')
+                                            ->label('Visible When (Field Name)')
+                                            ->helperText('Internal name (slug) of the field to watch for conditional visibility.'),
+                                            
+                                        TextInput::make('options.visible_when_value')
+                                            ->label('Visible When (Value)')
+                                            ->helperText('Value the watched field must match to become visible.'),
 
                                         Toggle::make('options.is_hidden_on_view')
                                             ->label(__('filament-custom-forms::fcf.admin.hide_in_view'))
@@ -279,6 +299,11 @@ class GlobalFieldResource extends Resource
                                         Toggle::make('options.is_inline')
                                             ->label('Display Inline')
                                             ->visible(fn ($get) => in_array($get('type'), ['radio', 'checkbox_list']))
+                                            ->default(false),
+                                            
+                                        Toggle::make('options.is_multiple')
+                                            ->label('Allow Multiple Selections')
+                                            ->visible(fn ($get) => $get('type') === 'select')
                                             ->default(false),
 
                                         Toggle::make('options.is_table')

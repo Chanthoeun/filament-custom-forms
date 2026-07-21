@@ -4,6 +4,7 @@ namespace Chanthoeun\FilamentCustomForms\Filament\Resources\CustomForms\Schemas;
 
 use App\Models\User;
 use Chanthoeun\FilamentCustomForms\CustomFormPlugin;
+use Chanthoeun\FilamentCustomForms\Models\CustomForm;
 use Filament\Forms\Components\Builder as FormBuilder;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Repeater;
@@ -47,6 +48,29 @@ class CustomFormForm
                             ->label(__('filament-custom-forms::fcf.form.is_active'))
                             ->default(true)
                             ->required(),
+                        \Filament\Schemas\Components\Fieldset::make('Linked Forms Configuration')
+                            ->columns(2)
+                            ->schema([
+                                Select::make('linked_forms')
+                                    ->label('Linked Forms')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->options(fn (?CustomForm $record) => CustomForm::where('is_active', true)
+                                        ->when($record, fn ($query) => $query->where('id', '!=', $record->id))
+                                        ->pluck('name', 'id')
+                                    )
+                                    ->columnSpanFull()
+                                    ->helperText('Select other forms to automatically embed into this form.'),
+                                Toggle::make('allow_multiple_linked_forms')
+                                    ->label('Allow Multiple Linked Forms')
+                                    ->default(true)
+                                    ->helperText('If enabled, users can select multiple additional forms to fill out.'),
+                                Toggle::make('is_wizard')
+                                    ->label('Render as Wizard')
+                                    ->default(false)
+                                    ->helperText('Automatically converts top-level sections into Wizard steps.'),
+                            ])
+                            ->columnSpanFull(),
                         Repeater::make('panel_access')
                             ->label('Panel Access & Permissions')
                             ->hidden(fn () => ! CustomFormPlugin::get()->hasPanelAccess())

@@ -141,9 +141,11 @@ To release a new version:
 
 1.  **Global Fields**: Under **Form Builder > Global Fields**, you can create reusable fields (e.g., standard 'Gender' or 'Country' selects) that can be imported into multiple custom forms with a single click.
 2.  **Form Creation**: Navigate to the **Custom Forms** resource to create dynamic forms using the builder. You can define new fields or import existing Global Fields instantly.
-3.  **Data Collection**: Users can submit entries through the generated forms.
-4.  **Entry Management**: View and export entries in the **Custom Form Entries** resource.
-5.  **Data Exporting**: Export the data grid to JSON, heavily formatted Excel files, or instantly as beautifully formatted PDF tables.
+3.  **Linked Forms**: You can link other Custom Forms directly into your form by selecting them in the **Linked Forms** configuration. The plugin dynamically injects them into the current form flow. If they are linked, they are automatically hidden from the main sidebar navigation to keep your menu clean!
+4.  **Auto-Wizard**: By toggling **Render as Wizard**, the plugin automatically transforms your top-level layout sections (and any Linked Forms) into beautiful, seamless Wizard Steps without requiring you to manually wrap your form in a Wizard layout block.
+5.  **Data Collection**: Users can submit entries through the generated forms.
+6.  **Entry Management**: View and export entries in the **Custom Form Entries** resource.
+7.  **Data Exporting**: Export the data grid to JSON, heavily formatted Excel files, or instantly as beautifully formatted PDF tables.
 
 ## Changelog
 

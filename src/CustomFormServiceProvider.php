@@ -26,6 +26,8 @@ class CustomFormServiceProvider extends PackageServiceProvider
                 'add_panel_access_to_custom_forms_table',
                 'create_global_fields_table',
                 'add_global_field_id_to_custom_form_fields_table',
+                'add_linked_forms_to_custom_forms_table',
+                'add_wizard_options_to_custom_forms_table',
             ])
             ->hasCommand(MigrateToTranslatableCommand::class)
             ->hasInstallCommand(function (InstallCommand $command) {

@@ -51,6 +51,7 @@ class CustomForm extends Model
         'linked_forms',
         'is_wizard',
         'allow_multiple_linked_forms',
+        'sort_order',
     ];
 
     protected $casts = [

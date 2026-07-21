@@ -126,7 +126,7 @@ class CustomFormEntryResource extends Resource
             }
 
             // Pre-fetch all active forms at once to avoid N+1 in the loop
-            $forms = CustomForm::where('is_active', true)->whereNotNull('name')->get();
+            $forms = CustomForm::where('is_active', true)->whereNotNull('name')->orderBy('sort_order')->get();
 
             // Get all linked form IDs to hide them from the navigation
             $linkedFormIds = $forms->pluck('linked_forms')

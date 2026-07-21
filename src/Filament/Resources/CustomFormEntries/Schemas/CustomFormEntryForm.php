@@ -139,7 +139,9 @@ class CustomFormEntryForm
                             foreach ($components as $component) {
                                 if ($component instanceof WizardStep) {
                                     if (! empty($looseFields)) {
-                                        $steps[] = WizardStep::make('Step '.(count($steps) + 1))->schema($looseFields);
+                                        $steps[] = WizardStep::make('Step ' . (count($steps) + 1))
+                                            ->schema($looseFields)
+                                            ->columns(2);
                                         $looseFields = [];
                                     }
                                     $steps[] = $component;
@@ -148,7 +150,9 @@ class CustomFormEntryForm
                                 }
                             }
                             if (! empty($looseFields)) {
-                                $steps[] = WizardStep::make('Step '.(count($steps) + 1))->schema($looseFields);
+                                $steps[] = WizardStep::make('Step ' . (count($steps) + 1))
+                                    ->schema($looseFields)
+                                    ->columns(2);
                             }
                             $components = $steps;
                         }
@@ -234,7 +238,8 @@ class CustomFormEntryForm
 
                 if ($isRootWizard) {
                     $component = WizardStep::make($isHiddenLabel ? null : $label) // Use label as heading
-                        ->schema($schema);
+                        ->schema($schema)
+                        ->columns($options['columns'] ?? 2);
                 } else {
                     $component = Section::make($isHiddenLabel ? null : $label) // Use label as heading
                         ->schema($schema)

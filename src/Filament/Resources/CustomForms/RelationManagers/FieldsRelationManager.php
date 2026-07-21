@@ -19,6 +19,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -289,26 +290,30 @@ class FieldsRelationManager extends RelationManager
                                             ->formatStateUsing(fn ($state) => is_array($state) ? $state : (empty($state) ? [] : ['default' => $state]))
                                             ->visible(fn ($get) => ! in_array($get('type'), ['wizard', 'nested_form']) && ! ($get('options.column_span_full') ?? false)),
 
-                                        Toggle::make('options.column_span_full')
-                                            ->label(__('filament-custom-forms::fcf.admin.full_width'))
-                                            ->default(false)
-                                            ->visible(fn ($get) => ! in_array($get('type'), ['wizard', 'nested_form'])),
+                                        Fieldset::make('Conditional Visibility')->schema([
+                                            TextInput::make('options.visible_when_field')
+                                                ->label('Visible When (Field Name)')
+                                                ->helperText('Internal name (slug) of the field to watch for conditional visibility.'),
 
-                                        Toggle::make('options.is_hidden_label')
-                                            ->label('Hide Label')
-                                            ->default(false),
+                                            TextInput::make('options.visible_when_value')
+                                                ->label('Visible When (Value)')
+                                                ->helperText('Value the watched field must match to become visible.'),
+                                        ]),
 
-                                        TextInput::make('options.visible_when_field')
-                                            ->label('Visible When (Field Name)')
-                                            ->helperText('Internal name (slug) of the field to watch for conditional visibility.'),
+                                        Group::make()->schema([
+                                            Toggle::make('options.column_span_full')
+                                                ->label(__('filament-custom-forms::fcf.admin.full_width'))
+                                                ->default(false)
+                                                ->visible(fn ($get) => ! in_array($get('type'), ['wizard', 'nested_form'])),
 
-                                        TextInput::make('options.visible_when_value')
-                                            ->label('Visible When (Value)')
-                                            ->helperText('Value the watched field must match to become visible.'),
+                                            Toggle::make('options.is_hidden_label')
+                                                ->label('Hide Label')
+                                                ->default(false),
 
-                                        Toggle::make('options.is_hidden_on_view')
-                                            ->label(__('filament-custom-forms::fcf.admin.hide_in_view'))
-                                            ->default(false),
+                                            Toggle::make('options.is_hidden_on_view')
+                                                ->label(__('filament-custom-forms::fcf.admin.hide_in_view'))
+                                                ->default(false),
+                                        ])->columns(3),
 
                                         Toggle::make('options.is_inline')
                                             ->label('Display Inline')

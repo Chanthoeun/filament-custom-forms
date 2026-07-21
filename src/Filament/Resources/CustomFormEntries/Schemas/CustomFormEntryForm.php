@@ -139,7 +139,7 @@ class CustomFormEntryForm
                             foreach ($components as $component) {
                                 if ($component instanceof WizardStep) {
                                     if (! empty($looseFields)) {
-                                        $steps[] = WizardStep::make('Step ' . (count($steps) + 1))
+                                        $steps[] = WizardStep::make('Step '.(count($steps) + 1))
                                             ->schema($looseFields)
                                             ->columns(2);
                                         $looseFields = [];
@@ -150,7 +150,7 @@ class CustomFormEntryForm
                                 }
                             }
                             if (! empty($looseFields)) {
-                                $steps[] = WizardStep::make('Step ' . (count($steps) + 1))
+                                $steps[] = WizardStep::make('Step '.(count($steps) + 1))
                                     ->schema($looseFields)
                                     ->columns(2);
                             }
